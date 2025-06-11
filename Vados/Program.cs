@@ -8,6 +8,8 @@ namespace Vados
         [STAThread]
         static void Main()
         {
+
+            Comandos.CriarPastaPadrao();
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1());
         }

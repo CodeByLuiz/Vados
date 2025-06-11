@@ -30,53 +30,93 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             button1 = new Button();
-            topPanel = new Panel();
-            pictureBox2 = new PictureBox();
+            pnlTop = new Panel();
+            btnManual = new PictureBox();
+            btnConfigs = new PictureBox();
+            imgLogo = new PictureBox();
+            pnlBottom = new Panel();
             pictureBox1 = new PictureBox();
-            topPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            pnlTop.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
+            pnlBottom.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(474, 279);
+            button1.Anchor = AnchorStyles.None;
+            button1.Location = new Point(597, 52);
             button1.Name = "button1";
-            button1.Size = new Size(75, 23);
+            button1.Size = new Size(93, 23);
             button1.TabIndex = 0;
-            button1.Text = "button1";
+            button1.Text = "Trocar Página";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
-            // topPanel
+            // pnlTop
             // 
-            topPanel.AutoScroll = true;
-            topPanel.Controls.Add(pictureBox2);
-            topPanel.Controls.Add(pictureBox1);
-            topPanel.Dock = DockStyle.Top;
-            topPanel.Location = new Point(0, 0);
-            topPanel.Name = "topPanel";
-            topPanel.Size = new Size(1280, 100);
-            topPanel.TabIndex = 1;
+            pnlTop.AutoScroll = true;
+            pnlTop.Controls.Add(button1);
+            pnlTop.Controls.Add(btnManual);
+            pnlTop.Controls.Add(btnConfigs);
+            pnlTop.Controls.Add(imgLogo);
+            pnlTop.Dock = DockStyle.Top;
+            pnlTop.Location = new Point(0, 0);
+            pnlTop.Name = "pnlTop";
+            pnlTop.Size = new Size(1280, 131);
+            pnlTop.TabIndex = 1;
             // 
-            // pictureBox2
+            // btnManual
             // 
-            pictureBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            pictureBox2.Cursor = Cursors.Hand;
-            pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(1205, 25);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(50, 50);
-            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox2.TabIndex = 1;
-            pictureBox2.TabStop = false;
+            btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnManual.Cursor = Cursors.Hand;
+            btnManual.Image = (Image)resources.GetObject("btnManual.Image");
+            btnManual.Location = new Point(1130, 25);
+            btnManual.Name = "btnManual";
+            btnManual.Size = new Size(50, 50);
+            btnManual.SizeMode = PictureBoxSizeMode.Zoom;
+            btnManual.TabIndex = 2;
+            btnManual.TabStop = false;
+            // 
+            // btnConfigs
+            // 
+            btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnConfigs.Cursor = Cursors.Hand;
+            btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
+            btnConfigs.Location = new Point(1205, 25);
+            btnConfigs.Name = "btnConfigs";
+            btnConfigs.Size = new Size(50, 50);
+            btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
+            btnConfigs.TabIndex = 1;
+            btnConfigs.TabStop = false;
+            // 
+            // imgLogo
+            // 
+            imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
+            imgLogo.Location = new Point(34, 3);
+            imgLogo.Name = "imgLogo";
+            imgLogo.Size = new Size(228, 97);
+            imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
+            imgLogo.TabIndex = 0;
+            imgLogo.TabStop = false;
+            // 
+            // pnlBottom
+            // 
+            pnlBottom.Controls.Add(pictureBox1);
+            pnlBottom.Dock = DockStyle.Fill;
+            pnlBottom.Location = new Point(0, 0);
+            pnlBottom.Name = "pnlBottom";
+            pnlBottom.Size = new Size(1280, 720);
+            pnlBottom.TabIndex = 3;
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(34, 3);
+            pictureBox1.Image = Properties.Resources.micIcon;
+            pictureBox1.Location = new Point(585, 271);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(228, 97);
+            pictureBox1.Size = new Size(110, 110);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -85,12 +125,16 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(topPanel);
-            Controls.Add(button1);
+            Controls.Add(pnlTop);
+            Controls.Add(pnlBottom);
+            MinimumSize = new Size(360, 180);
             Name = "UserControlHome";
             Size = new Size(1280, 720);
-            topPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            pnlTop.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
+            ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
+            ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
+            pnlBottom.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
@@ -98,8 +142,11 @@
         #endregion
 
         private Button button1;
-        private Panel topPanel;
-        private PictureBox pictureBox2;
+        private Panel pnlTop;
+        private PictureBox btnConfigs;
+        private PictureBox imgLogo;
+        private PictureBox btnManual;
+        private Panel pnlBottom;
         private PictureBox pictureBox1;
     }
 }

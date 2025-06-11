@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Vados")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d20bb25a9e22d6beb6f16e79263e10f97d972ee1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Vados")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Vados")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

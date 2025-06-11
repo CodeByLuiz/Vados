@@ -36,3 +36,4 @@ C:\Users\ETEC\Music\Vados\Vados\obj\Debug\net8.0-windows\Vados.genruntimeconfig.
 C:\Users\ETEC\Music\Vados\Vados\obj\Debug\net8.0-windows\ref\Vados.dll
 C:\Users\ETEC\Music\Vados\Vados\obj\Debug\net8.0-windows\Vados.Properties.Resources.resources
 C:\Users\ETEC\source\repos\Vados\Vados\obj\Debug\net8.0-windows\Vados.Properties.Resources.resources
+C:\Users\ETEC\source\repos\Vados\Vados\obj\Debug\net8.0-windows\Vados.sourcelink.json

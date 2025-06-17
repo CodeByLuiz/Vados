@@ -24,5 +24,23 @@ namespace Vados
             //Ir para página de configurações
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
         }
+
+        private void txtComando_Click(object sender, EventArgs e)
+        {
+            //if (txtComando.ForeColor == Color.FromArgb(88, 99, 152))
+            //{
+            txtComando.Text = "";
+            txtComando.ForeColor = Color.Black;
+            //}
+        }
+
+        private void txtComando_LostFocus(object sender, EventArgs e)
+        {
+            if (txtComando.Text == "")
+            {
+                txtComando.Text = "Escreva um comando...";
+                txtComando.ForeColor = Color.FromArgb(88, 99, 152);
+            }
+        }
     }
 }

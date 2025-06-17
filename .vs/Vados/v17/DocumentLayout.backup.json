@@ -7,28 +7,36 @@
       "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\usercontrolhome.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\usercontrolsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\usercontrolsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\usercontrolhome.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\usercontrolhome.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\usercontrolhome.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\usercontrolhome.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\loadpageeventargs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\loadpageeventargs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\colors.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\colors.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\global.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\global.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|c:\\users\\etec\\source\\repos\\vados\\vados\\usercontrolsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{25349A45-D45C-4301-AB13-72A2627A9288}|Vados\\Vados.csproj|solutionrelative:vados\\usercontrolsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,23 +46,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Form1.cs [Projeto]",
-              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.cs",
-              "RelativeDocumentMoniker": "Vados\\Form1.cs",
-              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.cs [Projeto]",
-              "RelativeToolTip": "Vados\\Form1.cs [Projeto]",
+              "DocumentIndex": 4,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Vados\\Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.Designer.cs",
+              "RelativeToolTip": "Vados\\Form1.Designer.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAQwDMAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T14:15:11.393Z",
-              "EditorCaption": " [Projeto]"
+              "WhenOpened": "2025-06-11T20:48:57.669Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -65,25 +70,64 @@
               "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlHome.cs [Projeto]*",
               "RelativeToolTip": "Vados\\UserControlHome.cs [Projeto]*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-11T14:05:46.036Z",
+              "WhenOpened": "2025-06-11T20:41:53.924Z",
               "EditorCaption": " [Projeto]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "UserControlHome.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlHome.Designer.cs",
+              "RelativeDocumentMoniker": "Vados\\UserControlHome.Designer.cs",
+              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlHome.Designer.cs*",
+              "RelativeToolTip": "Vados\\UserControlHome.Designer.cs*",
+              "ViewState": "AgIAAEcAAAAAAAAAAAArwFIAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-11T20:40:17.364Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Colors.cs",
+              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Colors.cs",
+              "RelativeDocumentMoniker": "Vados\\Colors.cs",
+              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Colors.cs",
+              "RelativeToolTip": "Vados\\Colors.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-11T20:22:20.346Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Program.cs",
+              "RelativeDocumentMoniker": "Vados\\Program.cs",
+              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Program.cs",
+              "RelativeToolTip": "Vados\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-11T20:08:45.288Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "UserControlHome.cs",
               "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlHome.cs",
               "RelativeDocumentMoniker": "Vados\\UserControlHome.cs",
               "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlHome.cs*",
               "RelativeToolTip": "Vados\\UserControlHome.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAB0AAAAAAAAAAADwvysAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-29T11:50:36.15Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "Global.cs",
               "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Global.cs",
               "RelativeDocumentMoniker": "Vados\\Global.cs",
@@ -96,20 +140,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "LoadPageEventArgs.cs",
-              "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\LoadPageEventArgs.cs",
-              "RelativeDocumentMoniker": "Vados\\LoadPageEventArgs.cs",
-              "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\LoadPageEventArgs.cs",
-              "RelativeToolTip": "Vados\\LoadPageEventArgs.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-04T19:43:52.327Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "UserControlSettings.cs",
               "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\UserControlSettings.cs",
               "RelativeDocumentMoniker": "Vados\\UserControlSettings.cs",
@@ -122,13 +153,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.cs",
               "RelativeDocumentMoniker": "Vados\\Form1.cs",
               "ToolTip": "C:\\Users\\ETEC\\source\\repos\\Vados\\Vados\\Form1.cs",
               "RelativeToolTip": "Vados\\Form1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-28T20:49:00.466Z",
               "EditorCaption": ""

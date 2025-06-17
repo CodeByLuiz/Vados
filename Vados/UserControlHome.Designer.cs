@@ -35,6 +35,7 @@
             btnConfigs = new PictureBox();
             imgLogo = new PictureBox();
             pnlBottom = new Panel();
+            txtComando = new TextBox();
             pictureBox1 = new PictureBox();
             pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
@@ -47,7 +48,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.None;
-            button1.Location = new Point(597, 52);
+            button1.Location = new Point(609, 34);
             button1.Name = "button1";
             button1.Size = new Size(93, 23);
             button1.TabIndex = 0;
@@ -65,7 +66,7 @@
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(1280, 131);
+            pnlTop.Size = new Size(1280, 100);
             pnlTop.TabIndex = 1;
             // 
             // btnManual
@@ -95,15 +96,16 @@
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(34, 3);
+            imgLogo.Location = new Point(34, 12);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(228, 97);
+            imgLogo.Size = new Size(191, 73);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 0;
             imgLogo.TabStop = false;
             // 
             // pnlBottom
             // 
+            pnlBottom.Controls.Add(txtComando);
             pnlBottom.Controls.Add(pictureBox1);
             pnlBottom.Dock = DockStyle.Fill;
             pnlBottom.Location = new Point(0, 0);
@@ -111,12 +113,28 @@
             pnlBottom.Size = new Size(1280, 720);
             pnlBottom.TabIndex = 3;
             // 
+            // txtComando
+            // 
+            txtComando.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtComando.Cursor = Cursors.IBeam;
+            txtComando.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtComando.ForeColor = Color.FromArgb(82, 99, 152);
+            txtComando.Location = new Point(208, 525);
+            txtComando.MinimumSize = new Size(300, 0);
+            txtComando.Name = "txtComando";
+            txtComando.Size = new Size(864, 57);
+            txtComando.TabIndex = 1;
+            txtComando.Text = "Escreva um comando...";
+            txtComando.Click += txtComando_Click;
+            txtComando.LostFocus += txtComando_LostFocus;
+            // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.None;
             pictureBox1.Image = Properties.Resources.micIcon;
-            pictureBox1.Location = new Point(585, 271);
+            pictureBox1.Location = new Point(532, 149);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(110, 110);
+            pictureBox1.Size = new Size(247, 214);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -135,6 +153,7 @@
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             pnlBottom.ResumeLayout(false);
+            pnlBottom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
@@ -148,5 +167,6 @@
         private PictureBox btnManual;
         private Panel pnlBottom;
         private PictureBox pictureBox1;
+        private TextBox txtComando;
     }
 }

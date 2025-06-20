@@ -20,7 +20,7 @@ namespace Vados
             InitializeComponent();
         }
 
-        
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -61,6 +61,21 @@ namespace Vados
             {
                 Comandos.ExcluirArquivo(nome, extension);
             }
+        }
+
+        private void btnRenomear_Click(object sender, EventArgs e)
+        {
+            string extension = cbExtensoes.Text;
+            string nome = txtNome.Text;
+            string novoNome = txtNovoNome.Text;
+            if (extension == "pasta")
+            {
+                Comandos.RenomearPasta(nome, novoNome);
+            }
+            else { 
+            Comandos.RenomearArquivo(nome, novoNome, extension);
+                    }
+
         }
     }
 }

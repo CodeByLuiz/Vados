@@ -113,6 +113,34 @@ namespace Vados
 
         }
 
+        public static void RenomearArquivo(string nome, string novoNome, string extensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        {
+            string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
+            string novoPath = Path.Combine(Global.DefaultFolder + novoNome + "." + extensao);
+            if (File.Exists(path))
+            {
+                File.Move(path, novoPath);
+                Console.WriteLine("Arquivo" + nome + "Renomeado para " + novoNome);
+            }
+            else
+            {
+                MessageBox.Show("esse arquivo não existe");
+            }
+        }
 
+        public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
+        {
+            string path = Path.Combine(Global.DefaultFolder + nome);
+            string novoPath = Path.Combine(Global.DefaultFolder + novoNome);
+            if (Directory.Exists(path))
+            {
+                Directory.Move(path, novoPath);
+                Console.WriteLine("Pasta" + nome + "Renomeada para " + novoNome);
+            }
+            else
+            {
+                MessageBox.Show("essa pasta não existe");
+            }
+        }
     }
 }

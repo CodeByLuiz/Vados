@@ -33,13 +33,19 @@
             btnExluir = new Button();
             cbExtensoes = new ComboBox();
             txtNome = new TextBox();
+            txtNovoNome = new TextBox();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            btnRenomear = new Button();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(441, 15);
+            button1.Location = new Point(504, 20);
+            button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
-            button1.Size = new Size(186, 23);
+            button1.Size = new Size(213, 31);
             button1.TabIndex = 0;
             button1.Text = "pagina inicial";
             button1.UseVisualStyleBackColor = true;
@@ -47,9 +53,10 @@
             // 
             // btnCriar
             // 
-            btnCriar.Location = new Point(53, 140);
+            btnCriar.Location = new Point(61, 265);
+            btnCriar.Margin = new Padding(3, 4, 3, 4);
             btnCriar.Name = "btnCriar";
-            btnCriar.Size = new Size(75, 23);
+            btnCriar.Size = new Size(86, 31);
             btnCriar.TabIndex = 1;
             btnCriar.Text = "Criar";
             btnCriar.UseVisualStyleBackColor = true;
@@ -57,9 +64,10 @@
             // 
             // btnExluir
             // 
-            btnExluir.Location = new Point(278, 140);
+            btnExluir.Location = new Point(317, 265);
+            btnExluir.Margin = new Padding(3, 4, 3, 4);
             btnExluir.Name = "btnExluir";
-            btnExluir.Size = new Size(75, 23);
+            btnExluir.Size = new Size(86, 31);
             btnExluir.TabIndex = 2;
             btnExluir.Text = "Excluir";
             btnExluir.UseVisualStyleBackColor = true;
@@ -69,29 +77,83 @@
             // 
             cbExtensoes.FormattingEnabled = true;
             cbExtensoes.Items.AddRange(new object[] { "txt", "pasta", "img", "png", "docx" });
-            cbExtensoes.Location = new Point(232, 95);
+            cbExtensoes.Location = new Point(437, 139);
+            cbExtensoes.Margin = new Padding(3, 4, 3, 4);
             cbExtensoes.Name = "cbExtensoes";
-            cbExtensoes.Size = new Size(121, 23);
+            cbExtensoes.Size = new Size(138, 28);
             cbExtensoes.TabIndex = 3;
             // 
             // txtNome
             // 
-            txtNome.Location = new Point(53, 95);
+            txtNome.Location = new Point(113, 139);
+            txtNome.Margin = new Padding(3, 4, 3, 4);
             txtNome.Name = "txtNome";
-            txtNome.Size = new Size(144, 23);
+            txtNome.Size = new Size(164, 27);
             txtNome.TabIndex = 4;
+            // 
+            // txtNovoNome
+            // 
+            txtNovoNome.Location = new Point(113, 187);
+            txtNovoNome.Margin = new Padding(3, 4, 3, 4);
+            txtNovoNome.Name = "txtNovoNome";
+            txtNovoNome.Size = new Size(164, 27);
+            txtNovoNome.TabIndex = 5;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(14, 190);
+            label1.Name = "label1";
+            label1.Size = new Size(93, 20);
+            label1.TabIndex = 6;
+            label1.Text = "Novo Nome:";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(14, 142);
+            label2.Name = "label2";
+            label2.Size = new Size(53, 20);
+            label2.TabIndex = 7;
+            label2.Text = "Nome:";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(360, 146);
+            label3.Name = "label3";
+            label3.Size = new Size(71, 20);
+            label3.TabIndex = 8;
+            label3.Text = "extensão:";
+            // 
+            // btnRenomear
+            // 
+            btnRenomear.Location = new Point(191, 265);
+            btnRenomear.Margin = new Padding(3, 4, 3, 4);
+            btnRenomear.Name = "btnRenomear";
+            btnRenomear.Size = new Size(86, 31);
+            btnRenomear.TabIndex = 9;
+            btnRenomear.Text = "Renomear";
+            btnRenomear.UseVisualStyleBackColor = true;
+            btnRenomear.Click += btnRenomear_Click;
             // 
             // UserControlSettings
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btnRenomear);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(txtNovoNome);
             Controls.Add(txtNome);
             Controls.Add(cbExtensoes);
             Controls.Add(btnExluir);
             Controls.Add(btnCriar);
             Controls.Add(button1);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "UserControlSettings";
-            Size = new Size(640, 360);
+            Size = new Size(731, 480);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -103,5 +165,10 @@
         private Button btnExluir;
         private ComboBox cbExtensoes;
         private TextBox txtNome;
+        private TextBox txtNovoNome;
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Button btnRenomear;
     }
 }

@@ -27,19 +27,22 @@ namespace Vados
 
         private void txtComando_Click(object sender, EventArgs e)
         {
-            //if (txtComando.ForeColor == Color.FromArgb(88, 99, 152))
-            //{
-            txtComando.Text = "";
-            txtComando.ForeColor = Color.Black;
-            //}
+            //Apagar texto temporário
+            if (txtComando.ForeColor.Equals(Colors.blueTernary))
+            {
+                txtComando.Text = "";
+                txtComando.ForeColor = Color.Black;
+            }
         }
 
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
+            //Retornar texto temporário
             if (txtComando.Text == "")
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
+                txtComando.ForeColor = Colors.blueTernary;
             }
         }
     }

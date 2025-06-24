@@ -37,6 +37,7 @@
             pnlBottom = new Panel();
             txtComando = new TextBox();
             pictureBox1 = new PictureBox();
+            textBox1 = new TextBox();
             pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
@@ -105,6 +106,7 @@
             // 
             // pnlBottom
             // 
+            pnlBottom.Controls.Add(textBox1);
             pnlBottom.Controls.Add(txtComando);
             pnlBottom.Controls.Add(pictureBox1);
             pnlBottom.Dock = DockStyle.Fill;
@@ -118,7 +120,7 @@
             txtComando.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             txtComando.Cursor = Cursors.IBeam;
             txtComando.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtComando.ForeColor = Color.FromArgb(82, 99, 152);
+            txtComando.ForeColor = Color.FromArgb(88, 99, 152);
             txtComando.Location = new Point(208, 525);
             txtComando.MinimumSize = new Size(300, 0);
             txtComando.Name = "txtComando";
@@ -138,6 +140,14 @@
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = AnchorStyles.None;
+            textBox1.Location = new Point(609, 606);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(93, 23);
+            textBox1.TabIndex = 2;
             // 
             // UserControlHome
             // 
@@ -168,5 +178,6 @@
         private Panel pnlBottom;
         private PictureBox pictureBox1;
         private TextBox txtComando;
+        private TextBox textBox1;
     }
 }

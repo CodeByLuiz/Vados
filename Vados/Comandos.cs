@@ -40,10 +40,93 @@ namespace Vados
 
 
         }
-
-        public static void CriarPastaPadrao()
+        public string SearchFolders(string aprocurar)
         {
+            string root = @"" + driveverifica(null);
+            var caminhos = new List<string>();
+            var ignorar = new List<string>
+    {
+        "$RECYCLE.BIN",
+        "System Volume Information",
+        "Recovery",
+        "Config.Msi",
+        "Windows",
+        "Program Files (x86)",
+        "Program Files"
+    };
+            var prioridades = new List<string>
+    {
+        Path.Combine(root, @"Users\Vados"),
+        Path.Combine(root, @"Users\Popel"),
+        Path.Combine(root, @"Users\Public")
+    };
 
+            var fila = new Queue<string>();
+            foreach (var pasta in prioridades)
+            {
+                if (Directory.Exists(pasta))
+                {
+                    fila.Enqueue(pasta);
+                    //caminhos.Add(pasta);
+                }
+            }
+
+            fila.Enqueue(root);
+
+            while (fila.Count > 0)
+            {
+                var atual = fila.Dequeue();
+                try
+                {
+                    foreach (var caminho in Directory.GetDirectories(atual))
+                    {
+                        string nomePasta = Path.GetFileName(caminho);
+                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                            continue;
+
+                        caminhos.Add(caminho);
+                        fila.Enqueue(caminho);
+
+                        if (caminho.Contains(aprocurar))
+                        {
+                            MessageBox.Show($"Foram encontrados {caminhos.Count} caminhos de pastas.");
+                            return caminho;
+                        }
+
+                    }
+                }
+
+                catch (Exception)
+                {
+
+                }
+            }
+            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+            return null;
+        }
+
+
+
+
+        public static string driveverifica(string[] args)
+        {
+            DriveInfo[] drives = DriveInfo.GetDrives();
+
+            foreach (DriveInfo drive in drives)
+            {
+                if (drive.IsReady)
+                {
+
+                    return drive.Name;
+                }
+            }
+            MessageBox.Show("Nenhum drive disponível encontrado.");
+            return null;
+        }
+
+        public static void CriarPastaPadrao(string caminho)
+        {
+            
             string path = @"C:\Vados";
             if (!Directory.Exists(path))
             {
@@ -51,10 +134,16 @@ namespace Vados
             }
         }
 
-        public static void CriarPasta(string nome) // cria pasta
+        public void CriarPasta(string nome, string path) // cria pasta
         {
+            
 
-            string path = Path.Combine(Global.DefaultFolder + nome);
+            if (path=="")
+            {
+                path = SearchFolders(path);
+                MessageBox.Show(path);
+            }
+             path = Path.Combine(Global.DefaultFolder + nome);
 
             if (!File.Exists(path))
             {
@@ -142,5 +231,7 @@ namespace Vados
                 MessageBox.Show("essa pasta não existe");
             }
         }
+
+
     }
 }

@@ -25,6 +25,26 @@ namespace Vados
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
         }
 
+        private void DrawEllipse(int x, int y, int largura, int altura)
+        {
+            Pen myPen = new Pen(Color.Red);
+            Graphics formGraphics;
+            formGraphics = this.CreateGraphics();
+            formGraphics.DrawEllipse(myPen, new Rectangle(x, y, largura, altura));
+            myPen.Dispose();
+            formGraphics.Dispose();
+        }
+
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            //Pintura padrão da página
+            base.OnPaint(e);
+
+            //Círculo em volta do microfone
+            DrawEllipse(100, 100, 100, 100);
+        }
+
         private void txtComando_Click(object sender, EventArgs e)
         {
             //Apagar texto temporário

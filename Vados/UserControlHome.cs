@@ -17,32 +17,13 @@ namespace Vados
         public UserControlHome()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             //Ir para página de configurações
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        }
-
-        private void DrawEllipse(int x, int y, int largura, int altura)
-        {
-            Pen myPen = new Pen(Color.Red);
-            Graphics formGraphics;
-            formGraphics = this.CreateGraphics();
-            formGraphics.DrawEllipse(myPen, new Rectangle(x, y, largura, altura));
-            myPen.Dispose();
-            formGraphics.Dispose();
-        }
-
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            //Pintura padrão da página
-            base.OnPaint(e);
-
-            //Círculo em volta do microfone
-            DrawEllipse(100, 100, 100, 100);
         }
 
         private void txtComando_Click(object sender, EventArgs e)
@@ -64,6 +45,25 @@ namespace Vados
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
             }
+        }
+
+        private void pnlBottom_Paint(object sender, PaintEventArgs e)
+        {
+            //Círculo atrás do microfone
+            int width = 216;
+            int height = 216;
+            int xx = this.Width / 2 - width / 2;
+            int yy = 150;
+            int offset = 50;
+
+            Brush brush = new SolidBrush(Color.White);
+            Rectangle rect = new Rectangle(xx - offset / 2, yy - offset / 2, width + offset, height + offset);
+            e.Graphics.FillEllipse(brush, rect);
+
+
+            //Microfone
+            Image micIcon = Image.FromFile("Imagens/Ícones/micIcon.png");
+            e.Graphics.DrawImage(micIcon, new Rectangle(xx, yy, width, height));
         }
     }
 }

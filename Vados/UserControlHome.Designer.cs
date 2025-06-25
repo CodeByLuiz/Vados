@@ -35,15 +35,13 @@
             btnConfigs = new PictureBox();
             imgLogo = new PictureBox();
             pnlBottom = new Panel();
-            txtComando = new TextBox();
-            pictureBox1 = new PictureBox();
             textBox1 = new TextBox();
+            txtComando = new TextBox();
             pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             pnlBottom.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // button1
@@ -108,12 +106,20 @@
             // 
             pnlBottom.Controls.Add(textBox1);
             pnlBottom.Controls.Add(txtComando);
-            pnlBottom.Controls.Add(pictureBox1);
             pnlBottom.Dock = DockStyle.Fill;
             pnlBottom.Location = new Point(0, 0);
             pnlBottom.Name = "pnlBottom";
             pnlBottom.Size = new Size(1280, 720);
             pnlBottom.TabIndex = 3;
+            pnlBottom.Paint += pnlBottom_Paint;
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = AnchorStyles.None;
+            textBox1.Location = new Point(609, 606);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(93, 23);
+            textBox1.TabIndex = 2;
             // 
             // txtComando
             // 
@@ -130,25 +136,6 @@
             txtComando.Click += txtComando_Click;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
-            // pictureBox1
-            // 
-            pictureBox1.Anchor = AnchorStyles.None;
-            pictureBox1.Image = Properties.Resources.micIcon;
-            pictureBox1.Location = new Point(532, 149);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(247, 214);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            // 
-            // textBox1
-            // 
-            textBox1.Anchor = AnchorStyles.None;
-            textBox1.Location = new Point(609, 606);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(93, 23);
-            textBox1.TabIndex = 2;
-            // 
             // UserControlHome
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -164,7 +151,6 @@
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -176,7 +162,6 @@
         private PictureBox imgLogo;
         private PictureBox btnManual;
         private Panel pnlBottom;
-        private PictureBox pictureBox1;
         private TextBox txtComando;
         private TextBox textBox1;
     }

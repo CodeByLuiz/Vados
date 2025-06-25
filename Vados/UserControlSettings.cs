@@ -73,10 +73,21 @@ namespace Vados
             {
                 Comandos.RenomearPasta(nome, novoNome);
             }
-            else { 
-            Comandos.RenomearArquivo(nome, novoNome, extension);
-                    }
+            else
+            {
+                Comandos.RenomearArquivo(nome, novoNome, extension);
+            }
 
+        }
+
+        private void UserControlSettings_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAdm_Click(object sender, EventArgs e)
+        {
+            Comandos.DarAdm();
         }
     }
 }

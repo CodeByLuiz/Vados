@@ -235,6 +235,35 @@ namespace Vados
             }
         }
 
+        public static void DarAdm()// da permissões de administrador
+        {
+            try
+            {
+                ProcessStartInfo proc = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    FileName = Application.ExecutablePath,
+                    Verb = "runas"
+                };
+
+                Process.Start(proc);
+                Application.Exit();
+            }
+            catch
+            {
+                MessageBox.Show("O programa precisa de permissões de administrador para funcionar corretamente.", "Permissão negada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+        }
+
+
+
 
     }
+
+    
+
+
+
 }

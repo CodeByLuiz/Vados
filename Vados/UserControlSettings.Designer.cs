@@ -41,6 +41,9 @@
             label4 = new Label();
             txtDestinatario = new TextBox();
             btnAdm = new Button();
+            cbIdioma = new ComboBox();
+            btnMudarIdioma = new Button();
+            label5 = new Label();
             SuspendLayout();
             // 
             // button1
@@ -160,7 +163,7 @@
             // btnAdm
             // 
             btnAdm.BackColor = Color.IndianRed;
-            btnAdm.Location = new Point(297, 375);
+            btnAdm.Location = new Point(113, 360);
             btnAdm.Name = "btnAdm";
             btnAdm.Size = new Size(203, 35);
             btnAdm.TabIndex = 12;
@@ -168,10 +171,43 @@
             btnAdm.UseVisualStyleBackColor = false;
             btnAdm.Click += btnAdm_Click;
             // 
+            // cbIdioma
+            // 
+            cbIdioma.FormattingEnabled = true;
+            cbIdioma.Items.AddRange(new object[] { "Português do Brasil", "Inglês" });
+            cbIdioma.Location = new Point(631, 268);
+            cbIdioma.Margin = new Padding(3, 4, 3, 4);
+            cbIdioma.Name = "cbIdioma";
+            cbIdioma.Size = new Size(138, 28);
+            cbIdioma.TabIndex = 13;
+            // 
+            // btnMudarIdioma
+            // 
+            btnMudarIdioma.Location = new Point(614, 316);
+            btnMudarIdioma.Margin = new Padding(3, 4, 3, 4);
+            btnMudarIdioma.Name = "btnMudarIdioma";
+            btnMudarIdioma.Size = new Size(155, 31);
+            btnMudarIdioma.TabIndex = 14;
+            btnMudarIdioma.Text = "mudar idioma";
+            btnMudarIdioma.UseVisualStyleBackColor = true;
+            btnMudarIdioma.Click += btnMudarIdioma_Click;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(550, 276);
+            label5.Name = "label5";
+            label5.Size = new Size(59, 20);
+            label5.TabIndex = 15;
+            label5.Text = "Idioma:";
+            // 
             // UserControlSettings
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(label5);
+            Controls.Add(btnMudarIdioma);
+            Controls.Add(cbIdioma);
             Controls.Add(btnAdm);
             Controls.Add(txtDestinatario);
             Controls.Add(label4);
@@ -187,7 +223,7 @@
             Controls.Add(button1);
             Margin = new Padding(3, 4, 3, 4);
             Name = "UserControlSettings";
-            Size = new Size(731, 480);
+            Size = new Size(1254, 480);
             Load += UserControlSettings_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -208,5 +244,8 @@
         private Label label4;
         private TextBox txtDestinatario;
         private Button btnAdm;
+        private ComboBox cbIdioma;
+        private Button btnMudarIdioma;
+        private Label label5;
     }
 }

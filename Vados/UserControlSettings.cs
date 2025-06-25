@@ -89,5 +89,28 @@ namespace Vados
         {
             Comandos.DarAdm();
         }
+
+        private void btnMudarIdioma_Click(object sender, EventArgs e)
+        {
+            string idioma = cbIdioma.Text;
+            if (idioma == "Português do Brasil")
+            {
+                idioma = "pt-BR";
+                Comandos.MudarIdioma(idioma);
+                Comandos.ReiniciarPC();
+            }
+            else if (idioma == "Inglês")
+            {
+                idioma = "en-US";
+                Comandos.MudarIdioma(idioma);
+                Comandos.ReiniciarPC();
+            }
+            else
+            {
+                MessageBox.Show("Selecione um idioma válido.");
+            }
+
+
+        }
     }
 }

@@ -257,9 +257,34 @@ namespace Vados
 
         }
 
+        public static void MudarIdioma(string idioma) /// essa porra vai mudar o idoma da infarce do windows, mas só funciona no windows 10 e 11, e tem que reiniciar o pc para funcionar(tenho que aprender poweshell)
+        {
+            //o idioma tem que tar baixado caso o contrario ele só renicia a maquina e nao muda nada, dar pra fazer baixar o bagulho por comando powershell mas mesmo assim nao consigo testar pq meu windows tem licença só pra uma lingua 
+
+            string comando = $"Set-WinUILanguageOverride -Language '{idioma}'";
+
+            var processo = new ProcessStartInfo
+            {
+                FileName = "powershell.exe",
+                Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{comando}\"",
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+
+            Process.Start(processo);
+
+            MessageBox.Show("O idioma da interface foi alterado. O computador será reiniciado em 5 segundos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            //nao consigo testar isso aqui,meu pc só tem o idioma pt-BR e nao consigo mudar, mas deve funcionar, testem no de vcs se der 
 
 
+        }
 
+        public static void ReiniciarPC() // reinicia o pc
+        {
+            Process.Start("shutdown", "/r /t 5");
+            Application.Exit();
+        }
     }
 
     

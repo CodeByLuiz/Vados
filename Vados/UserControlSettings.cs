@@ -18,6 +18,8 @@ namespace Vados
         public UserControlSettings()
         {
             InitializeComponent();
+            
+            
         }
 
 
@@ -30,7 +32,7 @@ namespace Vados
 
         private void btnCriar_Click(object sender, EventArgs e)
         {
-
+            
             string extension = cbExtensoes.Text;
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
@@ -42,7 +44,7 @@ namespace Vados
             }
             else
             {
-                Comandos.CriarArquivo(nome, extension);
+                Comandos.CriarArquivo(nome, extension, destino);
             }
 
 

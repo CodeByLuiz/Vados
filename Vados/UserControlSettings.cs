@@ -33,11 +33,12 @@ namespace Vados
 
             string extension = cbExtensoes.Text;
             string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
 
 
             if (extension == "pasta")
             {
-                Comandos.CriarPasta(nome);
+                Comandos.CriarPasta(nome, destino);
             }
             else
             {

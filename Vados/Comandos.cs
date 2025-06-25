@@ -40,7 +40,7 @@ namespace Vados
 
 
         }
-        public string SearchFolders(string aprocurar)
+        public static string SearchFolders(string aprocurar)
         {
             string root = @"" + driveverifica(null);
             var caminhos = new List<string>();
@@ -124,7 +124,7 @@ namespace Vados
             return null;
         }
 
-        public static void CriarPastaPadrao(string caminho)
+        public static void CriarPastaPadrao()
         {
             
             string path = @"C:\Vados";
@@ -134,16 +134,19 @@ namespace Vados
             }
         }
 
-        public void CriarPasta(string nome, string path) // cria pasta
+        public static void CriarPasta(string nome, string path) // cria pasta
         {
             
-
+            MessageBox.Show(path);
             if (path=="")
             {
-                path = SearchFolders(path);
+                path = SearchFolders(path)+@"\"+nome;
                 MessageBox.Show(path);
             }
-             path = Path.Combine(Global.DefaultFolder + nome);
+            else {
+                path = Path.Combine(Global.DefaultFolder + nome);
+            }
+                
 
             if (!File.Exists(path))
             {

@@ -38,14 +38,15 @@
             label2 = new Label();
             label3 = new Label();
             btnRenomear = new Button();
+            label4 = new Label();
+            txtDestinatario = new TextBox();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(504, 20);
-            button1.Margin = new Padding(3, 4, 3, 4);
+            button1.Location = new Point(441, 15);
             button1.Name = "button1";
-            button1.Size = new Size(213, 31);
+            button1.Size = new Size(186, 23);
             button1.TabIndex = 0;
             button1.Text = "pagina inicial";
             button1.UseVisualStyleBackColor = true;
@@ -53,10 +54,9 @@
             // 
             // btnCriar
             // 
-            btnCriar.Location = new Point(61, 265);
-            btnCriar.Margin = new Padding(3, 4, 3, 4);
+            btnCriar.Location = new Point(53, 199);
             btnCriar.Name = "btnCriar";
-            btnCriar.Size = new Size(86, 31);
+            btnCriar.Size = new Size(75, 23);
             btnCriar.TabIndex = 1;
             btnCriar.Text = "Criar";
             btnCriar.UseVisualStyleBackColor = true;
@@ -64,10 +64,9 @@
             // 
             // btnExluir
             // 
-            btnExluir.Location = new Point(317, 265);
-            btnExluir.Margin = new Padding(3, 4, 3, 4);
+            btnExluir.Location = new Point(277, 199);
             btnExluir.Name = "btnExluir";
-            btnExluir.Size = new Size(86, 31);
+            btnExluir.Size = new Size(75, 23);
             btnExluir.TabIndex = 2;
             btnExluir.Text = "Excluir";
             btnExluir.UseVisualStyleBackColor = true;
@@ -77,70 +76,84 @@
             // 
             cbExtensoes.FormattingEnabled = true;
             cbExtensoes.Items.AddRange(new object[] { "txt", "pasta", "img", "png", "docx" });
-            cbExtensoes.Location = new Point(437, 139);
-            cbExtensoes.Margin = new Padding(3, 4, 3, 4);
+            cbExtensoes.Location = new Point(382, 104);
             cbExtensoes.Name = "cbExtensoes";
-            cbExtensoes.Size = new Size(138, 28);
+            cbExtensoes.Size = new Size(121, 23);
             cbExtensoes.TabIndex = 3;
             // 
             // txtNome
             // 
-            txtNome.Location = new Point(113, 139);
-            txtNome.Margin = new Padding(3, 4, 3, 4);
+            txtNome.Location = new Point(99, 104);
             txtNome.Name = "txtNome";
-            txtNome.Size = new Size(164, 27);
+            txtNome.Size = new Size(144, 23);
             txtNome.TabIndex = 4;
             // 
             // txtNovoNome
             // 
-            txtNovoNome.Location = new Point(113, 187);
-            txtNovoNome.Margin = new Padding(3, 4, 3, 4);
+            txtNovoNome.Location = new Point(99, 140);
             txtNovoNome.Name = "txtNovoNome";
-            txtNovoNome.Size = new Size(164, 27);
+            txtNovoNome.Size = new Size(144, 23);
             txtNovoNome.TabIndex = 5;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(14, 190);
+            label1.Location = new Point(12, 142);
             label1.Name = "label1";
-            label1.Size = new Size(93, 20);
+            label1.Size = new Size(75, 15);
             label1.TabIndex = 6;
             label1.Text = "Novo Nome:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(14, 142);
+            label2.Location = new Point(12, 106);
             label2.Name = "label2";
-            label2.Size = new Size(53, 20);
+            label2.Size = new Size(43, 15);
             label2.TabIndex = 7;
             label2.Text = "Nome:";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(360, 146);
+            label3.Location = new Point(315, 110);
             label3.Name = "label3";
-            label3.Size = new Size(71, 20);
+            label3.Size = new Size(56, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
             // 
             // btnRenomear
             // 
-            btnRenomear.Location = new Point(191, 265);
-            btnRenomear.Margin = new Padding(3, 4, 3, 4);
+            btnRenomear.Location = new Point(167, 199);
             btnRenomear.Name = "btnRenomear";
-            btnRenomear.Size = new Size(86, 31);
+            btnRenomear.Size = new Size(75, 23);
             btnRenomear.TabIndex = 9;
             btnRenomear.Text = "Renomear";
             btnRenomear.UseVisualStyleBackColor = true;
             btnRenomear.Click += btnRenomear_Click;
             // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(12, 33);
+            label4.Name = "label4";
+            label4.Size = new Size(90, 15);
+            label4.TabIndex = 10;
+            label4.Text = "pasta \"destino\":";
+            // 
+            // txtDestinatario
+            // 
+            txtDestinatario.Location = new Point(99, 30);
+            txtDestinatario.Name = "txtDestinatario";
+            txtDestinatario.Size = new Size(100, 23);
+            txtDestinatario.TabIndex = 11;
+            // 
             // UserControlSettings
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(txtDestinatario);
+            Controls.Add(label4);
             Controls.Add(btnRenomear);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -151,9 +164,8 @@
             Controls.Add(btnExluir);
             Controls.Add(btnCriar);
             Controls.Add(button1);
-            Margin = new Padding(3, 4, 3, 4);
             Name = "UserControlSettings";
-            Size = new Size(731, 480);
+            Size = new Size(640, 360);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -170,5 +182,7 @@
         private Label label2;
         private Label label3;
         private Button btnRenomear;
+        private Label label4;
+        private TextBox txtDestinatario;
     }
 }

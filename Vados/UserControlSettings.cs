@@ -18,8 +18,8 @@ namespace Vados
         public UserControlSettings()
         {
             InitializeComponent();
-            
-            
+
+
         }
 
 
@@ -32,7 +32,7 @@ namespace Vados
 
         private void btnCriar_Click(object sender, EventArgs e)
         {
-            
+
             string extension = cbExtensoes.Text;
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
@@ -113,6 +113,16 @@ namespace Vados
             }
 
 
+        }
+
+        private void btnlog_Click(object sender, EventArgs e)
+        {
+
+           foreach(var x in Comandos.funcaoteste("oi", true))
+            {
+                listateste.Items.Add(x);
+            }
+                
         }
     }
 }

@@ -40,69 +40,117 @@ namespace Vados
 
 
         }
-    //    public static List<string> funcaoteste()
-    //    {
-    //        string root = @"" + driveverifica(null);
-    //        var caminhos = new List<string>();
-            
-    //        var ignorar = new List<string>
-    //{
-    //    "$RECYCLE.BIN",
-    //    "System Volume Information",
-    //    "Recovery",
-    //    "Config.Msi",
-    //    "Windows",
-    //    "Program Files (x86)",
-    //    "Program Files"
-    //};
-    //        var prioridades = new List<string>
-    //{
-    //    Path.Combine(root, @"Vados"),
-    //    Path.Combine(root, @"Users\Default"),
-    //    //Path.Combine(root, @"Users\Public")
-    //};
+        public static List<string> funcaoteste(string aprocurar, bool comando)
+        {
+            string root = @"" + driveverifica(null);
+            var caminhos = new List<string>();
+            var ignorar = new List<string>
+    {
+        "$RECYCLE.BIN",
+        "System Volume Information",
+        "Recovery",
+        "Config.Msi",
+        "Windows",
+        "Program Files (x86)",
+        "Program Files"
+    };
+            var prioridades = new List<string>
+    {
+        Path.Combine(root, @"Vados"),
+        Path.Combine(root, @"Users\Default\Desktop"),
+        Path.Combine(root, @"Users\Default\Contacts"),
+        Path.Combine(root, @"Users\Default\Documents"),
+        Path.Combine(root, @"Users\Default\Downloads"),
+        Path.Combine(root, @"Users\Default\Favorites"),
+        Path.Combine(root, @"Users\Default\Pictures"),
+        Path.Combine(root, @"Users\Default\Saved Games"),
+        Path.Combine(root, @"Users\Default\Links"),
+        Path.Combine(root, @"Users\Default\Music"),
+        Path.Combine(root, @"Users\Default\3D Objects"),
+        Path.Combine(root, @"Users\Default\OneDrive"),
+        Path.Combine(root, @"Users\Default\Searches"),
+        Path.Combine(root, @"Users\Default\Videos"),
+        //Path.Combine(root, @"Users\Default"),
 
-    //        var fila = new Queue<string>();
-    //        foreach (var pasta in prioridades)
-    //        {
-    //            if (Directory.Exists(pasta))
-    //            {
-    //                fila.Enqueue(pasta);
-    //                //caminhos.Add(pasta);
-    //            }
-    //        }
+        Path.Combine(root),
+    };
 
-    //        fila.Enqueue(root);
+            var fila = new Queue<string>();
+            foreach (var pasta in prioridades)
+            {
+                if (Directory.Exists(pasta))
+                {
+                    fila.Enqueue(pasta);
+                    //caminhos.Add(pasta);
+                }
+            }
 
-    //        while (fila.Count > 0)
-    //        {
-    //            var atual = fila.Dequeue();
-    //            try
-    //            {
-    //                foreach (var caminho in Directory.GetDirectories(atual))
-    //                {
-    //                    string nomePasta = Path.GetFileName(caminho);
-    //                    if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-    //                        continue;
+            fila.Enqueue(root);
 
-    //                    caminhos.Add(caminho);
-    //                    fila.Enqueue(caminho);
-                        
+            while (fila.Count > 0)
+            {
+                var atual = fila.Dequeue();
+                try
+                {
+                    switch (comando)
+                    {
+                        case true:
+
+                            foreach (var caminho in Directory.GetDirectories(atual))
+                            {
+                                string nomePasta = Path.GetFileName(caminho);
+                                if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                                    continue;
+
+                                caminhos.Add(caminho);
+                                fila.Enqueue(caminho);
+
+                                if (caminho.Contains(aprocurar))
+                                {
+                                    MessageBox.Show($"Foram encontrados {caminhos.Count} caminhos de pastas.");
+                                    return caminhos;
+                                }
+                                // MessageBox.Show(caminho);
+                            }
+
+                            break;
+                        case false:
 
 
-    //                }
-                    
-                    
-    //            }
+                            foreach (var arquivo in Directory.GetFiles(atual))
+                            {
+                                string nome = Path.GetFileName(arquivo);
+                                if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    MessageBox.Show($"Arquivo encontrado: {arquivo}");
+                                    return caminhos;
+                                }
+                            }
 
-    //            catch (Exception)
-    //            {
 
-    //            }
-                
-    //        }
-    //        return caminhos;
-    //    }
+                            foreach (var caminho in Directory.GetDirectories(atual))
+                            {
+                                string nomePasta = Path.GetFileName(caminho);
+                                if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                                    continue;
+
+                                fila.Enqueue(caminho);
+                            }
+
+                            break;
+                    }
+
+
+                }
+
+                catch (Exception)
+                {
+
+                }
+            }
+            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+            return null;
+        }
         public static string SearchFolders(string aprocurar,bool comando) // busca recursivamente por pastas ou arquivos
         {
             //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
@@ -124,8 +172,22 @@ namespace Vados
             var prioridades = new List<string>
     {
         Path.Combine(root, @"Vados"),
-        Path.Combine(root, @"Users\Default"),
-        Path.Combine(root)
+        Path.Combine(root, @"Users\Default\Desktop"),
+        Path.Combine(root, @"Users\Default\Contacts"),
+        Path.Combine(root, @"Users\Default\Documents"),
+        Path.Combine(root, @"Users\Default\Downloads"),
+        Path.Combine(root, @"Users\Default\Favorites"),
+        Path.Combine(root, @"Users\Default\Pictures"),
+        Path.Combine(root, @"Users\Default\Saved Games"),
+        Path.Combine(root, @"Users\Default\Links"),
+        Path.Combine(root, @"Users\Default\Music"),
+        Path.Combine(root, @"Users\Default\3D Objects"),
+        Path.Combine(root, @"Users\Default\OneDrive"),
+        Path.Combine(root, @"Users\Default\Searches"),
+        Path.Combine(root, @"Users\Default\Videos"),
+        //Path.Combine(root, @"Users\Default"),
+
+        Path.Combine(root),
     };
 
             var fila = new Queue<string>();
@@ -332,8 +394,13 @@ namespace Vados
         public static void RenomearArquivo(string nome, string novoNome, string extensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
 
-            string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
-            string novoPath = Path.Combine(Global.DefaultFolder + novoNome + "." + extensao);
+            //string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
+            nome = nome + "." + extensao;
+            string path = SearchFolders(nome,false);
+            
+
+            string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome + "." + extensao);
+          
             if (File.Exists(path))
             {
                 File.Move(path, novoPath);
@@ -347,8 +414,12 @@ namespace Vados
 
         public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
-            string path = Path.Combine(Global.DefaultFolder + nome);
-            string novoPath = Path.Combine(Global.DefaultFolder + novoNome);
+
+            string path = SearchFolders(nome, true);
+            MessageBox.Show(path);
+
+            string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
+
             if (Directory.Exists(path))
             {
                 Directory.Move(path, novoPath);

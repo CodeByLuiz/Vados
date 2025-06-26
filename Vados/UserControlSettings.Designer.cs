@@ -44,14 +44,15 @@
             cbIdioma = new ComboBox();
             btnMudarIdioma = new Button();
             label5 = new Label();
+            listateste = new ListBox();
+            btnlog = new Button();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(504, 20);
-            button1.Margin = new Padding(3, 4, 3, 4);
+            button1.Location = new Point(441, 15);
             button1.Name = "button1";
-            button1.Size = new Size(213, 31);
+            button1.Size = new Size(186, 23);
             button1.TabIndex = 0;
             button1.Text = "pagina inicial";
             button1.UseVisualStyleBackColor = true;
@@ -59,10 +60,9 @@
             // 
             // btnCriar
             // 
-            btnCriar.Location = new Point(61, 265);
-            btnCriar.Margin = new Padding(3, 4, 3, 4);
+            btnCriar.Location = new Point(53, 199);
             btnCriar.Name = "btnCriar";
-            btnCriar.Size = new Size(86, 31);
+            btnCriar.Size = new Size(75, 23);
             btnCriar.TabIndex = 1;
             btnCriar.Text = "Criar";
             btnCriar.UseVisualStyleBackColor = true;
@@ -70,10 +70,9 @@
             // 
             // btnExluir
             // 
-            btnExluir.Location = new Point(317, 265);
-            btnExluir.Margin = new Padding(3, 4, 3, 4);
+            btnExluir.Location = new Point(277, 199);
             btnExluir.Name = "btnExluir";
-            btnExluir.Size = new Size(86, 31);
+            btnExluir.Size = new Size(75, 23);
             btnExluir.TabIndex = 2;
             btnExluir.Text = "Excluir";
             btnExluir.UseVisualStyleBackColor = true;
@@ -83,61 +82,57 @@
             // 
             cbExtensoes.FormattingEnabled = true;
             cbExtensoes.Items.AddRange(new object[] { "txt", "pasta", "img", "png", "docx" });
-            cbExtensoes.Location = new Point(437, 139);
-            cbExtensoes.Margin = new Padding(3, 4, 3, 4);
+            cbExtensoes.Location = new Point(382, 104);
             cbExtensoes.Name = "cbExtensoes";
-            cbExtensoes.Size = new Size(138, 28);
+            cbExtensoes.Size = new Size(121, 23);
             cbExtensoes.TabIndex = 3;
             // 
             // txtNome
             // 
-            txtNome.Location = new Point(113, 139);
-            txtNome.Margin = new Padding(3, 4, 3, 4);
+            txtNome.Location = new Point(99, 104);
             txtNome.Name = "txtNome";
-            txtNome.Size = new Size(164, 27);
+            txtNome.Size = new Size(144, 23);
             txtNome.TabIndex = 4;
             // 
             // txtNovoNome
             // 
-            txtNovoNome.Location = new Point(113, 187);
-            txtNovoNome.Margin = new Padding(3, 4, 3, 4);
+            txtNovoNome.Location = new Point(99, 140);
             txtNovoNome.Name = "txtNovoNome";
-            txtNovoNome.Size = new Size(164, 27);
+            txtNovoNome.Size = new Size(144, 23);
             txtNovoNome.TabIndex = 5;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(14, 189);
+            label1.Location = new Point(12, 142);
             label1.Name = "label1";
-            label1.Size = new Size(93, 20);
+            label1.Size = new Size(75, 15);
             label1.TabIndex = 6;
             label1.Text = "Novo Nome:";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(14, 141);
+            label2.Location = new Point(12, 106);
             label2.Name = "label2";
-            label2.Size = new Size(53, 20);
+            label2.Size = new Size(43, 15);
             label2.TabIndex = 7;
             label2.Text = "Nome:";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(360, 147);
+            label3.Location = new Point(315, 110);
             label3.Name = "label3";
-            label3.Size = new Size(71, 20);
+            label3.Size = new Size(57, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
             // 
             // btnRenomear
             // 
-            btnRenomear.Location = new Point(191, 265);
-            btnRenomear.Margin = new Padding(3, 4, 3, 4);
+            btnRenomear.Location = new Point(167, 199);
             btnRenomear.Name = "btnRenomear";
-            btnRenomear.Size = new Size(86, 31);
+            btnRenomear.Size = new Size(75, 23);
             btnRenomear.TabIndex = 9;
             btnRenomear.Text = "Renomear";
             btnRenomear.UseVisualStyleBackColor = true;
@@ -146,26 +141,26 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(14, 44);
+            label4.Location = new Point(12, 33);
             label4.Name = "label4";
-            label4.Size = new Size(113, 20);
+            label4.Size = new Size(90, 15);
             label4.TabIndex = 10;
             label4.Text = "pasta \"destino\":";
             // 
             // txtDestinatario
             // 
-            txtDestinatario.Location = new Point(113, 40);
-            txtDestinatario.Margin = new Padding(3, 4, 3, 4);
+            txtDestinatario.Location = new Point(99, 30);
             txtDestinatario.Name = "txtDestinatario";
-            txtDestinatario.Size = new Size(114, 27);
+            txtDestinatario.Size = new Size(100, 23);
             txtDestinatario.TabIndex = 11;
             // 
             // btnAdm
             // 
             btnAdm.BackColor = Color.IndianRed;
-            btnAdm.Location = new Point(113, 360);
+            btnAdm.Location = new Point(99, 270);
+            btnAdm.Margin = new Padding(3, 2, 3, 2);
             btnAdm.Name = "btnAdm";
-            btnAdm.Size = new Size(203, 35);
+            btnAdm.Size = new Size(178, 26);
             btnAdm.TabIndex = 12;
             btnAdm.Text = "Adm";
             btnAdm.UseVisualStyleBackColor = false;
@@ -175,18 +170,16 @@
             // 
             cbIdioma.FormattingEnabled = true;
             cbIdioma.Items.AddRange(new object[] { "Português do Brasil", "Inglês" });
-            cbIdioma.Location = new Point(631, 268);
-            cbIdioma.Margin = new Padding(3, 4, 3, 4);
+            cbIdioma.Location = new Point(552, 201);
             cbIdioma.Name = "cbIdioma";
-            cbIdioma.Size = new Size(138, 28);
+            cbIdioma.Size = new Size(121, 23);
             cbIdioma.TabIndex = 13;
             // 
             // btnMudarIdioma
             // 
-            btnMudarIdioma.Location = new Point(614, 316);
-            btnMudarIdioma.Margin = new Padding(3, 4, 3, 4);
+            btnMudarIdioma.Location = new Point(537, 237);
             btnMudarIdioma.Name = "btnMudarIdioma";
-            btnMudarIdioma.Size = new Size(155, 31);
+            btnMudarIdioma.Size = new Size(136, 23);
             btnMudarIdioma.TabIndex = 14;
             btnMudarIdioma.Text = "mudar idioma";
             btnMudarIdioma.UseVisualStyleBackColor = true;
@@ -195,16 +188,37 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(550, 276);
+            label5.Location = new Point(481, 207);
             label5.Name = "label5";
-            label5.Size = new Size(59, 20);
+            label5.Size = new Size(47, 15);
             label5.TabIndex = 15;
             label5.Text = "Idioma:";
             // 
+            // listateste
+            // 
+            listateste.FormattingEnabled = true;
+            listateste.ItemHeight = 15;
+            listateste.Location = new Point(696, 53);
+            listateste.Name = "listateste";
+            listateste.Size = new Size(337, 289);
+            listateste.TabIndex = 16;
+            // 
+            // btnlog
+            // 
+            btnlog.Location = new Point(696, 24);
+            btnlog.Name = "btnlog";
+            btnlog.Size = new Size(75, 23);
+            btnlog.TabIndex = 17;
+            btnlog.Text = "button2";
+            btnlog.UseVisualStyleBackColor = true;
+            btnlog.Click += btnlog_Click;
+            // 
             // UserControlSettings
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btnlog);
+            Controls.Add(listateste);
             Controls.Add(label5);
             Controls.Add(btnMudarIdioma);
             Controls.Add(cbIdioma);
@@ -221,9 +235,8 @@
             Controls.Add(btnExluir);
             Controls.Add(btnCriar);
             Controls.Add(button1);
-            Margin = new Padding(3, 4, 3, 4);
             Name = "UserControlSettings";
-            Size = new Size(1254, 480);
+            Size = new Size(1097, 360);
             Load += UserControlSettings_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -247,5 +260,7 @@
         private ComboBox cbIdioma;
         private Button btnMudarIdioma;
         private Label label5;
+        private ListBox listateste;
+        private Button btnlog;
     }
 }

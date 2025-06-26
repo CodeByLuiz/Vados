@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,21 +50,44 @@ namespace Vados
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
-            //Círculo atrás do microfone
-            int width = 216;
-            int height = 216;
-            int xx = this.Width / 2 - width / 2;
-            int yy = 150;
-            int offset = 50;
+            int sizeOffset = 50;
+            int width = 216 + sizeOffset;
+            int height = 216 + sizeOffset;
+            int xx = this.Width / 2 - width / 2 - sizeOffset / 2;
+            int yy = 150 - sizeOffset/ 2;
 
-            Brush brush = new SolidBrush(Color.White);
-            Rectangle rect = new Rectangle(xx - offset / 2, yy - offset / 2, width + offset, height + offset);
+            //Sombra do círculo
+            int shadowOffset = 15;
+
+            using (GraphicsPath path = new GraphicsPath())
+            {
+                path.AddEllipse(xx, yy + shadowOffset, width, height);
+
+                PathGradientBrush pathBrush = new PathGradientBrush(path);
+
+                pathBrush.CenterColor = Color.FromArgb(100, Color.Black);
+                pathBrush.SurroundColors = new[] { Color.FromArgb(2, Color.Black) };
+                e.Graphics.FillPath(pathBrush, path);
+            }
+
+
+            //Contorno do círculo
+            int outlineSize = 15;
+
+            Brush brush = new SolidBrush(Colors.bluePrimary);
+            Rectangle rect = new Rectangle(xx, yy, width, height);
+            e.Graphics.FillEllipse(brush, rect);
+
+
+            //Círculo atrás do microfone
+            brush = new SolidBrush(Color.White);
+            rect = new Rectangle(xx + outlineSize / 2, yy + outlineSize / 2, width - outlineSize, height - outlineSize);
             e.Graphics.FillEllipse(brush, rect);
 
 
             //Microfone
             Image micIcon = Image.FromFile("Imagens/Ícones/micIcon.png");
-            e.Graphics.DrawImage(micIcon, new Rectangle(xx, yy, width, height));
+            e.Graphics.DrawImage(micIcon, new Rectangle(xx + sizeOffset / 2, yy + sizeOffset / 2, width - sizeOffset, height - sizeOffset));
         }
     }
 }

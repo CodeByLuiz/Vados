@@ -86,7 +86,6 @@ namespace Vados
 
 
             //Microfone
-            //Image micIcon = Image.FromFile("Imagens/Ícones/micIcon.png");
             string imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png");
             Image micIcon = Image.FromFile(imgPath);
             e.Graphics.DrawImage(micIcon, new Rectangle(xx + sizeOffset / 2, yy + sizeOffset / 2, width - sizeOffset, height - sizeOffset));

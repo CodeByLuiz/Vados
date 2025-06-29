@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices.Marshalling;
+
 namespace Vados
 {
     public partial class Form1 : Form
@@ -5,6 +7,7 @@ namespace Vados
         private bool isFullscreen = false;
         private FormWindowState lastWindowState;
         private FormBorderStyle lastBorderStyle;
+        private Rectangle lastBounds;
 
         public Form1()
         {
@@ -46,19 +49,23 @@ namespace Vados
                 //Ativar tela cheia
                 if (isFullscreen == false)
                 {
+                    lastBounds = Screen.FromControl(this).Bounds;
                     lastWindowState = WindowState;
                     lastBorderStyle = FormBorderStyle;
 
-                    WindowState = FormWindowState.Maximized;
                     FormBorderStyle = FormBorderStyle.None;
+                    WindowState = FormWindowState.Maximized;
+                    TopMost = true;
 
                     isFullscreen = true;
                     return;
                 }
 
                 //Desativar tela cheia
+                Bounds = lastBounds;
                 WindowState = lastWindowState;
                 FormBorderStyle = lastBorderStyle;
+                TopMost = false;
 
                 isFullscreen = false;
             }

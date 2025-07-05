@@ -40,117 +40,124 @@ namespace Vados
 
 
         }
-        public static List<string> funcaoteste(string aprocurar, bool comando)
-        {
-            string root = @"" + driveverifica(null);
-            var caminhos = new List<string>();
-            var ignorar = new List<string>
-    {
-        "$RECYCLE.BIN",
-        "System Volume Information",
-        "Recovery",
-        "Config.Msi",
-        "Windows",
-        "Program Files (x86)",
-        "Program Files"
-    };
-            var prioridades = new List<string>
-    {
-        Path.Combine(root, @"Vados"),
-        Path.Combine(root, @"Users\Default\Desktop"),
-        Path.Combine(root, @"Users\Default\Contacts"),
-        Path.Combine(root, @"Users\Default\Documents"),
-        Path.Combine(root, @"Users\Default\Downloads"),
-        Path.Combine(root, @"Users\Default\Favorites"),
-        Path.Combine(root, @"Users\Default\Pictures"),
-        Path.Combine(root, @"Users\Default\Saved Games"),
-        Path.Combine(root, @"Users\Default\Links"),
-        Path.Combine(root, @"Users\Default\Music"),
-        Path.Combine(root, @"Users\Default\3D Objects"),
-        Path.Combine(root, @"Users\Default\OneDrive"),
-        Path.Combine(root, @"Users\Default\Searches"),
-        Path.Combine(root, @"Users\Default\Videos"),
-        //Path.Combine(root, @"Users\Default"),
+    //    public static List<string> funcaoteste(string aprocurar, bool comando)
+    //    {
+    //        string root = @"" + driveverifica(null);
+    //        var caminhos = new List<string>();
+    //        var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    //        var ignorar = new List<string>
+    //{
+    //    "$RECYCLE.BIN",
+    //    "System Volume Information",
+    //    "Recovery",
+    //    "Config.Msi",
+    //    "Windows",
+    //    "Program Files (x86)",
+    //    "Program Files"
+    //};
+    //        var prioridades = new List<string>
+    //{
+    //    Path.Combine(root, @"Vados"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+    //    //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-        Path.Combine(root),
-    };
+    //    Path.Combine(root),
+    //};
 
-            var fila = new Queue<string>();
-            foreach (var pasta in prioridades)
-            {
-                if (Directory.Exists(pasta))
-                {
-                    fila.Enqueue(pasta);
-                    //caminhos.Add(pasta);
-                }
-            }
+    //        var fila = new Queue<string>();
+    //        foreach (var pasta in prioridades)
+    //        {
+    //            if (Directory.Exists(pasta))
+    //            {
+    //                fila.Enqueue(pasta);
+    //                //caminhos.Add(pasta);
+    //            }
+    //        }
 
-            fila.Enqueue(root);
+    //        fila.Enqueue(root);
 
-            while (fila.Count > 0)
-            {
-                var atual = fila.Dequeue();
-                try
-                {
-                    switch (comando)
-                    {
-                        case true:
+    //        while (fila.Count > 0)
+    //        {
+    //            var atual = fila.Dequeue();
+    //            try
+    //            {
+    //                switch (comando)
+    //                {
+    //                    case true:
 
-                            foreach (var caminho in Directory.GetDirectories(atual))
-                            {
-                                string nomePasta = Path.GetFileName(caminho);
-                                if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-                                    continue;
+    //                        foreach (var caminho in Directory.GetDirectories(atual))
+    //                        {
+    //                            string nomePasta = Path.GetFileName(caminho);
+    //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+    //                                continue;
 
-                                caminhos.Add(caminho);
-                                fila.Enqueue(caminho);
-
-                                if (caminho.Contains(aprocurar))
-                                {
-                                    MessageBox.Show($"Foram encontrados {caminhos.Count} caminhos de pastas.");
-                                    return caminhos;
-                                }
-                                // MessageBox.Show(caminho);
-                            }
-
-                            break;
-                        case false:
-
-
-                            foreach (var arquivo in Directory.GetFiles(atual))
-                            {
-                                string nome = Path.GetFileName(arquivo);
-                                if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    MessageBox.Show($"Arquivo encontrado: {arquivo}");
-                                    return caminhos;
-                                }
-                            }
+    //                            if (visitados.Add(caminho))
+    //                            {
+    //                                caminhos.Add(caminho);
+    //                                //fila.Enqueue(caminho);
+    //                                Comandos.InserirNoInicio(fila, caminho);
+    //                                if (caminho.Contains(aprocurar))
+    //                                {
+    //                                    MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+    //                                    return caminhos;
+    //                                }
+    //                                // MessageBox.Show(caminho);
+    //                            }
 
 
-                            foreach (var caminho in Directory.GetDirectories(atual))
-                            {
-                                string nomePasta = Path.GetFileName(caminho);
-                                if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-                                    continue;
+    //                        }
 
-                                fila.Enqueue(caminho);
-                            }
-
-                            break;
-                    }
+    //                        break;
+    //                    case false:
 
 
-                }
+    //                        foreach (var arquivo in Directory.GetFiles(atual))
+    //                        {
+    //                            string nome = Path.GetFileName(arquivo);
+    //                            if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+    //                            {
+    //                                MessageBox.Show($"Arquivo encontrado: {arquivo}");
+    //                                return caminhos;
+    //                            }
+    //                        }
 
-                catch (Exception)
-                {
 
-                }
-            }
-            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-            return null;
-        }
+    //                        foreach (var caminho in Directory.GetDirectories(atual))
+    //                        {
+    //                            string nomePasta = Path.GetFileName(caminho);
+    //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+    //                                continue;
+
+    //                            //fila.Enqueue(caminho);
+    //                            Comandos.InserirNoInicio(fila, caminho);
+    //                        }
+
+    //                        break;
+    //                }
+
+
+    //            }
+
+    //            catch (Exception)
+    //            {
+
+    //            }
+    //        }
+    //        MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+    //        return null;
+    //    }
         public static string SearchFolders(string aprocurar,bool comando) // busca recursivamente por pastas ou arquivos
         {
             //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
@@ -159,6 +166,7 @@ namespace Vados
 
             string root = @"" + driveverifica(null);
             var caminhos = new List<string>();
+            var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var ignorar = new List<string>
     {
         "$RECYCLE.BIN",
@@ -172,20 +180,20 @@ namespace Vados
             var prioridades = new List<string>
     {
         Path.Combine(root, @"Vados"),
-        Path.Combine(root, @"Users\Default\Desktop"),
-        Path.Combine(root, @"Users\Default\Contacts"),
-        Path.Combine(root, @"Users\Default\Documents"),
-        Path.Combine(root, @"Users\Default\Downloads"),
-        Path.Combine(root, @"Users\Default\Favorites"),
-        Path.Combine(root, @"Users\Default\Pictures"),
-        Path.Combine(root, @"Users\Default\Saved Games"),
-        Path.Combine(root, @"Users\Default\Links"),
-        Path.Combine(root, @"Users\Default\Music"),
-        Path.Combine(root, @"Users\Default\3D Objects"),
-        Path.Combine(root, @"Users\Default\OneDrive"),
-        Path.Combine(root, @"Users\Default\Searches"),
-        Path.Combine(root, @"Users\Default\Videos"),
-        //Path.Combine(root, @"Users\Default"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+        //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
         Path.Combine(root),
     };
@@ -217,15 +225,25 @@ namespace Vados
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                                     continue;
 
-                                caminhos.Add(caminho);
-                                fila.Enqueue(caminho);
-                                
-                                if (caminho.Contains(aprocurar))
+                                if (visitados.Add(caminho))
                                 {
-                                    MessageBox.Show($"Foram encontrados {caminhos.Count} caminhos de pastas.");
-                                    return caminho;
+                                    caminhos.Add(caminho);
+                                    //fila.Enqueue(caminho);
+                                    Comandos.InserirNoInicio(fila, caminho);
+                                    if (caminho.Contains(aprocurar) && atual.Contains(aprocurar) )
+                                    {
+                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+                                        MessageBox.Show(atual+" situação 1 "+ aprocurar);
+                                        return atual;
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+                                        MessageBox.Show(caminho+" situação 2 " + aprocurar);
+                                        return caminho;
+                                    }
+                                        
                                 }
-                               // MessageBox.Show(caminho);
                             }
 
                             break;
@@ -249,7 +267,13 @@ namespace Vados
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                                     continue;
 
-                                fila.Enqueue(caminho);
+                                //fila.Enqueue(caminho);
+
+
+                                if (visitados.Add(caminho))
+                                {
+                                    Comandos.InserirNoInicio(fila, caminho);
+                                }
                             }
 
                             break;
@@ -267,7 +291,25 @@ namespace Vados
             return null;
         }
 
+        public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
+        {
+            Queue<T> filaTemporaria = new Queue<T>();
 
+            
+            while (fila.Count > 0)
+            {
+                filaTemporaria.Enqueue(fila.Dequeue());
+            }
+
+           
+            fila.Enqueue(novoElemento);
+
+           
+            while (filaTemporaria.Count > 0)
+            {
+                fila.Enqueue(filaTemporaria.Dequeue());
+            }
+        }
 
 
         public static string driveverifica(string[] args)
@@ -300,7 +342,7 @@ namespace Vados
         {
             try
             {
-                if (path == "")
+                if (path == "") 
                 {
                     path = Path.Combine(Global.DefaultFolder + nome);
                 }
@@ -342,7 +384,7 @@ namespace Vados
                 else
                 {
                     path = SearchFolders(path, true) + @"\" + nome + "." + extension;
-
+                    MessageBox.Show(path);
                 }
 
                 using (FileStream fs = File.Create(path)) ;

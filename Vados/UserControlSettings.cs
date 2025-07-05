@@ -117,8 +117,8 @@ namespace Vados
 
         private void btnlog_Click(object sender, EventArgs e)
         {
-
-           foreach(var x in Comandos.funcaoteste("oi", true))
+            MessageBox.Show(Environment.UserName);
+            foreach (var x in Comandos.funcaoteste("oi", true))
             {
                 listateste.Items.Add(x);
             }

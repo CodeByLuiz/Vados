@@ -14,6 +14,6 @@ namespace Vados
         public static UserControlSettings userControlSettings = new UserControlSettings();
 
 
-        public static string DefaultFolder = @"C:\Vados\";
+        public static string DefaultFolder = Comandos.driveverifica+@"Vados\";
     }
 }

@@ -124,7 +124,7 @@
             label3.AutoSize = true;
             label3.Location = new Point(315, 110);
             label3.Name = "label3";
-            label3.Size = new Size(57, 15);
+            label3.Size = new Size(56, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
             // 
@@ -198,9 +198,9 @@
             // 
             listateste.FormattingEnabled = true;
             listateste.ItemHeight = 15;
-            listateste.Location = new Point(696, 53);
+            listateste.Location = new Point(679, 53);
             listateste.Name = "listateste";
-            listateste.Size = new Size(337, 289);
+            listateste.Size = new Size(415, 289);
             listateste.TabIndex = 16;
             // 
             // btnlog

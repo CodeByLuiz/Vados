@@ -15,10 +15,27 @@ namespace Vados
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
 
+        System.Windows.Forms.Timer timer;
+
+        //Variáveis do botão do microfone
+        float circleSizeDefault = 266;
+        float circleSize = 266;
+        float circleSizeTarget = 266;
+        float circleX = 0;
+        float circleY = 0;
+        bool circleHovering = false;
+        bool lastCircleHovering = false;
+
+
         public UserControlHome()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
+
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 16; // ~60 FPS
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -53,18 +70,15 @@ namespace Vados
             int middleX = this.Width / 2;
             int middleY = this.Height / 2;
 
-            int sizeOffset = 50;
-            int width = 216 + sizeOffset;
-            int height = 216 + sizeOffset;
-            int xx = middleX - width / 2;
-            int yy = 150 - sizeOffset / 2;
+            circleX = middleX - circleSize / 2;
+            circleY = 278 - circleSize / 2;
 
             //Sombra do círculo
             int shadowOffset = 15;
 
             using (GraphicsPath path = new GraphicsPath())
             {
-                path.AddEllipse(xx, yy + shadowOffset, width, height);
+                path.AddEllipse(circleX, circleY + shadowOffset, circleSize, circleSize);
 
                 PathGradientBrush pathBrush = new PathGradientBrush(path);
 
@@ -78,24 +92,63 @@ namespace Vados
             int outlineSize = 15;
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
-            Rectangle rect = new Rectangle(xx, yy, width, height);
+            RectangleF rect = new RectangleF(circleX, circleY, circleSize, circleSize);
             e.Graphics.FillEllipse(brush, rect);
 
 
             //Círculo atrás do microfone
             brush = new SolidBrush(Color.White);
-            rect = new Rectangle(xx + outlineSize / 2, yy + outlineSize / 2, width - outlineSize, height - outlineSize);
+            rect = new RectangleF(circleX + outlineSize / 2, circleY + outlineSize / 2, circleSize - outlineSize, circleSize - outlineSize);
             e.Graphics.FillEllipse(brush, rect);
 
 
             //Microfone
+            int sizeOffset = 50;
             string imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png");
             Image micIcon = Image.FromFile(imgPath);
-            e.Graphics.DrawImage(micIcon, new Rectangle(xx + sizeOffset / 2, yy + sizeOffset / 2, width - sizeOffset, height - sizeOffset));
+            e.Graphics.DrawImage(micIcon, new RectangleF(circleX + sizeOffset / 2, circleY + sizeOffset / 2, circleSize - sizeOffset, circleSize - sizeOffset));
+        }
+        
+        private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
+        {
+            lastCircleHovering = circleHovering;
+
+            //Aumentar tamanho do botão do microfone quando passar o mouse
+            Point mousePos = this.PointToClient(Cursor.Position);
+            int mouseX = mousePos.X;
+            int mouseY = mousePos.Y;
+
+            PointF middle = new PointF(circleX + circleSize / 2, circleY + circleSize / 2);
+            float distanceX = middle.X - mouseX;
+            float distanceY = middle.Y - mouseY;
+            double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
+
+            //Checar se o mouse está em dentro do círculo
+            if (distance <= circleSize / 2) {
+                //Aumentar tamanho do círculo
+                circleSizeTarget = 300;
+                circleHovering = true;
+                pnlBottom.Cursor = Cursors.Hand;
+            } else {
+                //Resetar tamanho do botão
+                circleHovering = false;
+                circleSizeTarget = circleSizeDefault;
+                pnlBottom.Cursor = Cursors.Default;
+            }
         }
 
-        private void pnlBottom_Resize(object sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
+            //Ajustar tamanho do botão do microfone
+            circleSize += (circleSizeTarget - circleSize) / 3;
+            lblDebug.Text = circleSize.ToString() + ", " + circleSizeTarget.ToString() + ", " + ((circleSizeTarget - circleSize) / 10).ToString();
+
+            if (Math.Abs(circleSizeTarget - circleSize) < 1)
+            {
+                circleSize = circleSizeTarget;
+                return;
+            }
+
             pnlBottom.Invalidate();
         }
     }

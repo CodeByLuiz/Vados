@@ -31,10 +31,11 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             button1 = new Button();
             pnlTop = new Panel();
+            lblDebug = new Label();
             btnManual = new PictureBox();
             btnConfigs = new PictureBox();
             imgLogo = new PictureBox();
-            pnlBottom = new Panel();
+            pnlBottom = new OptmizedPanel();
             textBox1 = new TextBox();
             txtComando = new TextBox();
             pnlTop.SuspendLayout();
@@ -47,7 +48,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.None;
-            button1.Location = new Point(696, 38);
+            button1.Location = new Point(605, 38);
             button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
             button1.Size = new Size(106, 31);
@@ -59,6 +60,7 @@
             // pnlTop
             // 
             pnlTop.AutoScroll = true;
+            pnlTop.Controls.Add(lblDebug);
             pnlTop.Controls.Add(button1);
             pnlTop.Controls.Add(btnManual);
             pnlTop.Controls.Add(btnConfigs);
@@ -67,15 +69,24 @@
             pnlTop.Location = new Point(0, 0);
             pnlTop.Margin = new Padding(0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(1463, 118);
+            pnlTop.Size = new Size(1280, 118);
             pnlTop.TabIndex = 1;
+            // 
+            // lblDebug
+            // 
+            lblDebug.AutoSize = true;
+            lblDebug.Location = new Point(263, 80);
+            lblDebug.Name = "lblDebug";
+            lblDebug.Size = new Size(54, 20);
+            lblDebug.TabIndex = 3;
+            lblDebug.Text = "Debug";
             // 
             // btnManual
             // 
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1291, 33);
+            btnManual.Location = new Point(1108, 33);
             btnManual.Margin = new Padding(3, 4, 3, 4);
             btnManual.Name = "btnManual";
             btnManual.Size = new Size(57, 67);
@@ -88,7 +99,7 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1377, 33);
+            btnConfigs.Location = new Point(1194, 33);
             btnConfigs.Margin = new Padding(3, 4, 3, 4);
             btnConfigs.Name = "btnConfigs";
             btnConfigs.Size = new Size(57, 67);
@@ -115,15 +126,15 @@
             pnlBottom.Location = new Point(0, 0);
             pnlBottom.Margin = new Padding(3, 4, 3, 4);
             pnlBottom.Name = "pnlBottom";
-            pnlBottom.Size = new Size(1463, 960);
+            pnlBottom.Size = new Size(1280, 720);
             pnlBottom.TabIndex = 3;
             pnlBottom.Paint += pnlBottom_Paint;
-            pnlBottom.Resize += pnlBottom_Resize;
+            pnlBottom.MouseMove += pnlBottom_MouseMove;
             // 
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.None;
-            textBox1.Location = new Point(696, 808);
+            textBox1.Location = new Point(605, 649);
             textBox1.Margin = new Padding(3, 4, 3, 4);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(106, 27);
@@ -135,11 +146,11 @@
             txtComando.Cursor = Cursors.IBeam;
             txtComando.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             txtComando.ForeColor = Color.FromArgb(88, 99, 152);
-            txtComando.Location = new Point(238, 700);
+            txtComando.Location = new Point(238, 528);
             txtComando.Margin = new Padding(3, 4, 3, 4);
             txtComando.MinimumSize = new Size(342, 4);
             txtComando.Name = "txtComando";
-            txtComando.Size = new Size(987, 69);
+            txtComando.Size = new Size(804, 69);
             txtComando.TabIndex = 1;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
@@ -154,8 +165,9 @@
             Margin = new Padding(3, 4, 3, 4);
             MinimumSize = new Size(411, 240);
             Name = "UserControlHome";
-            Size = new Size(1463, 960);
+            Size = new Size(1280, 720);
             pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
@@ -171,8 +183,9 @@
         private PictureBox btnConfigs;
         private PictureBox imgLogo;
         private PictureBox btnManual;
-        private Panel pnlBottom;
         private TextBox txtComando;
         private TextBox textBox1;
+        private Label lblDebug;
+        private OptmizedPanel pnlBottom;
     }
 }

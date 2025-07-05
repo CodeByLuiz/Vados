@@ -50,11 +50,14 @@ namespace Vados
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
+            int middleX = this.Width / 2;
+            int middleY = this.Height / 2;
+
             int sizeOffset = 50;
             int width = 216 + sizeOffset;
             int height = 216 + sizeOffset;
-            int xx = this.Width / 2 - width / 2 - sizeOffset / 2;
-            int yy = 150 - sizeOffset/ 2;
+            int xx = middleX - width / 2;
+            int yy = 150 - sizeOffset / 2;
 
             //Sombra do círculo
             int shadowOffset = 15;
@@ -89,6 +92,11 @@ namespace Vados
             string imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png");
             Image micIcon = Image.FromFile(imgPath);
             e.Graphics.DrawImage(micIcon, new Rectangle(xx + sizeOffset / 2, yy + sizeOffset / 2, width - sizeOffset, height - sizeOffset));
+        }
+
+        private void pnlBottom_Resize(object sender, EventArgs e)
+        {
+            pnlBottom.Invalidate();
         }
     }
 }

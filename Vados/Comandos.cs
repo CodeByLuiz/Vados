@@ -179,7 +179,7 @@ namespace Vados
     };
             var prioridades = new List<string>
     {
-        Path.Combine(root, @"Vados"),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData" + @"\Roaming" + @"\Vados" ),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
@@ -311,7 +311,6 @@ namespace Vados
             }
         }
 
-
         public static string driveverifica(string[] args)
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
@@ -328,13 +327,23 @@ namespace Vados
             return null;
         }
 
-        public static void CriarPastaPadrao()
+
+        public static string CriarPastaPadrao()
         {
-            
-            string path = @"C:\Vados";
-            if (!Directory.Exists(path))
+
+            string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
+
+            try
             {
-                Directory.CreateDirectory(path);
+                if (!Directory.Exists(caminhoPadrao))
+                    Directory.CreateDirectory(caminhoPadrao);
+
+                return caminhoPadrao;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao criar a pasta padrão: " + ex.Message);
+                return null;
             }
         }
 
@@ -344,7 +353,7 @@ namespace Vados
             {
                 if (path == "") 
                 {
-                    path = Path.Combine(Global.DefaultFolder + nome);
+                    path = Path.Combine(Global.DefaultFolder + @"\" + nome);
                 }
                 else
                 {
@@ -379,7 +388,7 @@ namespace Vados
             {
                 if (path == "")
                 {
-                    path = Path.Combine(Global.DefaultFolder + nome + "." + extension);
+                    path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
                 }
                 else
                 {

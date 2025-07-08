@@ -123,17 +123,14 @@ namespace Vados
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
-                foreach (var x in Comandos.SearchFolders(SearchArquivo, true))
-                {
-                    listateste.Items.Add(x);
-                }
+                
+                    listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true));
+                
             }
             else
             {
-                foreach (var x in Comandos.SearchFolders(SearchArquivo, false))
-                {
-                    listateste.Items.Add(x);
-                }
+                  listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+                
             }
         }
 

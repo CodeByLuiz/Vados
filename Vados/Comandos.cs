@@ -179,7 +179,7 @@ namespace Vados
     };
             var prioridades = new List<string>
     {
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData" + @"\Roaming" + @"\Vados" ),
+        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados" ),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
         Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
@@ -229,14 +229,14 @@ namespace Vados
                                 {
                                     caminhos.Add(caminho);
                                     //fila.Enqueue(caminho);
-                                    Comandos.InserirNoInicio(fila, caminho);
+                                    InserirNoInicio(fila, caminho);
                                     if (caminho.Contains(aprocurar) && atual.Contains(aprocurar) )
                                     {
                                         MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
                                         MessageBox.Show(atual+" situação 1 "+ aprocurar);
                                         return atual;
                                     }
-                                    else
+                                    else if (caminho.Contains(aprocurar)) 
                                     {
                                         MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
                                         MessageBox.Show(caminho+" situação 2 " + aprocurar);
@@ -332,7 +332,7 @@ namespace Vados
         {
 
             string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-
+            MessageBox.Show(caminhoPadrao);
             try
             {
                 if (!Directory.Exists(caminhoPadrao))

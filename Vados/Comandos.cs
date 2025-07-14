@@ -27,19 +27,16 @@ namespace Vados
 
 
         public static void AbrirGerenciador(string path)
-        {// comando pra abrir o gerenciador depois de realizar uma função
-
-
+        {
+            //Comando pra abrir o gerenciador depois de realizar uma função
             path = Path.GetDirectoryName(path);
             if (Directory.Exists(path))
             {
                 Process.Start("explorer.exe", path);
             }
-
-
-
-
         }
+
+
     //    public static List<string> funcaoteste(string aprocurar, bool comando)
     //    {
     //        string root = @"" + driveverifica(null);
@@ -168,35 +165,36 @@ namespace Vados
             var caminhos = new List<string>();
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var ignorar = new List<string>
-    {
-        "$RECYCLE.BIN",
-        "System Volume Information",
-        "Recovery",
-        "Config.Msi",
-        "Windows",
-        "Program Files (x86)",
-        "Program Files"
-    };
-            var prioridades = new List<string>
-    {
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados" ),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-        Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-        //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+            {
+                "$RECYCLE.BIN",
+                "System Volume Information",
+                "Recovery",
+                "Config.Msi",
+                "Windows",
+                "Program Files (x86)",
+                "Program Files"
+            };
 
-        Path.Combine(root),
-    };
+            var prioridades = new List<string>
+            {
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+
+                Path.Combine(root),
+            };
 
             var fila = new Queue<string>();
             foreach (var pasta in prioridades)

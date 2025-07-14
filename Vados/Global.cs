@@ -23,7 +23,7 @@ namespace Vados
             GraphicsPath path = new GraphicsPath();
             float diameter = radius * 2;
 
-            //Canto cima esquera
+            //Canto cima esquerda
             path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
             //Linha cima
             path.AddLine(rect.X + radius, rect.Y, rect.Right - radius, rect.Y);

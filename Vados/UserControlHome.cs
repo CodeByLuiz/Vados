@@ -26,6 +26,19 @@ namespace Vados
         bool circleHovering = false;
         bool lastCircleHovering = false;
 
+        //Variáveis da textbox
+        int txtAreaPaddingW = 15;
+        int txtAreaPaddingH = 5;
+        int txtAreaWidth;
+        int txtAreaHeight;
+        int txtAreaX;
+        int txtAreaY;
+        int txtAreaOutSize = 5;
+        float txtIconMarginH = 5;
+        float txtIconMarginW = 9;
+        float txtIconSize;
+        int txtboxWidthOffset;
+        bool setTextboxWidth = false;
 
         public UserControlHome()
         {
@@ -35,7 +48,6 @@ namespace Vados
             timer.Interval = 16; // ~60 FPS
             timer.Tick += Timer_Tick;
             timer.Start();
-
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -71,7 +83,7 @@ namespace Vados
             int middleY = this.Height / 2;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-            //-------------------BOTÃO DO MICROFONE-----------------
+            #region BOTÃO DO MICROFONE
 
             circleX = middleX - circleSize / 2;
             circleY = 335 - circleSize / 2;
@@ -110,34 +122,42 @@ namespace Vados
             Image micIcon = Image.FromFile(imgPath);
             e.Graphics.DrawImage(micIcon, new RectangleF(circleX + sizeDiff / 2, circleY + sizeDiff / 2, circleSize - sizeDiff, circleSize - sizeDiff));
 
+            #endregion
 
 
-            //-------------------CAIXA DE TEXTO-----------------
-            int txtMarginW = 20;
-            int txtMarginH = 10;
-            int txtWidth = txtComando.Width + txtMarginW * 2;
-            int txtHeight = txtComando.Height + txtMarginH * 2;
+            #region CAIXA DE TEXTO
 
             //Contorno
             Color outlineColor = Colors.bluePrimary;
-            outlineSize = 5;
+            int outWidth = txtAreaWidth + txtAreaOutSize * 2;
+            int outHeight = txtAreaHeight + txtAreaOutSize * 2;
+            int outX = txtAreaX - txtAreaOutSize;
+            int outY = txtAreaY - txtAreaOutSize;
 
             brush = new SolidBrush(outlineColor);
-            rect = new RectangleF(txtComando.Location.X - txtMarginW, txtComando.Location.Y - txtMarginH, txtWidth, txtHeight);
-            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(txtHeight * 0.25));
+            rect = new RectangleF(outX, outY, outWidth, outHeight);
+            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.25));
             e.Graphics.FillPath(brush, roundedRectPath);
+
 
             //Fundo
             Color backColor = txtComando.BackColor;
-            int backX = txtComando.Location.X - txtMarginW + outlineSize;
-            int backY = txtComando.Location.Y - txtMarginH + outlineSize;
-            int backWidth = txtWidth - outlineSize * 2;
-            int backHeight = txtHeight - outlineSize * 2;
 
             brush = new SolidBrush(backColor);
-            rect = new RectangleF(backX, backY, backWidth, backHeight);
-            roundedRectPath = Global.RoundedRectangle(rect, (float)(backHeight * 0.25));
+            rect = new RectangleF(txtAreaX, txtAreaY, txtAreaWidth, txtAreaHeight);
+            roundedRectPath = Global.RoundedRectangle(rect, (float)(txtAreaHeight * 0.25));
             e.Graphics.FillPath(brush, roundedRectPath);
+
+
+            //Botão de enviar comando
+            float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float txtIconY = txtAreaY + txtIconMarginH;
+
+            imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png");
+            Image sendIcon = Image.FromFile(imgPath);
+            e.Graphics.DrawImage(sendIcon, txtIconX, txtIconY, txtIconSize, txtIconSize);
+
+            #endregion
         }
 
         private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
@@ -188,11 +208,27 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            //Ajustar posição da textbox
+            //Ajustar textbox
             int middleX = this.Width / 2;
-            int txtWidth = txtComando.Width;
 
-            txtComando.Location = new Point(middleX - txtWidth / 2, txtComando.Location.Y);
+            //Definir variáveis
+            if (setTextboxWidth == true)
+            {
+                txtComando.Width += txtboxWidthOffset;
+            }
+            txtAreaWidth = txtComando.Width + txtAreaPaddingW * 2;
+            txtAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
+            txtAreaX = txtComando.Location.X - txtAreaPaddingW;
+            txtAreaY = txtComando.Location.Y - txtAreaPaddingH;
+            txtIconSize = txtAreaHeight - 2 * txtIconMarginH;
+            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
+            
+            //Posição
+            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
+
+            //Tamanho
+            txtComando.Width -= txtboxWidthOffset;
+            setTextboxWidth = true;
         }
     }
 }

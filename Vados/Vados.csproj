@@ -28,7 +28,7 @@
     <Content Include="Images\Icons\micIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Icons\vados-icone.ico" />
+    <Content Include="Images\Icons\vados-icone.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Logo.jpg">

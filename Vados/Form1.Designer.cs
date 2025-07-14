@@ -52,7 +52,7 @@
             MinimumSize = new Size(729, 464);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "VADOS";
+            Text = "Vados";
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
             ResumeLayout(false);

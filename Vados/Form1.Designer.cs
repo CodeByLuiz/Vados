@@ -38,16 +38,15 @@
             panelContainer.Location = new Point(0, 0);
             panelContainer.Margin = new Padding(3, 4, 3, 4);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1445, 908);
+            panelContainer.Size = new Size(1262, 673);
             panelContainer.TabIndex = 1;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1445, 908);
+            ClientSize = new Size(1262, 673);
             Controls.Add(panelContainer);
-            FormBorderStyle = FormBorderStyle.None;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);
             MinimumSize = new Size(729, 464);
@@ -55,6 +54,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "VADOS";
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             ResumeLayout(false);
         }
 

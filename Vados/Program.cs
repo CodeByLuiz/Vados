@@ -1,3 +1,10 @@
+using System;
+using System.Diagnostics;
+using System.Security.Principal;
+using System.Windows.Forms;
+
+
+
 namespace Vados
 {
     internal static class Program

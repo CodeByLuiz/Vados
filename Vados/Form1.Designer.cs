@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             panelContainer = new Panel();
             SuspendLayout();
             // 
@@ -46,11 +47,12 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1262, 673);
             Controls.Add(panelContainer);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);
             MinimumSize = new Size(729, 464);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Form1";
+            Text = "VADOS";
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
             ResumeLayout(false);

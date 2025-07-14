@@ -14,9 +14,9 @@ namespace Vados
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
 
-        public static string DefaultFolder = @"C:\Vados\";
+        public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
-
+      
         //Desenhar retângulo arredondado
         public static GraphicsPath RoundedRectangle(RectangleF rect, float radius)
         {

@@ -18,9 +18,9 @@ namespace Vados
         System.Windows.Forms.Timer timer;
 
         //Variáveis do botão do microfone
-        float circleSizeDefault = 266;
-        float circleSize = 266;
-        float circleSizeTarget = 266;
+        float circleSizeDefault = 320;
+        float circleSize = 320;
+        float circleSizeTarget = 320;
         float circleX = 0;
         float circleY = 0;
         bool circleHovering = false;
@@ -69,27 +69,28 @@ namespace Vados
         {
             int middleX = this.Width / 2;
             int middleY = this.Height / 2;
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            //-------------------BOTÃO DO MICROFONE-----------------
 
             circleX = middleX - circleSize / 2;
-            circleY = 278 - circleSize / 2;
+            circleY = 335 - circleSize / 2;
 
             //Sombra do círculo
             int shadowOffset = 15;
 
-            using (GraphicsPath path = new GraphicsPath())
-            {
-                path.AddEllipse(circleX, circleY + shadowOffset, circleSize, circleSize);
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(circleX, circleY + shadowOffset, circleSize, circleSize);
 
-                PathGradientBrush pathBrush = new PathGradientBrush(path);
+            PathGradientBrush pathBrush = new PathGradientBrush(path);
 
-                pathBrush.CenterColor = Color.FromArgb(100, Color.Black);
-                pathBrush.SurroundColors = new[] { Color.FromArgb(2, Color.Black) };
-                e.Graphics.FillPath(pathBrush, path);
-            }
+            pathBrush.CenterColor = Color.FromArgb(100, Color.Black);
+            pathBrush.SurroundColors = new[] { Color.FromArgb(2, Color.Black) };
+            e.Graphics.FillPath(pathBrush, path);
 
 
             //Contorno do círculo
-            int outlineSize = 15;
+            int outlineSize = 25;
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
             RectangleF rect = new RectangleF(circleX, circleY, circleSize, circleSize);
@@ -97,18 +98,48 @@ namespace Vados
 
 
             //Círculo atrás do microfone
-            brush = new SolidBrush(Color.White);
+            Color circleColor = Color.FromArgb(243, 243, 243);
+            brush = new SolidBrush(circleColor);
             rect = new RectangleF(circleX + outlineSize / 2, circleY + outlineSize / 2, circleSize - outlineSize, circleSize - outlineSize);
             e.Graphics.FillEllipse(brush, rect);
 
 
             //Microfone
-            int sizeOffset = 50;
+            int sizeDiff = 120;
             string imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png");
             Image micIcon = Image.FromFile(imgPath);
-            e.Graphics.DrawImage(micIcon, new RectangleF(circleX + sizeOffset / 2, circleY + sizeOffset / 2, circleSize - sizeOffset, circleSize - sizeOffset));
+            e.Graphics.DrawImage(micIcon, new RectangleF(circleX + sizeDiff / 2, circleY + sizeDiff / 2, circleSize - sizeDiff, circleSize - sizeDiff));
+
+
+
+            //-------------------CAIXA DE TEXTO-----------------
+            int txtMarginW = 20;
+            int txtMarginH = 10;
+            int txtWidth = txtComando.Width + txtMarginW * 2;
+            int txtHeight = txtComando.Height + txtMarginH * 2;
+
+            //Contorno
+            Color outlineColor = Colors.bluePrimary;
+            outlineSize = 5;
+
+            brush = new SolidBrush(outlineColor);
+            rect = new RectangleF(txtComando.Location.X - txtMarginW, txtComando.Location.Y - txtMarginH, txtWidth, txtHeight);
+            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(txtHeight * 0.25));
+            e.Graphics.FillPath(brush, roundedRectPath);
+
+            //Fundo
+            Color backColor = txtComando.BackColor;
+            int backX = txtComando.Location.X - txtMarginW + outlineSize;
+            int backY = txtComando.Location.Y - txtMarginH + outlineSize;
+            int backWidth = txtWidth - outlineSize * 2;
+            int backHeight = txtHeight - outlineSize * 2;
+
+            brush = new SolidBrush(backColor);
+            rect = new RectangleF(backX, backY, backWidth, backHeight);
+            roundedRectPath = Global.RoundedRectangle(rect, (float)(backHeight * 0.25));
+            e.Graphics.FillPath(brush, roundedRectPath);
         }
-        
+
         private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
         {
             lastCircleHovering = circleHovering;
@@ -124,12 +155,15 @@ namespace Vados
             double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
 
             //Checar se o mouse está em dentro do círculo
-            if (distance <= circleSize / 2) {
+            if (distance <= circleSize / 2)
+            {
                 //Aumentar tamanho do círculo
                 circleSizeTarget = 300;
                 circleHovering = true;
                 pnlBottom.Cursor = Cursors.Hand;
-            } else {
+            }
+            else
+            {
                 //Resetar tamanho do botão
                 circleHovering = false;
                 circleSizeTarget = circleSizeDefault;
@@ -150,6 +184,15 @@ namespace Vados
             }
 
             pnlBottom.Invalidate();
+        }
+
+        private void pnlBottom_Resize(object sender, EventArgs e)
+        {
+            //Ajustar posição da textbox
+            int middleX = this.Width / 2;
+            int txtWidth = txtComando.Width;
+
+            txtComando.Location = new Point(middleX - txtWidth / 2, txtComando.Location.Y);
         }
     }
 }

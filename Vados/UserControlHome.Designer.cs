@@ -130,27 +130,33 @@
             pnlBottom.TabIndex = 3;
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
+            pnlBottom.Resize += pnlBottom_Resize;
             // 
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.None;
+            textBox1.BorderStyle = BorderStyle.None;
             textBox1.Location = new Point(605, 649);
             textBox1.Margin = new Padding(3, 4, 3, 4);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(106, 27);
+            textBox1.Size = new Size(106, 20);
             textBox1.TabIndex = 2;
             // 
             // txtComando
             // 
             txtComando.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtComando.BackColor = Color.FromArgb(243, 243, 243);
+            txtComando.BorderStyle = BorderStyle.None;
             txtComando.Cursor = Cursors.IBeam;
-            txtComando.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtComando.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
             txtComando.ForeColor = Color.FromArgb(88, 99, 152);
-            txtComando.Location = new Point(238, 528);
+            txtComando.ImeMode = ImeMode.NoControl;
+            txtComando.Location = new Point(238, 573);
             txtComando.Margin = new Padding(3, 4, 3, 4);
+            txtComando.MaximumSize = new Size(1240, 0);
             txtComando.MinimumSize = new Size(342, 4);
             txtComando.Name = "txtComando";
-            txtComando.Size = new Size(804, 69);
+            txtComando.Size = new Size(804, 44);
             txtComando.TabIndex = 1;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
@@ -160,6 +166,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(231, 231, 231);
             Controls.Add(pnlTop);
             Controls.Add(pnlBottom);
             Margin = new Padding(3, 4, 3, 4);

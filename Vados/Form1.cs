@@ -55,7 +55,6 @@ namespace Vados
 
                     FormBorderStyle = FormBorderStyle.None;
                     WindowState = FormWindowState.Maximized;
-                    TopMost = true;
 
                     isFullscreen = true;
                     return;
@@ -65,7 +64,6 @@ namespace Vados
                 Bounds = lastBounds;
                 WindowState = lastWindowState;
                 FormBorderStyle = lastBorderStyle;
-                TopMost = false;
 
                 isFullscreen = false;
             }

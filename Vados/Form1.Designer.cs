@@ -35,21 +35,24 @@
             // 
             panelContainer.Dock = DockStyle.Fill;
             panelContainer.Location = new Point(0, 0);
+            panelContainer.Margin = new Padding(3, 4, 3, 4);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1264, 681);
+            panelContainer.Size = new Size(1262, 673);
             panelContainer.TabIndex = 1;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1264, 681);
+            ClientSize = new Size(1262, 673);
             Controls.Add(panelContainer);
-            MinimumSize = new Size(640, 360);
+            Margin = new Padding(3, 4, 3, 4);
+            MinimumSize = new Size(729, 464);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             ResumeLayout(false);
         }
 

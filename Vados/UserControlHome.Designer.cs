@@ -31,27 +31,27 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             button1 = new Button();
             pnlTop = new Panel();
+            lblDebug = new Label();
             btnManual = new PictureBox();
             btnConfigs = new PictureBox();
             imgLogo = new PictureBox();
-            pnlBottom = new Panel();
-            txtComando = new TextBox();
-            pictureBox1 = new PictureBox();
+            pnlBottom = new OptmizedPanel();
             textBox1 = new TextBox();
+            txtComando = new TextBox();
             pnlTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
             pnlBottom.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // button1
             // 
             button1.Anchor = AnchorStyles.None;
-            button1.Location = new Point(609, 34);
+            button1.Location = new Point(605, 38);
+            button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
-            button1.Size = new Size(93, 23);
+            button1.Size = new Size(106, 31);
             button1.TabIndex = 0;
             button1.Text = "Trocar Página";
             button1.UseVisualStyleBackColor = true;
@@ -60,24 +60,36 @@
             // pnlTop
             // 
             pnlTop.AutoScroll = true;
+            pnlTop.Controls.Add(lblDebug);
             pnlTop.Controls.Add(button1);
             pnlTop.Controls.Add(btnManual);
             pnlTop.Controls.Add(btnConfigs);
             pnlTop.Controls.Add(imgLogo);
             pnlTop.Dock = DockStyle.Top;
             pnlTop.Location = new Point(0, 0);
+            pnlTop.Margin = new Padding(0);
             pnlTop.Name = "pnlTop";
-            pnlTop.Size = new Size(1280, 100);
+            pnlTop.Size = new Size(1280, 118);
             pnlTop.TabIndex = 1;
+            // 
+            // lblDebug
+            // 
+            lblDebug.AutoSize = true;
+            lblDebug.Location = new Point(263, 80);
+            lblDebug.Name = "lblDebug";
+            lblDebug.Size = new Size(54, 20);
+            lblDebug.TabIndex = 3;
+            lblDebug.Text = "Debug";
             // 
             // btnManual
             // 
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1130, 25);
+            btnManual.Location = new Point(1108, 33);
+            btnManual.Margin = new Padding(3, 4, 3, 4);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(50, 50);
+            btnManual.Size = new Size(57, 67);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 2;
             btnManual.TabStop = false;
@@ -87,9 +99,10 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1205, 25);
+            btnConfigs.Location = new Point(1194, 33);
+            btnConfigs.Margin = new Padding(3, 4, 3, 4);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(50, 50);
+            btnConfigs.Size = new Size(57, 67);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 1;
             btnConfigs.TabStop = false;
@@ -97,9 +110,10 @@
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(34, 12);
+            imgLogo.Location = new Point(39, 16);
+            imgLogo.Margin = new Padding(3, 4, 3, 4);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(191, 73);
+            imgLogo.Size = new Size(218, 97);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 0;
             imgLogo.TabStop = false;
@@ -108,63 +122,64 @@
             // 
             pnlBottom.Controls.Add(textBox1);
             pnlBottom.Controls.Add(txtComando);
-            pnlBottom.Controls.Add(pictureBox1);
             pnlBottom.Dock = DockStyle.Fill;
             pnlBottom.Location = new Point(0, 0);
+            pnlBottom.Margin = new Padding(3, 4, 3, 4);
             pnlBottom.Name = "pnlBottom";
             pnlBottom.Size = new Size(1280, 720);
             pnlBottom.TabIndex = 3;
+            pnlBottom.Paint += pnlBottom_Paint;
+            pnlBottom.MouseMove += pnlBottom_MouseMove;
+            pnlBottom.Resize += pnlBottom_Resize;
+            // 
+            // textBox1
+            // 
+            textBox1.Anchor = AnchorStyles.None;
+            textBox1.BorderStyle = BorderStyle.None;
+            textBox1.Location = new Point(605, 649);
+            textBox1.Margin = new Padding(3, 4, 3, 4);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(106, 20);
+            textBox1.TabIndex = 2;
             // 
             // txtComando
             // 
             txtComando.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtComando.BackColor = Color.FromArgb(243, 243, 243);
+            txtComando.BorderStyle = BorderStyle.None;
             txtComando.Cursor = Cursors.IBeam;
-            txtComando.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtComando.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
             txtComando.ForeColor = Color.FromArgb(88, 99, 152);
-            txtComando.Location = new Point(208, 525);
-            txtComando.MinimumSize = new Size(300, 0);
+            txtComando.ImeMode = ImeMode.NoControl;
+            txtComando.Location = new Point(238, 573);
+            txtComando.Margin = new Padding(3, 4, 3, 4);
+            txtComando.MaximumSize = new Size(1240, 0);
+            txtComando.MinimumSize = new Size(342, 4);
             txtComando.Name = "txtComando";
-            txtComando.Size = new Size(864, 57);
+            txtComando.Size = new Size(804, 44);
             txtComando.TabIndex = 1;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
-            // pictureBox1
-            // 
-            pictureBox1.Anchor = AnchorStyles.None;
-            pictureBox1.Image = Properties.Resources.micIcon;
-            pictureBox1.Location = new Point(532, 149);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(247, 214);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 0;
-            pictureBox1.TabStop = false;
-            // 
-            // textBox1
-            // 
-            textBox1.Anchor = AnchorStyles.None;
-            textBox1.Location = new Point(609, 606);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(93, 23);
-            textBox1.TabIndex = 2;
-            // 
             // UserControlHome
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(231, 231, 231);
             Controls.Add(pnlTop);
             Controls.Add(pnlBottom);
-            MinimumSize = new Size(360, 180);
+            Margin = new Padding(3, 4, 3, 4);
+            MinimumSize = new Size(411, 240);
             Name = "UserControlHome";
             Size = new Size(1280, 720);
             pnlTop.ResumeLayout(false);
+            pnlTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -175,9 +190,9 @@
         private PictureBox btnConfigs;
         private PictureBox imgLogo;
         private PictureBox btnManual;
-        private Panel pnlBottom;
-        private PictureBox pictureBox1;
         private TextBox txtComando;
         private TextBox textBox1;
+        private Label lblDebug;
+        private OptmizedPanel pnlBottom;
     }
 }

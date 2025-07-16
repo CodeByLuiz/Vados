@@ -21,6 +21,7 @@ namespace Vados
             panelContainer.Controls.Clear();
             userControl.Dock = DockStyle.Fill;
             panelContainer.Controls.Add(userControl);
+            this.Focus();
         }
 
 

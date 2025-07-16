@@ -18,24 +18,24 @@ namespace Vados
         System.Windows.Forms.Timer timer;
 
         //Variáveis do botão do microfone
-        float circleSizeDefault = 320;
-        float circleSize = 320;
-        float circleSizeTarget = 320;
+        float circleSizeDefault = 325;
+        float circleSize = 325;
+        float circleSizeTarget = 325;
         float circleX = 0;
         float circleY = 0;
         bool circleHovering = false;
         bool lastCircleHovering = false;
 
         //Variáveis da textbox
-        int txtAreaPaddingW = 15;
-        int txtAreaPaddingH = 5;
+        int txtAreaPaddingW = 18;
+        int txtAreaPaddingH = 15;
         int txtAreaWidth;
         int txtAreaHeight;
         int txtAreaX;
         int txtAreaY;
-        int txtAreaOutSize = 5;
-        float txtIconMarginH = 5;
-        float txtIconMarginW = 9;
+        int txtAreaOutSize = 6;
+        float txtIconMarginH = 8;
+        float txtIconMarginW = 18;
         float txtIconSize;
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
@@ -50,7 +50,7 @@ namespace Vados
             timer.Start();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnTrocarPagina_Click(object sender, EventArgs e)
         {
             //Ir para página de configurações
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
@@ -136,7 +136,7 @@ namespace Vados
 
             brush = new SolidBrush(outlineColor);
             rect = new RectangleF(outX, outY, outWidth, outHeight);
-            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.25));
+            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.33));
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
@@ -145,7 +145,7 @@ namespace Vados
 
             brush = new SolidBrush(backColor);
             rect = new RectangleF(txtAreaX, txtAreaY, txtAreaWidth, txtAreaHeight);
-            roundedRectPath = Global.RoundedRectangle(rect, (float)(txtAreaHeight * 0.25));
+            roundedRectPath = Global.RoundedRectangle(rect, (float)(txtAreaHeight * 0.33));
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
@@ -222,13 +222,17 @@ namespace Vados
             txtAreaY = txtComando.Location.Y - txtAreaPaddingH;
             txtIconSize = txtAreaHeight - 2 * txtIconMarginH;
             txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
-            
+
             //Posição
             txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
 
             //Tamanho
             txtComando.Width -= txtboxWidthOffset;
             setTextboxWidth = true;
+
+
+            //Ajustar label (o que você deseja fazer?)
+            lblText.Location = new Point(middleX - lblText.Width / 2, lblText.Location.Y);
         }
     }
 }

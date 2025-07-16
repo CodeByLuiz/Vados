@@ -49,7 +49,7 @@
             Controls.Add(panelContainer);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);
-            MinimumSize = new Size(729, 464);
+            MinimumSize = new Size(820, 540);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Vados";

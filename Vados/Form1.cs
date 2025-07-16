@@ -49,12 +49,14 @@ namespace Vados
                 //Ativar tela cheia
                 if (isFullscreen == false)
                 {
-                    lastBounds = Screen.FromControl(this).Bounds;
+                    lastBounds = Bounds;
                     lastWindowState = WindowState;
                     lastBorderStyle = FormBorderStyle;
 
+                    WindowState = FormWindowState.Normal;
                     FormBorderStyle = FormBorderStyle.None;
                     WindowState = FormWindowState.Maximized;
+                    Bounds = Screen.FromControl(this).Bounds;
 
                     isFullscreen = true;
                     return;

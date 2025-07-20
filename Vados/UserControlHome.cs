@@ -162,19 +162,24 @@ namespace Vados
 
         private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
         {
-            lastCircleHovering = circleHovering;
-
-            //Aumentar tamanho do botão do microfone quando passar o mouse
+            //Informações do mouse
+            pnlBottom.Cursor = Cursors.Default;
             Point mousePos = this.PointToClient(Cursor.Position);
             int mouseX = mousePos.X;
             int mouseY = mousePos.Y;
 
+
+            #region BOTÃO DE MICROFONE
+
+            lastCircleHovering = circleHovering;
+
+            //Aumentar tamanho do botão do microfone quando passar o mouse
             PointF middle = new PointF(circleX + circleSize / 2, circleY + circleSize / 2);
             float distanceX = middle.X - mouseX;
             float distanceY = middle.Y - mouseY;
             double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
 
-            //Checar se o mouse está em dentro do círculo
+            //Checar se o mouse está dentro do círculo
             if (distance <= circleSize / 2)
             {
                 //Aumentar tamanho do círculo
@@ -184,18 +189,36 @@ namespace Vados
             }
             else
             {
-                //Resetar tamanho do botão
+                //Resetar tamanho do círculo
                 circleHovering = false;
                 circleSizeTarget = circleSizeDefault;
-                pnlBottom.Cursor = Cursors.Default;
             }
+
+            #endregion
+
+
+            #region BOTÃO DE ENVIAR COMANDO
+
+            float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float txtIconY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(txtIconX, txtIconY, txtIconSize, txtIconSize);
+
+            lblDebug.Text = rect.Width.ToString() + ", " + rect.Height.ToString() + " - " + rect.X.ToString() + ", " + rect.Y.ToString() + " - " + mouseX.ToString() + ", " + mouseY.ToString();
+
+            //Checar se o mouse está em dentro do botão
+            if (Global.InsideRectangle(mousePos, rect) == true)
+            {
+                //Trocar imagem do mouse
+                pnlBottom.Cursor = Cursors.Hand;
+            }
+
+            #endregion
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
             //Ajustar tamanho do botão do microfone
             circleSize += (circleSizeTarget - circleSize) / 3;
-            lblDebug.Text = circleSize.ToString() + ", " + circleSizeTarget.ToString() + ", " + ((circleSizeTarget - circleSize) / 10).ToString();
 
             if (Math.Abs(circleSizeTarget - circleSize) < 1)
             {

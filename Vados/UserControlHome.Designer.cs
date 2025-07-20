@@ -78,7 +78,7 @@
             // lblDebug
             // 
             lblDebug.AutoSize = true;
-            lblDebug.Location = new Point(221, 60);
+            lblDebug.Location = new Point(231, 60);
             lblDebug.Name = "lblDebug";
             lblDebug.Size = new Size(42, 15);
             lblDebug.TabIndex = 8;

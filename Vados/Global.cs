@@ -43,5 +43,18 @@ namespace Vados
             path.CloseFigure();
             return path;
         }
+
+
+        //Checar se um ponto está dentro de determinado retângulo
+        public static bool InsideRectangle(Point point, RectangleF rect)
+        {
+            if (point.X < rect.X) { return false; }
+            if (point.Y < rect.Y) { return false; }
+            if (point.X > rect.X + rect.Width) { return false; }
+            if (point.Y > rect.Y + rect.Height) { return false; }
+
+            return true;
+        }
+
     }
 }

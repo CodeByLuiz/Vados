@@ -56,9 +56,8 @@
             pnlBottom.Controls.Add(txtComando);
             pnlBottom.Dock = DockStyle.Fill;
             pnlBottom.Location = new Point(0, 0);
-            pnlBottom.Margin = new Padding(3, 4, 3, 4);
             pnlBottom.Name = "pnlBottom";
-            pnlBottom.Size = new Size(1920, 1080);
+            pnlBottom.Size = new Size(1680, 810);
             pnlBottom.TabIndex = 3;
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
@@ -69,9 +68,9 @@
             lblText.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             lblText.AutoSize = true;
             lblText.Font = new Font("Segoe UI Semibold", 27F, FontStyle.Bold);
-            lblText.Location = new Point(695, 593);
+            lblText.Location = new Point(608, 445);
             lblText.Name = "lblText";
-            lblText.Size = new Size(531, 61);
+            lblText.Size = new Size(425, 48);
             lblText.TabIndex = 9;
             lblText.Text = "O que você deseja fazer?";
             lblText.TextAlign = ContentAlignment.TopCenter;
@@ -79,19 +78,18 @@
             // lblDebug
             // 
             lblDebug.AutoSize = true;
-            lblDebug.Location = new Point(253, 80);
+            lblDebug.Location = new Point(221, 60);
             lblDebug.Name = "lblDebug";
-            lblDebug.Size = new Size(54, 20);
+            lblDebug.Size = new Size(42, 15);
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
             // 
             // btnTrocarPagina
             // 
             btnTrocarPagina.Anchor = AnchorStyles.Top;
-            btnTrocarPagina.Location = new Point(925, 38);
-            btnTrocarPagina.Margin = new Padding(3, 4, 3, 4);
+            btnTrocarPagina.Location = new Point(809, 28);
             btnTrocarPagina.Name = "btnTrocarPagina";
-            btnTrocarPagina.Size = new Size(106, 31);
+            btnTrocarPagina.Size = new Size(93, 23);
             btnTrocarPagina.TabIndex = 1;
             btnTrocarPagina.Text = "Trocar Página";
             btnTrocarPagina.UseVisualStyleBackColor = true;
@@ -102,10 +100,9 @@
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1748, 33);
-            btnManual.Margin = new Padding(3, 4, 3, 4);
+            btnManual.Location = new Point(1530, 25);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(57, 67);
+            btnManual.Size = new Size(50, 50);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
@@ -115,10 +112,9 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1834, 33);
-            btnConfigs.Margin = new Padding(3, 4, 3, 4);
+            btnConfigs.Location = new Point(1605, 25);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(57, 67);
+            btnConfigs.Size = new Size(50, 50);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
@@ -126,10 +122,9 @@
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(39, 16);
-            imgLogo.Margin = new Padding(3, 4, 3, 4);
+            imgLogo.Location = new Point(34, 12);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(218, 97);
+            imgLogo.Size = new Size(191, 73);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 5;
             imgLogo.TabStop = false;
@@ -138,10 +133,9 @@
             // 
             textBox1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             textBox1.BorderStyle = BorderStyle.None;
-            textBox1.Location = new Point(925, 811);
-            textBox1.Margin = new Padding(3, 4, 3, 4);
+            textBox1.Location = new Point(809, 608);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(106, 20);
+            textBox1.Size = new Size(93, 16);
             textBox1.TabIndex = 2;
             textBox1.TabStop = false;
             // 
@@ -154,12 +148,11 @@
             txtComando.Font = new Font("Segoe UI", 20F);
             txtComando.ForeColor = Color.FromArgb(88, 99, 152);
             txtComando.ImeMode = ImeMode.NoControl;
-            txtComando.Location = new Point(335, 735);
-            txtComando.Margin = new Padding(3, 4, 3, 4);
-            txtComando.MaximumSize = new Size(1240, 0);
-            txtComando.MinimumSize = new Size(342, 4);
+            txtComando.Location = new Point(293, 551);
+            txtComando.MaximumSize = new Size(1085, 0);
+            txtComando.MinimumSize = new Size(299, 4);
             txtComando.Name = "txtComando";
-            txtComando.Size = new Size(1240, 45);
+            txtComando.Size = new Size(1085, 36);
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
@@ -167,14 +160,13 @@
             // 
             // UserControlHome
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(231, 231, 231);
             Controls.Add(pnlBottom);
-            Margin = new Padding(3, 4, 3, 4);
-            MinimumSize = new Size(411, 240);
+            MinimumSize = new Size(360, 180);
             Name = "UserControlHome";
-            Size = new Size(1920, 1080);
+            Size = new Size(1680, 810);
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();

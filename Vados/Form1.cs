@@ -8,6 +8,7 @@ namespace Vados
         private FormWindowState lastWindowState;
         private FormBorderStyle lastBorderStyle;
         private Rectangle lastBounds;
+        private Rectangle lastMinimizedBounds;
 
         public Form1()
         {

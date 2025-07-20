@@ -208,7 +208,8 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            //Ajustar textbox
+            #region AJUSTAR TEXTBOX
+
             int middleX = this.Width / 2;
 
             //Definir variáveis
@@ -216,23 +217,30 @@ namespace Vados
             {
                 txtComando.Width += txtboxWidthOffset;
             }
+            float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
+            txtIconSize = txtOldAreaHeight - 2 * txtIconMarginH;
+            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
+
+            //Posição da textbox
+            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
+
+            //Tamanho e posição da área atrás da textbox
             txtAreaWidth = txtComando.Width + txtAreaPaddingW * 2;
             txtAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
             txtAreaX = txtComando.Location.X - txtAreaPaddingW;
             txtAreaY = txtComando.Location.Y - txtAreaPaddingH;
-            txtIconSize = txtAreaHeight - 2 * txtIconMarginH;
-            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
 
-            //Posição
-            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
-
-            //Tamanho
+            //Diminuir tamanho da textbox para não passar por cima do botão de enviar
             txtComando.Width -= txtboxWidthOffset;
             setTextboxWidth = true;
+
+            #endregion
 
 
             //Ajustar label (o que você deseja fazer?)
             lblText.Location = new Point(middleX - lblText.Width / 2, lblText.Location.Y);
+
+            pnlBottom.Invalidate();
         }
     }
 }

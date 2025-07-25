@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -289,6 +290,105 @@ namespace Vados
             return null;
         }
 
+        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio) 
+        {
+            //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
+            pastaRoot = SearchFolders(pastaRoot,true);
+            
+            string root = @"" + driveverifica(null);
+            var caminhos = new List<string>();
+            var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var resultados = new HashSet<string>();
+            var ignorar = new List<string>
+            {
+                "$RECYCLE.BIN",
+                "System Volume Information",
+                "Recovery",
+                "Config.Msi",
+                "Windows",
+                "Program Files (x86)",
+                "Program Files"
+            };
+
+            var prioridades = new List<string>
+            {
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+
+                Path.Combine(root),
+            };
+
+            var fila = new Queue<string>();
+            foreach (var pasta in prioridades)
+            {
+                if (Directory.Exists(pasta))
+                {
+                    fila.Enqueue(pasta);
+                    caminhos.Add(pasta);
+                }
+            }
+
+            fila.Enqueue(root);
+
+            while (fila.Count > 0)
+            {
+                var atual = fila.Dequeue();
+                try
+                {
+                    foreach (var arquivo in Directory.GetFiles(atual))
+                    {
+                        string nome = Path.GetFileName(arquivo);
+                        if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && nome.Contains(outrocriterio) && arquivo.Contains(pastaRoot) )
+                        {
+                           MessageBox.Show($"Arquivo encontrado: {arquivo}");
+                            resultados.Add(arquivo);
+
+                        }
+
+
+                        foreach (var caminho in Directory.GetDirectories(atual))
+                        {
+                            string nomePasta = Path.GetFileName(caminho);
+                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                                continue;
+
+                            //fila.Enqueue(caminho);
+
+
+                            if (visitados.Add(caminho))
+                            {
+                                Comandos.InserirNoInicio(fila, caminho);
+                            }
+                        }
+
+
+                    }
+                }
+
+                catch (Exception)
+                {
+
+                }
+            }
+            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+            return resultados;
+        }
+
+
+
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
         {
             Queue<T> filaTemporaria = new Queue<T>();
@@ -308,6 +408,17 @@ namespace Vados
                 fila.Enqueue(filaTemporaria.Dequeue());
             }
         }
+
+        public static string MultiTask(string criterio, string pastaAbuscar, string criterio2)
+        {
+            // esse aqui pode buscar pelo nome e extensão   
+            MultiSearch(criterio, pastaAbuscar, criterio2);
+
+
+
+            return "oi";
+        }
+        
 
         public static string driveverifica(string[] args)
         {

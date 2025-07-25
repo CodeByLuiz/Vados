@@ -119,6 +119,7 @@ namespace Vados
         {
 
          string SearchArquivo = txtSearch.Text;
+        
 
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
@@ -129,7 +130,10 @@ namespace Vados
             }
             else
             {
-                  listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+                // listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+                foreach (var x in Comandos.MultiSearch(SearchArquivo,"pasta de teste",".txt")) { 
+                    listateste.Items.Add(x);
+                }
                 
             }
         }

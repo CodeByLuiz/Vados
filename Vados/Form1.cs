@@ -8,6 +8,7 @@ namespace Vados
         private FormWindowState lastWindowState;
         private FormBorderStyle lastBorderStyle;
         private Rectangle lastBounds;
+        private Rectangle lastMinimizedBounds;
 
         public Form1()
         {
@@ -21,6 +22,7 @@ namespace Vados
             panelContainer.Controls.Clear();
             userControl.Dock = DockStyle.Fill;
             panelContainer.Controls.Add(userControl);
+            this.Focus();
         }
 
 
@@ -49,12 +51,14 @@ namespace Vados
                 //Ativar tela cheia
                 if (isFullscreen == false)
                 {
-                    lastBounds = Screen.FromControl(this).Bounds;
+                    lastBounds = Bounds;
                     lastWindowState = WindowState;
                     lastBorderStyle = FormBorderStyle;
 
+                    WindowState = FormWindowState.Normal;
                     FormBorderStyle = FormBorderStyle.None;
                     WindowState = FormWindowState.Maximized;
+                    Bounds = Screen.FromControl(this).Bounds;
 
                     isFullscreen = true;
                     return;

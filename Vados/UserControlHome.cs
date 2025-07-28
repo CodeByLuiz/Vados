@@ -18,39 +18,40 @@ namespace Vados
         System.Windows.Forms.Timer timer;
 
         //Variáveis do botão do microfone
-        float circleSizeDefault = 320;
-        float circleSize = 320;
-        float circleSizeTarget = 320;
+        float circleSizeDefault = 325;
+        float circleSize = 325;
+        float circleSizeTarget = 325;
         float circleX = 0;
         float circleY = 0;
         bool circleHovering = false;
         bool lastCircleHovering = false;
 
         //Variáveis da textbox
-        int txtAreaPaddingW = 15;
-        int txtAreaPaddingH = 5;
+        int txtAreaPaddingW = 18;
+        int txtAreaPaddingH = 15;
         int txtAreaWidth;
         int txtAreaHeight;
         int txtAreaX;
         int txtAreaY;
-        int txtAreaOutSize = 5;
-        float txtIconMarginH = 5;
-        float txtIconMarginW = 9;
+        int txtAreaOutSize = 6;
+        float txtIconMarginH = 8;
+        float txtIconMarginW = 18;
         float txtIconSize;
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
+        bool textboxActive = false;
 
         public UserControlHome()
         {
             InitializeComponent();
 
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16; // ~60 FPS
+            timer.Interval = 16; //~60 FPS
             timer.Tick += Timer_Tick;
             timer.Start();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnTrocarPagina_Click(object sender, EventArgs e)
         {
             //Ir para página de configurações
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
@@ -59,22 +60,26 @@ namespace Vados
         private void txtComando_Click(object sender, EventArgs e)
         {
             //Apagar texto temporário
-            if (txtComando.ForeColor.Equals(Colors.blueTernary))
+            if (textboxActive == false)
             {
                 txtComando.Text = "";
                 txtComando.ForeColor = Color.Black;
             }
+
+            textboxActive = true;
         }
 
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário
-            if (txtComando.Text == "")
+            if (textboxActive == true)
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
             }
+
+            textboxActive = false;
         }
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
@@ -136,7 +141,7 @@ namespace Vados
 
             brush = new SolidBrush(outlineColor);
             rect = new RectangleF(outX, outY, outWidth, outHeight);
-            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.25));
+            GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.33));
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
@@ -145,7 +150,7 @@ namespace Vados
 
             brush = new SolidBrush(backColor);
             rect = new RectangleF(txtAreaX, txtAreaY, txtAreaWidth, txtAreaHeight);
-            roundedRectPath = Global.RoundedRectangle(rect, (float)(txtAreaHeight * 0.25));
+            roundedRectPath = Global.RoundedRectangle(rect, (float)(txtAreaHeight * 0.33));
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
@@ -162,19 +167,24 @@ namespace Vados
 
         private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
         {
-            lastCircleHovering = circleHovering;
-
-            //Aumentar tamanho do botão do microfone quando passar o mouse
+            //Informações do mouse
+            pnlBottom.Cursor = Cursors.Default;
             Point mousePos = this.PointToClient(Cursor.Position);
             int mouseX = mousePos.X;
             int mouseY = mousePos.Y;
 
+
+            #region BOTÃO DE MICROFONE
+
+            lastCircleHovering = circleHovering;
+
+            //Aumentar tamanho do botão do microfone quando passar o mouse
             PointF middle = new PointF(circleX + circleSize / 2, circleY + circleSize / 2);
             float distanceX = middle.X - mouseX;
             float distanceY = middle.Y - mouseY;
             double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
 
-            //Checar se o mouse está em dentro do círculo
+            //Checar se o mouse está dentro do círculo
             if (distance <= circleSize / 2)
             {
                 //Aumentar tamanho do círculo
@@ -184,18 +194,36 @@ namespace Vados
             }
             else
             {
-                //Resetar tamanho do botão
+                //Resetar tamanho do círculo
                 circleHovering = false;
                 circleSizeTarget = circleSizeDefault;
-                pnlBottom.Cursor = Cursors.Default;
             }
+
+            #endregion
+
+
+            #region BOTÃO DE ENVIAR COMANDO
+
+            float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float txtIconY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(txtIconX, txtIconY, txtIconSize, txtIconSize);
+
+            lblDebug.Text = rect.Width.ToString() + ", " + rect.Height.ToString() + " - " + rect.X.ToString() + ", " + rect.Y.ToString() + " - " + mouseX.ToString() + ", " + mouseY.ToString();
+
+            //Checar se o mouse está em dentro do botão
+            if (Global.InsideRectangle(mousePos, rect) == true)
+            {
+                //Trocar imagem do mouse
+                pnlBottom.Cursor = Cursors.Hand;
+            }
+
+            #endregion
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
             //Ajustar tamanho do botão do microfone
             circleSize += (circleSizeTarget - circleSize) / 3;
-            lblDebug.Text = circleSize.ToString() + ", " + circleSizeTarget.ToString() + ", " + ((circleSizeTarget - circleSize) / 10).ToString();
 
             if (Math.Abs(circleSizeTarget - circleSize) < 1)
             {
@@ -208,27 +236,74 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            //Ajustar textbox
+            #region AJUSTAR TEXTBOX
+
             int middleX = this.Width / 2;
 
-            //Definir variáveis
+            //Ajustar tamanho para definir as variáveis corretamente
             if (setTextboxWidth == true)
             {
                 txtComando.Width += txtboxWidthOffset;
             }
+
+            //Tamanho da textbox
+            double newWidth = this.Width * 0.575;
+            txtComando.Width = (int)newWidth;
+
+            //Posição da textbox
+            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
+
+            //Variáveis da área atrás da textbox
+            float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
+            txtIconSize = txtOldAreaHeight - 2 * txtIconMarginH;
+            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
             txtAreaWidth = txtComando.Width + txtAreaPaddingW * 2;
             txtAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
             txtAreaX = txtComando.Location.X - txtAreaPaddingW;
             txtAreaY = txtComando.Location.Y - txtAreaPaddingH;
-            txtIconSize = txtAreaHeight - 2 * txtIconMarginH;
-            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
-            
-            //Posição
-            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
 
-            //Tamanho
+            //Diminuir tamanho da textbox para não passar por cima do botão de enviar
             txtComando.Width -= txtboxWidthOffset;
             setTextboxWidth = true;
+
+            #endregion
+
+
+            //Ajustar label (o que você deseja fazer?)
+            lblText.Location = new Point(middleX - lblText.Width / 2, lblText.Location.Y);
+
+            pnlBottom.Invalidate();
+        }
+
+        private void pnlBottom_Click(object sender, EventArgs e)
+        {
+            //Informações do mouse
+            pnlBottom.Cursor = Cursors.Default;
+            Point mousePos = this.PointToClient(Cursor.Position);
+            int mouseX = mousePos.X;
+            int mouseY = mousePos.Y;
+
+
+            #region BOTÃO DE ENVIAR COMANDO
+
+            float sendButtonX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float sendButtonY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(sendButtonX, sendButtonY, txtIconSize, txtIconSize);
+
+            //Checar se o mouse está em dentro do botão
+            if (Global.InsideRectangle(mousePos, rect) == true)
+            {
+                string comando = txtComando.Text;
+
+                if (textboxActive == true)
+                {
+                    List<string> palavras = Comandos.SepararPalavras(comando);
+                    MessageBox.Show(String.Join(", ", palavras.ToArray()));
+                }
+            }
+
+            #endregion
+
         }
     }
 }

@@ -9,19 +9,109 @@ namespace Vados
 {
     internal class Comandos
     {
-        public static void ExecutarComando(string[] palavras)
-        {
+        #region TEXTO PARA COMANDO
 
+        //Funções das palavras
+        public enum WordType
+        {
+            Command,
+            Object,
+            Connector,
+            Argument,
+        };
+
+        static Dictionary<string, WordType> wordTypes = new Dictionary<string, WordType>(StringComparer.OrdinalIgnoreCase)
+        {
+            //Comandos
+            { "criar", WordType.Command },
+            { "renomear", WordType.Command },
+            { "excluir", WordType.Command },
+            //Objetos
+            { "pasta", WordType.Object },
+            { "arquivo", WordType.Object },
+            //Conectores
+            { "para", WordType.Connector },
+        };
+
+
+        public static WordType WordGetType(string word)
+        {
+            if (wordTypes.TryGetValue(word, out WordType result))
+            {
+                return result;
+            }
+
+            return WordType.Argument;
         }
 
 
-        public static List<string> SepararPalavras(string comando)
+        public static List<WordType> CommandGetDetails(string command)
+        {
+            //Retorna uma lista de palavras necessárias para realizar o comando
+            switch (command)
+            {
+                case "criar":
+                    return new List<WordType>() { WordType.Object, WordType.Argument };
+
+                case "renomear":
+                    return new List<WordType>() { WordType.Object, WordType.Argument, WordType.Connector, WordType.Argument };
+
+                case "excluir":
+                    return new List<WordType>() { WordType.Object, WordType.Argument };
+
+
+                //Lista vazia se não identificar o comando
+                default:
+                    return new List<WordType>();
+            }
+        }
+
+
+        public static bool ValidateCommand(List<string> words)
+        {
+            string command = "";
+            List<WordType> typeOrder = null;
+            int typeIndex = 0;
+
+            //Checar se o comando possui todas as palavras necessárias
+            for (int i = 0; i < words.Count; i++)
+            {
+                string word = words[i].ToLower();
+                WordType type = WordGetType(word);
+                
+                //Definir comando
+                if (command == "" && type == WordType.Command)
+                {
+                    command = word;
+                    typeOrder = CommandGetDetails(command);
+                    continue;
+                }
+
+                //Ignorar palavras antes do comando
+                if (command == "") continue;
+
+
+                //Checar se é o tipo de palavra correta
+                WordType expectedType = typeOrder[typeIndex];
+
+                if (type == expectedType)
+                {
+                    typeIndex += 1;
+                }
+            }
+
+
+            return (typeIndex == typeOrder.Count);
+        }
+
+
+        public static List<string> SepararPalavras(string str)
         {
             var words = new List<string>();
-            if (comando == "") return words;
+            if (str == "") return words;
 
             char[] separators = { ' ', ',' };
-            char[] charList = comando.ToCharArray();
+            char[] charList = str.ToCharArray();
 
             string currentWord = "";
 
@@ -64,7 +154,10 @@ namespace Vados
 
             return words;
         }
-        
+
+        #endregion
+
+
         public static bool VerificarAppAbertas(string nome)    // ia usar mas acabei nao usando mas pode ser util
         {
             Process[] processes = Process.GetProcessesByName(nome);

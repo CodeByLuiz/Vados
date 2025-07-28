@@ -72,14 +72,13 @@ namespace Vados
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário
-            if (textboxActive == true)
+            if (textboxActive == true && txtComando.Text == "")
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
+                textboxActive = false;
             }
-
-            textboxActive = false;
         }
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
@@ -299,6 +298,7 @@ namespace Vados
                 {
                     List<string> palavras = Comandos.SepararPalavras(comando);
                     MessageBox.Show(String.Join(", ", palavras.ToArray()));
+                    MessageBox.Show(Comandos.ValidateCommand(palavras).ToString());
                 }
             }
 

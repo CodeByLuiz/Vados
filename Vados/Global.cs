@@ -45,7 +45,7 @@ namespace Vados
         }
 
 
-        //Checar se um ponto está dentro de determinado retângulo
+        //Checar se um ponto está dentro de um determinado retângulo
         public static bool InsideRectangle(Point point, RectangleF rect)
         {
             if (point.X < rect.X) { return false; }

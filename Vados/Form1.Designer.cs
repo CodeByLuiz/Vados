@@ -36,20 +36,18 @@
             // 
             panelContainer.Dock = DockStyle.Fill;
             panelContainer.Location = new Point(0, 0);
-            panelContainer.Margin = new Padding(3, 4, 3, 4);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1262, 673);
+            panelContainer.Size = new Size(1264, 681);
             panelContainer.TabIndex = 1;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1262, 673);
+            ClientSize = new Size(1264, 681);
             Controls.Add(panelContainer);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(3, 4, 3, 4);
-            MinimumSize = new Size(820, 540);
+            MinimumSize = new Size(960, 540);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Vados";

@@ -59,6 +59,7 @@
             pnlBottom.Name = "pnlBottom";
             pnlBottom.Size = new Size(1680, 810);
             pnlBottom.TabIndex = 3;
+            pnlBottom.Click += pnlBottom_Click;
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
             pnlBottom.Resize += pnlBottom_Resize;
@@ -141,7 +142,7 @@
             // 
             // txtComando
             // 
-            txtComando.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtComando.Anchor = AnchorStyles.None;
             txtComando.BackColor = Color.FromArgb(243, 243, 243);
             txtComando.BorderStyle = BorderStyle.None;
             txtComando.Cursor = Cursors.IBeam;

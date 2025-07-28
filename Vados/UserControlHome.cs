@@ -39,13 +39,14 @@ namespace Vados
         float txtIconSize;
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
+        bool textboxActive = false;
 
         public UserControlHome()
         {
             InitializeComponent();
 
             timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16; // ~60 FPS
+            timer.Interval = 16; //~60 FPS
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -59,22 +60,26 @@ namespace Vados
         private void txtComando_Click(object sender, EventArgs e)
         {
             //Apagar texto temporário
-            if (txtComando.ForeColor.Equals(Colors.blueTernary))
+            if (textboxActive == false)
             {
                 txtComando.Text = "";
                 txtComando.ForeColor = Color.Black;
             }
+
+            textboxActive = true;
         }
 
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário
-            if (txtComando.Text == "")
+            if (textboxActive == true)
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
             }
+
+            textboxActive = false;
         }
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
@@ -235,19 +240,23 @@ namespace Vados
 
             int middleX = this.Width / 2;
 
-            //Definir variáveis
+            //Ajustar tamanho para definir as variáveis corretamente
             if (setTextboxWidth == true)
             {
                 txtComando.Width += txtboxWidthOffset;
             }
-            float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
-            txtIconSize = txtOldAreaHeight - 2 * txtIconMarginH;
-            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
+
+            //Tamanho da textbox
+            double newWidth = this.Width * 0.575;
+            txtComando.Width = (int)newWidth;
 
             //Posição da textbox
             txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
 
-            //Tamanho e posição da área atrás da textbox
+            //Variáveis da área atrás da textbox
+            float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
+            txtIconSize = txtOldAreaHeight - 2 * txtIconMarginH;
+            txtboxWidthOffset = (int)(txtIconSize + txtIconMarginW * 3 - txtAreaPaddingW);
             txtAreaWidth = txtComando.Width + txtAreaPaddingW * 2;
             txtAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
             txtAreaX = txtComando.Location.X - txtAreaPaddingW;
@@ -264,6 +273,37 @@ namespace Vados
             lblText.Location = new Point(middleX - lblText.Width / 2, lblText.Location.Y);
 
             pnlBottom.Invalidate();
+        }
+
+        private void pnlBottom_Click(object sender, EventArgs e)
+        {
+            //Informações do mouse
+            pnlBottom.Cursor = Cursors.Default;
+            Point mousePos = this.PointToClient(Cursor.Position);
+            int mouseX = mousePos.X;
+            int mouseY = mousePos.Y;
+
+
+            #region BOTÃO DE ENVIAR COMANDO
+
+            float sendButtonX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float sendButtonY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(sendButtonX, sendButtonY, txtIconSize, txtIconSize);
+
+            //Checar se o mouse está em dentro do botão
+            if (Global.InsideRectangle(mousePos, rect) == true)
+            {
+                string comando = txtComando.Text;
+
+                if (textboxActive == true)
+                {
+                    List<string> palavras = Comandos.SepararPalavras(comando);
+                    MessageBox.Show(String.Join(", ", palavras.ToArray()));
+                }
+            }
+
+            #endregion
+
         }
     }
 }

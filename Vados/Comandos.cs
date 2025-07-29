@@ -591,6 +591,43 @@ namespace Vados
             }
         }
 
+        public static void MoverPasta(string nome, string destino)
+        {
+           
+            destino = SearchFolders(destino, true)+@"\"+nome;
+            nome = SearchFolders(nome, true);
+            MessageBox.Show(destino);
+
+           
+            if (Directory.Exists(destino))
+            {
+                MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                return;
+            }
+
+            Directory.Move(nome, destino);
+            
+        }
+
+        public static void MoverArquivo(string nome, string destino,string ext) 
+        {
+
+            destino = SearchFolders(destino, true) + @"\" + nome+"."+ext;
+            nome = SearchFolders(nome, false);
+            MessageBox.Show(destino);
+
+
+            if (File.Exists(destino))
+            {
+                MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                return;
+            }
+
+            File.Move(nome, destino);
+
+        }
+
+
         public static void DarAdm()// da permissões de administrador
         {
             try

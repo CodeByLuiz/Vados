@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlSettings));
             button1 = new Button();
             btnCriar = new Button();
             btnExluir = new Button();
@@ -48,6 +47,7 @@
             listateste = new ListBox();
             btnLog = new Button();
             txtSearch = new TextBox();
+            btnMover = new Button();
             SuspendLayout();
             // 
             // button1
@@ -126,7 +126,7 @@
             label3.AutoSize = true;
             label3.Location = new Point(315, 110);
             label3.Name = "label3";
-            label3.Size = new Size(56, 15);
+            label3.Size = new Size(57, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
             // 
@@ -155,6 +155,7 @@
             txtDestinatario.Name = "txtDestinatario";
             txtDestinatario.Size = new Size(100, 23);
             txtDestinatario.TabIndex = 11;
+            txtDestinatario.TextChanged += txtDestinatario_TextChanged;
             // 
             // btnAdm
             // 
@@ -223,12 +224,22 @@
             txtSearch.TabIndex = 18;
             txtSearch.TextChanged += textBox1_TextChanged;
             // 
+            // btnMover
+            // 
+            btnMover.Location = new Point(53, 242);
+            btnMover.Name = "btnMover";
+            btnMover.Size = new Size(75, 23);
+            btnMover.TabIndex = 19;
+            btnMover.Text = "Mover";
+            btnMover.UseVisualStyleBackColor = true;
+            btnMover.Click += btnMover_Click;
+            // 
             // UserControlSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             BackgroundImageLayout = ImageLayout.Stretch;
+            Controls.Add(btnMover);
             Controls.Add(txtSearch);
             Controls.Add(btnLog);
             Controls.Add(listateste);
@@ -249,7 +260,7 @@
             Controls.Add(btnCriar);
             Controls.Add(button1);
             Name = "UserControlSettings";
-            Size = new Size(1097, 360);
+            Size = new Size(1097, 705);
             Load += UserControlSettings_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -276,5 +287,6 @@
         private ListBox listateste;
         private Button btnLog;
         private TextBox txtSearch;
+        private Button btnMover;
     }
 }

@@ -118,25 +118,31 @@ namespace Vados
         private void btnLog_Click(object sender, EventArgs e)
         {
 
-         string SearchArquivo = txtSearch.Text;
+            string SearchArquivo = txtSearch.Text;
 
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
-                
-                    listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true));
-                
+
+                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true));
+
             }
             else
             {
-                  listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
-                
+                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+
             }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnAbrirArquivo_Click(object sender, EventArgs e)
+        {
+            string NomeArquivo = txtNome.Text;
+            Comandos.AbrirArquivo(NomeArquivo);
         }
     }
 }

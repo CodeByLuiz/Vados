@@ -604,6 +604,20 @@ namespace Vados
             Process.Start("shutdown", "/r /t 5");
             Application.Exit();
         }
+
+        public static void AbrirArquivo(string nome)
+        {
+           string arquivo = SearchFolders(nome,false);
+
+            var psi = new ProcessStartInfo()
+            {
+                UseShellExecute= true,
+                FileName = arquivo,
+            };
+            Process.Start(psi);
+        }
+
+
     }
 
 }

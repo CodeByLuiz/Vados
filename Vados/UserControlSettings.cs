@@ -155,17 +155,34 @@ namespace Vados
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
 
-            if(extension == "pasta")
+            if (extension == "pasta")
             {
                 Comandos.MoverPasta(nome, destino);
 
             }
             else
             {
-                Comandos.MoverArquivo(nome, destino,extension);
+                Comandos.MoverArquivo(nome, destino, extension);
             }
 
-            
+
+        }
+
+        private void btnDupe_Click(object sender, EventArgs e)
+        {
+            string extension = cbExtensoes.Text;
+            string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
+
+            if (extension == "pasta")
+            {
+                Comandos.DuplicarPasta(nome, destino);
+
+            }
+            else
+            {
+                Comandos.DuplicarArquivo(nome, destino);
+            }
         }
     }
 }

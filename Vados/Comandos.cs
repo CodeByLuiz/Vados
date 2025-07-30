@@ -539,6 +539,16 @@ namespace Vados
             string path = SearchFolders(nome, true);
             if (Directory.Exists(path))
             {
+
+                foreach (string arquivo in Directory.GetFiles(path))
+                {
+                    File.Delete(arquivo);
+                }
+                foreach(string subPasta in Directory.GetDirectories(path))
+                {
+                    ExcluirPasta(subPasta);
+                    
+                }
                 Directory.Delete(path);
                 Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
             }
@@ -593,40 +603,132 @@ namespace Vados
 
         public static void MoverPasta(string nome, string destino)
         {
-           
-            destino = SearchFolders(destino, true)+@"\"+nome;
-            nome = SearchFolders(nome, true);
-            MessageBox.Show(destino);
-
-           
-            if (Directory.Exists(destino))
+            try
             {
-                MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                return;
-            }
+                destino = SearchFolders(destino, true) + @"\" + nome;
+                nome = SearchFolders(nome, true);
+                MessageBox.Show(destino);
 
-            Directory.Move(nome, destino);
-            
+
+                if (Directory.Exists(destino))
+                {
+                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                    return;
+                }
+
+                Directory.Move(nome, destino);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao mover pasta: " + ex.Message);
+            }  
         }
 
         public static void MoverArquivo(string nome, string destino,string ext) 
         {
-
-            destino = SearchFolders(destino, true) + @"\" + nome+"."+ext;
-            nome = SearchFolders(nome, false);
-            MessageBox.Show(destino);
-
-
-            if (File.Exists(destino))
+            try
             {
-                MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                return;
+                nome = SearchFolders(nome, false);
+                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+                MessageBox.Show(destino," dsdasdasdadasdaasda");
+                // SearchFolders(destino, true) + @"\" + nome + "." + ext;
+
+                MessageBox.Show(destino);
+
+
+                if (File.Exists(destino))
+                {
+                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    return;
+                }
+
+                File.Move(nome, destino);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
             }
 
-            File.Move(nome, destino);
 
         }
 
+        public static void DuplicarPasta(string nome, string destino)
+        {
+            try
+            {
+                nome = SearchFolders(nome, true);
+                if (string.IsNullOrWhiteSpace(destino))
+                {
+                    destino = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
+                }
+                else
+                {
+                    destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+
+                }
+
+
+                MessageBox.Show(destino + " negocio infernal que pode estar dando erro");
+                if (Directory.Exists(destino))
+                {
+                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                    return;
+                }
+
+                Directory.CreateDirectory(destino);
+                foreach (string arquivo in Directory.GetFiles(nome))
+                {
+
+
+                    string nomeArquivo = Path.GetFileName(arquivo);
+                    string destinoArquivo = Path.Combine(destino, nomeArquivo);
+                    File.Copy(arquivo, destinoArquivo, true);
+
+                }
+                foreach (string subPasta in Directory.GetDirectories(nome))
+                {
+                    string nomeSubPasta = Path.GetFileName(subPasta);
+                    string destinoSubPasta = Path.Combine(destino, nomeSubPasta);
+                    MessageBox.Show(destinoSubPasta);
+                    MessageBox.Show(nomeSubPasta);
+                    DuplicarPasta(subPasta, destino);
+                }
+
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erro ao duplicar pasta: " + ex.Message);
+            }
+        }
+
+        public static void DuplicarArquivo(string nome, string destino)
+        {
+
+            try
+            {
+
+                nome = SearchFolders(nome, false);
+                MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
+                string ext = Path.GetExtension(nome);
+                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+
+                if (File.Exists(destino))
+                {
+                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    return;
+                }
+
+                File.Move(nome, destino);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao duplicar arquivo: " + ex.Message);
+            }
+
+            
+
+        }
 
         public static void DarAdm()// da permissões de administrador
         {

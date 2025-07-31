@@ -17,7 +17,7 @@ namespace Vados
             Command,
             Object,
             Connector,
-            Argument,
+            Value,
         };
 
         static Dictionary<string, WordType> wordTypes = new Dictionary<string, WordType>(StringComparer.OrdinalIgnoreCase)
@@ -41,7 +41,7 @@ namespace Vados
                 return result;
             }
 
-            return WordType.Argument;
+            return WordType.Value;
         }
 
 
@@ -51,13 +51,13 @@ namespace Vados
             switch (command)
             {
                 case "criar":
-                    return new List<WordType>() { WordType.Object, WordType.Argument };
+                    return new List<WordType>() { WordType.Object, WordType.Value };
 
                 case "renomear":
-                    return new List<WordType>() { WordType.Object, WordType.Argument, WordType.Connector, WordType.Argument };
+                    return new List<WordType>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value };
 
                 case "excluir":
-                    return new List<WordType>() { WordType.Object, WordType.Argument };
+                    return new List<WordType>() { WordType.Object, WordType.Value };
 
 
                 //Lista vazia se não identificar o comando
@@ -67,9 +67,38 @@ namespace Vados
         }
 
 
-        public static bool ValidateCommand(List<string> words)
+        public static void ExecuteCommand(List<string> arguments)
+        {
+            string obj = arguments[1];
+            string name = arguments[2];
+
+            switch (arguments[0])
+            {
+                case "criar":
+                    if (obj == "pasta") { CriarPasta(name, ""); }
+                    if (obj == "arquivo") { CriarArquivo(name, "txt", ""); }
+                    break;
+
+                case "renomear":
+                    string oldName = arguments[2];
+                    string newName = arguments[3];
+
+                    if (obj == "pasta") { RenomearPasta(oldName, newName); }
+                    if (obj == "arquivo") { RenomearArquivo(oldName, newName, "txt"); }
+                    break;
+
+                case "excluir":
+                    if (obj == "pasta") { ExcluirPasta(name); }
+                    if (obj == "arquivo") { ExcluirArquivo(name, "txt"); }
+                    break;
+            }
+        }
+
+
+        public static List<string> ValidateCommand(List<string> words)
         {
             string command = "";
+            List<string> arguments = new List<string>();
             List<WordType> typeOrder = null;
             int typeIndex = 0;
 
@@ -84,6 +113,7 @@ namespace Vados
                 {
                     command = word;
                     typeOrder = CommandGetDetails(command);
+                    arguments.Add(word);
                     continue;
                 }
 
@@ -97,15 +127,27 @@ namespace Vados
                 if (type == expectedType)
                 {
                     typeIndex += 1;
+
+                    //Definir argumentos pro comando
+                    if (type == WordType.Object || type == WordType.Value)
+                    {
+                        arguments.Add(word);
+                    }
                 }
             }
 
 
-            return (typeIndex == typeOrder.Count);
+            //Retornar argumentos se o comando estiver correto
+            if (typeOrder != null && typeIndex == typeOrder.Count)
+            {
+                return arguments;
+            }
+
+            return null;
         }
 
 
-        public static List<string> SepararPalavras(string str)
+        public static List<string> SeparateWords(string str)
         {
             var words = new List<string>();
             if (str == "") return words;

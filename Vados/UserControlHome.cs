@@ -292,13 +292,19 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                string comando = txtComando.Text;
+                string command = txtComando.Text;
 
                 if (textboxActive == true)
                 {
-                    List<string> palavras = Comandos.SepararPalavras(comando);
-                    MessageBox.Show(String.Join(", ", palavras.ToArray()));
-                    MessageBox.Show(Comandos.ValidateCommand(palavras).ToString());
+                    //Realizar comando
+                    List<string> words = Comandos.SeparateWords(command);
+                    List<string> arguments = Comandos.ValidateCommand(words);
+
+                    if (arguments != null)
+                    {
+                        MessageBox.Show(String.Join(", ", arguments.ToArray()));
+                        Comandos.ExecuteCommand(arguments);
+                    }
                 }
             }
 

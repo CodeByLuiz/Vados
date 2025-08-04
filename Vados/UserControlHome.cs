@@ -72,14 +72,13 @@ namespace Vados
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário
-            if (textboxActive == true)
+            if (textboxActive == true && txtComando.Text == "")
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
+                textboxActive = false;
             }
-
-            textboxActive = false;
         }
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
@@ -293,12 +292,19 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                string comando = txtComando.Text;
+                string command = txtComando.Text;
 
                 if (textboxActive == true)
                 {
-                    List<string> palavras = Comandos.SepararPalavras(comando);
-                    MessageBox.Show(String.Join(", ", palavras.ToArray()));
+                    //Realizar comando
+                    List<string> words = Comandos.SeparateWords(command);
+                    List<string> arguments = Comandos.ValidateCommand(words);
+
+                    if (arguments != null)
+                    {
+                        MessageBox.Show(String.Join(", ", arguments.ToArray()));
+                        Comandos.ExecuteCommand(arguments);
+                    }
                 }
             }
 

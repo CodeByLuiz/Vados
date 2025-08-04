@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -584,21 +585,28 @@ namespace Vados
 
         public static void CriarArquivo(string nome, string extension, string path) // cria arquivo
         {
+            
             try
             {
+                string nomefinal;
+
                 if (path == "")
                 {
                     path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
+                    nomefinal = CriarNome(nome, path,extension);
                 }
                 else
                 {
                     path = SearchFolders(path, true) + @"\" + nome + "." + extension;
                     MessageBox.Show(path);
+                    nomefinal = CriarNome(nome, path, extension);
                 }
+               
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path)+ @"\" + nomefinal + "." + extension);
 
-                using (FileStream fs = File.Create(path)) ;
-                Console.WriteLine("Arquivo" + nome + "Criado com sucesso");
-                AbrirGerenciador(path);
+                using (FileStream fs = File.Create(pathfinal))
+                Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
+                AbrirGerenciador(pathfinal);
             }
             catch (Exception ex)
             {
@@ -739,6 +747,39 @@ namespace Vados
             Process.Start("shutdown", "/r /t 5");
             Application.Exit();
         }
+
+        public static void AbrirArquivo(string nome)
+        {
+           string arquivo = SearchFolders(nome,false);
+
+            var psi = new ProcessStartInfo()
+            {
+                UseShellExecute= true,
+                FileName = arquivo,
+            };
+            Process.Start(psi);
+        }
+
+        public static string CriarNome(string nome, string path,string extension)
+        {
+            int contador = 1;
+            string nomefinal = nome;
+
+            if (File.Exists(path))
+            {
+                while (File.Exists(path))
+                {
+                    nomefinal = $"{nome}({contador})";
+                    contador++;
+                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "."+ extension);
+                }
+               
+            }
+            MessageBox.Show(nomefinal);
+            return nomefinal;
+        }
+        
+
     }
 
 }

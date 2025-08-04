@@ -49,6 +49,7 @@
             txtSearch = new TextBox();
             btnMover = new Button();
             btnDupe = new Button();
+            btnAbrirArquivo = new Button();
             SuspendLayout();
             // 
             // button1
@@ -84,7 +85,7 @@
             // cbExtensoes
             // 
             cbExtensoes.FormattingEnabled = true;
-            cbExtensoes.Items.AddRange(new object[] { "txt", "pasta", "img", "png", "docx" });
+            cbExtensoes.Items.AddRange(new object[] { "txt", "pasta", "img", "png", "docx", "jpg", "jpeg" });
             cbExtensoes.Location = new Point(382, 104);
             cbExtensoes.Name = "cbExtensoes";
             cbExtensoes.Size = new Size(121, 23);
@@ -128,6 +129,7 @@
             label3.Location = new Point(315, 110);
             label3.Name = "label3";
             label3.Size = new Size(56, 15);
+            label3.Size = new Size(57, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
             // 
@@ -244,6 +246,15 @@
             btnDupe.Text = "Duplicar";
             btnDupe.UseVisualStyleBackColor = true;
             btnDupe.Click += btnDupe_Click;
+            // btnAbrirArquivo
+            // 
+            btnAbrirArquivo.Location = new Point(113, 242);
+            btnAbrirArquivo.Name = "btnAbrirArquivo";
+            btnAbrirArquivo.Size = new Size(164, 23);
+            btnAbrirArquivo.TabIndex = 19;
+            btnAbrirArquivo.Text = "Abrir arquivo";
+            btnAbrirArquivo.UseVisualStyleBackColor = true;
+            btnAbrirArquivo.Click += btnAbrirArquivo_Click;
             // 
             // UserControlSettings
             // 
@@ -252,6 +263,7 @@
             BackgroundImageLayout = ImageLayout.Stretch;
             Controls.Add(btnDupe);
             Controls.Add(btnMover);
+            Controls.Add(btnAbrirArquivo);
             Controls.Add(txtSearch);
             Controls.Add(btnLog);
             Controls.Add(listateste);
@@ -272,7 +284,7 @@
             Controls.Add(btnCriar);
             Controls.Add(button1);
             Name = "UserControlSettings";
-            Size = new Size(1097, 705);
+            Size = new Size(1097, 530);
             Load += UserControlSettings_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -301,5 +313,6 @@
         private TextBox txtSearch;
         private Button btnMover;
         private Button btnDupe;
+        private Button btnAbrirArquivo;
     }
 }

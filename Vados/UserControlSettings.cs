@@ -120,7 +120,6 @@ namespace Vados
 
             string SearchArquivo = txtSearch.Text;
 
-
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
@@ -135,8 +134,8 @@ namespace Vados
                 {
                     listateste.Items.Add(x);
                 }
-
             }
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -144,10 +143,12 @@ namespace Vados
 
         }
 
+
         private void txtDestinatario_TextChanged(object sender, EventArgs e)
         {
 
         }
+
 
         private void btnMover_Click(object sender, EventArgs e)
         {
@@ -164,9 +165,8 @@ namespace Vados
             {
                 Comandos.MoverArquivo(nome, destino, extension);
             }
-
-
         }
+        
 
         private void btnDupe_Click(object sender, EventArgs e)
         {
@@ -183,6 +183,13 @@ namespace Vados
             {
                 Comandos.DuplicarArquivo(nome, destino);
             }
+        }
+        
+        
+        private void btnAbrirArquivo_Click(object sender, EventArgs e)
+        {
+            string NomeArquivo = txtNome.Text;
+            Comandos.AbrirArquivo(NomeArquivo);
         }
     }
 }

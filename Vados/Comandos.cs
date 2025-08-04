@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Policy;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,197 @@ namespace Vados
 {
     internal class Comandos
     {
+        #region TEXTO PARA COMANDO
+
+        //Funções das palavras
+        public enum WordType
+        {
+            Command,
+            Object,
+            Connector,
+            Value,
+        };
+
+        static Dictionary<string, WordType> wordTypes = new Dictionary<string, WordType>(StringComparer.OrdinalIgnoreCase)
+        {
+            //Comandos
+            { "criar", WordType.Command },
+            { "renomear", WordType.Command },
+            { "excluir", WordType.Command },
+            //Objetos
+            { "pasta", WordType.Object },
+            { "arquivo", WordType.Object },
+            //Conectores
+            { "para", WordType.Connector },
+        };
+
+
+        public static WordType WordGetType(string word)
+        {
+            if (wordTypes.TryGetValue(word, out WordType result))
+            {
+                return result;
+            }
+
+            return WordType.Value;
+        }
+
+
+        public static List<WordType> CommandGetDetails(string command)
+        {
+            //Retorna uma lista de palavras necessárias para realizar o comando
+            switch (command)
+            {
+                case "criar":
+                    return new List<WordType>() { WordType.Object, WordType.Value };
+
+                case "renomear":
+                    return new List<WordType>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value };
+
+                case "excluir":
+                    return new List<WordType>() { WordType.Object, WordType.Value };
+
+
+                //Lista vazia se não identificar o comando
+                default:
+                    return new List<WordType>();
+            }
+        }
+
+
+        public static void ExecuteCommand(List<string> arguments)
+        {
+            string obj = arguments[1];
+            string name = arguments[2];
+
+            switch (arguments[0])
+            {
+                case "criar":
+                    if (obj == "pasta") { CriarPasta(name, ""); }
+                    if (obj == "arquivo") { CriarArquivo(name, "txt", ""); }
+                    break;
+
+                case "renomear":
+                    string oldName = arguments[2];
+                    string newName = arguments[3];
+
+                    if (obj == "pasta") { RenomearPasta(oldName, newName); }
+                    if (obj == "arquivo") { RenomearArquivo(oldName, newName, "txt"); }
+                    break;
+
+                case "excluir":
+                    if (obj == "pasta") { ExcluirPasta(name); }
+                    if (obj == "arquivo") { ExcluirArquivo(name, "txt"); }
+                    break;
+            }
+        }
+
+
+        public static List<string> ValidateCommand(List<string> words)
+        {
+            string command = "";
+            List<string> arguments = new List<string>();
+            List<WordType> typeOrder = null;
+            int typeIndex = 0;
+
+            //Checar se o comando possui todas as palavras necessárias
+            for (int i = 0; i < words.Count; i++)
+            {
+                string word = words[i].ToLower();
+                WordType type = WordGetType(word);
+                
+                //Definir comando
+                if (command == "" && type == WordType.Command)
+                {
+                    command = word;
+                    typeOrder = CommandGetDetails(command);
+                    arguments.Add(word);
+                    continue;
+                }
+
+                //Ignorar palavras antes do comando
+                if (command == "") continue;
+
+
+                //Checar se é o tipo de palavra correta
+                WordType expectedType = typeOrder[typeIndex];
+
+                if (type == expectedType)
+                {
+                    typeIndex += 1;
+
+                    //Definir argumentos pro comando
+                    if (type == WordType.Object || type == WordType.Value)
+                    {
+                        arguments.Add(word);
+                    }
+                }
+            }
+
+
+            //Retornar argumentos se o comando estiver correto
+            if (typeOrder != null && typeIndex == typeOrder.Count)
+            {
+                return arguments;
+            }
+
+            return null;
+        }
+
+
+        public static List<string> SeparateWords(string str)
+        {
+            var words = new List<string>();
+            if (str == "") return words;
+
+            char[] separators = { ' ', ',' };
+            char[] charList = str.ToCharArray();
+
+            string currentWord = "";
+
+            for (var i = 0; i < charList.Length; i++)
+            {
+                char c = charList[i];
+                bool breakWord = false;
+
+                //Checar se o caractere é um separador
+                for (var j = 0; j < separators.Length; j++)
+                {
+                    char s = separators[j];
+
+                    if (c == s)
+                    {
+                        breakWord = true;
+                        break;
+                    }
+                }
+
+                //Adicionar caractere à palavra
+                if (breakWord == false)
+                {
+                    currentWord += c;
+                    continue;
+                }
+
+                //Ir para a próxima palavra (se o caractere for um separador)
+                if (currentWord != "")  //Ignorar palavras vazias
+                {
+                    words.Add(currentWord);
+                    currentWord = "";
+                }
+            }
+
+            //Adicionar última palavra
+            if (currentWord != "") {
+                words.Add(currentWord);
+            }
+
+            return words;
+        }
+
+        #endregion
+
+
         public static bool VerificarAppAbertas(string nome)    // ia usar mas acabei nao usando mas pode ser util
         {
             Process[] processes = Process.GetProcessesByName(nome);
@@ -38,125 +230,132 @@ namespace Vados
         }
 
 
-    //    public static List<string> funcaoteste(string aprocurar, bool comando)
-    //    {
-    //        string root = @"" + driveverifica(null);
-    //        var caminhos = new List<string>();
-    //        var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-    //        var ignorar = new List<string>
-    //{
-    //    "$RECYCLE.BIN",
-    //    "System Volume Information",
-    //    "Recovery",
-    //    "Config.Msi",
-    //    "Windows",
-    //    "Program Files (x86)",
-    //    "Program Files"
-    //};
-    //        var prioridades = new List<string>
-    //{
-    //    Path.Combine(root, @"Vados"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-    //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-    //    //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+        #region FUNÇÃO TESTE
 
-    //    Path.Combine(root),
-    //};
+        //    public static List<string> funcaoteste(string aprocurar, bool comando)
+        //    {
+        //        string root = @"" + driveverifica(null);
+        //        var caminhos = new List<string>();
+        //        var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //        var ignorar = new List<string>
+        //{
+        //    "$RECYCLE.BIN",
+        //    "System Volume Information",
+        //    "Recovery",
+        //    "Config.Msi",
+        //    "Windows",
+        //    "Program Files (x86)",
+        //    "Program Files"
+        //};
+        //        var prioridades = new List<string>
+        //{
+        //    Path.Combine(root, @"Vados"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+        //    //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-    //        var fila = new Queue<string>();
-    //        foreach (var pasta in prioridades)
-    //        {
-    //            if (Directory.Exists(pasta))
-    //            {
-    //                fila.Enqueue(pasta);
-    //                //caminhos.Add(pasta);
-    //            }
-    //        }
+        //    Path.Combine(root),
+        //};
 
-    //        fila.Enqueue(root);
+        //        var fila = new Queue<string>();
+        //        foreach (var pasta in prioridades)
+        //        {
+        //            if (Directory.Exists(pasta))
+        //            {
+        //                fila.Enqueue(pasta);
+        //                //caminhos.Add(pasta);
+        //            }
+        //        }
 
-    //        while (fila.Count > 0)
-    //        {
-    //            var atual = fila.Dequeue();
-    //            try
-    //            {
-    //                switch (comando)
-    //                {
-    //                    case true:
+        //        fila.Enqueue(root);
 
-    //                        foreach (var caminho in Directory.GetDirectories(atual))
-    //                        {
-    //                            string nomePasta = Path.GetFileName(caminho);
-    //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-    //                                continue;
+        //        while (fila.Count > 0)
+        //        {
+        //            var atual = fila.Dequeue();
+        //            try
+        //            {
+        //                switch (comando)
+        //                {
+        //                    case true:
 
-    //                            if (visitados.Add(caminho))
-    //                            {
-    //                                caminhos.Add(caminho);
-    //                                //fila.Enqueue(caminho);
-    //                                Comandos.InserirNoInicio(fila, caminho);
-    //                                if (caminho.Contains(aprocurar))
-    //                                {
-    //                                    MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-    //                                    return caminhos;
-    //                                }
-    //                                // MessageBox.Show(caminho);
-    //                            }
+        //                        foreach (var caminho in Directory.GetDirectories(atual))
+        //                        {
+        //                            string nomePasta = Path.GetFileName(caminho);
+        //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+        //                                continue;
 
-
-    //                        }
-
-    //                        break;
-    //                    case false:
+        //                            if (visitados.Add(caminho))
+        //                            {
+        //                                caminhos.Add(caminho);
+        //                                //fila.Enqueue(caminho);
+        //                                Comandos.InserirNoInicio(fila, caminho);
+        //                                if (caminho.Contains(aprocurar))
+        //                                {
+        //                                    MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+        //                                    return caminhos;
+        //                                }
+        //                                // MessageBox.Show(caminho);
+        //                            }
 
 
-    //                        foreach (var arquivo in Directory.GetFiles(atual))
-    //                        {
-    //                            string nome = Path.GetFileName(arquivo);
-    //                            if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
-    //                            {
-    //                                MessageBox.Show($"Arquivo encontrado: {arquivo}");
-    //                                return caminhos;
-    //                            }
-    //                        }
+        //                        }
+
+        //                        break;
+        //                    case false:
 
 
-    //                        foreach (var caminho in Directory.GetDirectories(atual))
-    //                        {
-    //                            string nomePasta = Path.GetFileName(caminho);
-    //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-    //                                continue;
-
-    //                            //fila.Enqueue(caminho);
-    //                            Comandos.InserirNoInicio(fila, caminho);
-    //                        }
-
-    //                        break;
-    //                }
+        //                        foreach (var arquivo in Directory.GetFiles(atual))
+        //                        {
+        //                            string nome = Path.GetFileName(arquivo);
+        //                            if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+        //                            {
+        //                                MessageBox.Show($"Arquivo encontrado: {arquivo}");
+        //                                return caminhos;
+        //                            }
+        //                        }
 
 
-    //            }
+        //                        foreach (var caminho in Directory.GetDirectories(atual))
+        //                        {
+        //                            string nomePasta = Path.GetFileName(caminho);
+        //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+        //                                continue;
 
-    //            catch (Exception)
-    //            {
+        //                            //fila.Enqueue(caminho);
+        //                            Comandos.InserirNoInicio(fila, caminho);
+        //                        }
 
-    //            }
-    //        }
-    //        MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-    //        return null;
-    //    }
-        public static string SearchFolders(string aprocurar,bool comando) // busca recursivamente por pastas ou arquivos
+        //                        break;
+        //                }
+
+
+        //            }
+
+        //            catch (Exception)
+        //            {
+
+        //            }
+        //        }
+        //        MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+        //        return null;
+        //    }
+
+
+        #endregion
+
+
+        public static string SearchFolders(string aprocurar, bool comando) // busca recursivamente por pastas ou arquivos
         {
             //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
             // por exemplo no comando de criar arquivos, ele sera TRUE, pq ele ira localizar a PASTA onde o arquivo sera criado
@@ -290,6 +489,7 @@ namespace Vados
             return null;
         }
 
+      
         public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio) 
         {
             //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
@@ -388,7 +588,6 @@ namespace Vados
         }
 
 
-
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
         {
             Queue<T> filaTemporaria = new Queue<T>();
@@ -418,7 +617,7 @@ namespace Vados
 
             return "oi";
         }
-        
+
 
         public static string driveverifica(string[] args)
         {
@@ -456,6 +655,7 @@ namespace Vados
             }
         }
 
+
         public static void CriarPasta(string nome, string path) // cria pasta
         {
             try
@@ -491,23 +691,31 @@ namespace Vados
             }
         }
 
+
         public static void CriarArquivo(string nome, string extension, string path) // cria arquivo
         {
+            
             try
             {
+                string nomefinal;
+
                 if (path == "")
                 {
                     path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
+                    nomefinal = CriarNome(nome, path,extension);
                 }
                 else
                 {
                     path = SearchFolders(path, true) + @"\" + nome + "." + extension;
                     MessageBox.Show(path);
+                    nomefinal = CriarNome(nome, path, extension);
                 }
+               
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path)+ @"\" + nomefinal + "." + extension);
 
-                using (FileStream fs = File.Create(path)) ;
-                Console.WriteLine("Arquivo" + nome + "Criado com sucesso");
-                AbrirGerenciador(path);
+                using (FileStream fs = File.Create(pathfinal))
+                Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
+                AbrirGerenciador(pathfinal);
             }
             catch (Exception ex)
             {
@@ -516,6 +724,7 @@ namespace Vados
 
             }
         }
+
 
         public static void ExcluirArquivo(string nome, string extension) //exclui arquivo
         {
@@ -533,6 +742,7 @@ namespace Vados
 
 
         }
+
 
         public static void ExcluirPasta(string nome) // exclui pasta
         {
@@ -561,6 +771,7 @@ namespace Vados
 
         }
 
+
         public static void RenomearArquivo(string nome, string novoNome, string extensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
 
@@ -582,6 +793,7 @@ namespace Vados
             }
         }
 
+
         public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
 
@@ -600,6 +812,7 @@ namespace Vados
                 MessageBox.Show("essa pasta não existe");
             }
         }
+
 
         public static void MoverPasta(string nome, string destino)
         {
@@ -730,6 +943,7 @@ namespace Vados
 
         }
 
+
         public static void DarAdm()// da permissões de administrador
         {
             try
@@ -751,6 +965,7 @@ namespace Vados
             }
 
         }
+
 
         public static void MudarIdioma(string idioma) /// essa porra vai mudar o idoma da infarce do windows, mas só funciona no windows 10 e 11, e tem que reiniciar o pc para funcionar(tenho que aprender poweshell)
         {
@@ -775,15 +990,45 @@ namespace Vados
 
         }
 
+
         public static void ReiniciarPC() // reinicia o pc
         {
             Process.Start("shutdown", "/r /t 5");
             Application.Exit();
         }
+
+        public static void AbrirArquivo(string nome)
+        {
+           string arquivo = SearchFolders(nome,false);
+
+            var psi = new ProcessStartInfo()
+            {
+                UseShellExecute= true,
+                FileName = arquivo,
+            };
+            Process.Start(psi);
+        }
+
+        public static string CriarNome(string nome, string path,string extension)
+        {
+            int contador = 1;
+            string nomefinal = nome;
+
+            if (File.Exists(path))
+            {
+                while (File.Exists(path))
+                {
+                    nomefinal = $"{nome}({contador})";
+                    contador++;
+                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "."+ extension);
+                }
+               
+            }
+            MessageBox.Show(nomefinal);
+            return nomefinal;
+        }
+        
+
     }
-
-    
-
-
 
 }

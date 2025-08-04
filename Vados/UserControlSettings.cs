@@ -129,9 +129,13 @@ namespace Vados
             }
             else
             {
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
-
+                // listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+                foreach (var x in Comandos.MultiSearch(SearchArquivo, "pasta de teste", ".txt"))
+                {
+                    listateste.Items.Add(x);
+                }
             }
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -139,6 +143,49 @@ namespace Vados
 
         }
 
+
+        private void txtDestinatario_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void btnMover_Click(object sender, EventArgs e)
+        {
+            string extension = cbExtensoes.Text;
+            string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
+
+            if (extension == "pasta")
+            {
+                Comandos.MoverPasta(nome, destino);
+
+            }
+            else
+            {
+                Comandos.MoverArquivo(nome, destino, extension);
+            }
+        }
+        
+
+        private void btnDupe_Click(object sender, EventArgs e)
+        {
+            string extension = cbExtensoes.Text;
+            string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
+
+            if (extension == "pasta")
+            {
+                Comandos.DuplicarPasta(nome, destino);
+
+            }
+            else
+            {
+                Comandos.DuplicarArquivo(nome, destino);
+            }
+        }
+        
+        
         private void btnAbrirArquivo_Click(object sender, EventArgs e)
         {
             string NomeArquivo = txtNome.Text;

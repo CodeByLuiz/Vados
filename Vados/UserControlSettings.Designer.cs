@@ -128,7 +128,6 @@
             label3.AutoSize = true;
             label3.Location = new Point(315, 110);
             label3.Name = "label3";
-            label3.Size = new Size(56, 15);
             label3.Size = new Size(57, 15);
             label3.TabIndex = 8;
             label3.Text = "extensão:";
@@ -246,9 +245,10 @@
             btnDupe.Text = "Duplicar";
             btnDupe.UseVisualStyleBackColor = true;
             btnDupe.Click += btnDupe_Click;
+            // 
             // btnAbrirArquivo
             // 
-            btnAbrirArquivo.Location = new Point(113, 242);
+            btnAbrirArquivo.Location = new Point(99, 301);
             btnAbrirArquivo.Name = "btnAbrirArquivo";
             btnAbrirArquivo.Size = new Size(164, 23);
             btnAbrirArquivo.TabIndex = 19;

@@ -129,8 +129,11 @@ namespace Vados
             }
             else
             {
-                // listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
-                foreach (var x in Comandos.MultiSearch(SearchArquivo, "pasta de teste", ".txt"))
+                
+                HashSet<string> porra = new HashSet<string>();
+                porra = Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt");
+
+                foreach (var x in Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt")) 
                 {
                     listateste.Items.Add(x);
                 }
@@ -163,7 +166,7 @@ namespace Vados
             }
             else
             {
-                Comandos.MoverArquivo(nome, destino, extension);
+                Comandos.MoverArquivo(nome, destino);
             }
         }
         

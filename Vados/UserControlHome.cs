@@ -298,6 +298,8 @@ namespace Vados
                 {
                     //Realizar comando
                     List<string> words = Comandos.SeparateWords(command);
+                    words = Comandos.IdentifyWordGroups(words);
+                    MessageBox.Show(String.Join(", ", words.ToArray()));
                     List<string> arguments = Comandos.ValidateCommand(words);
 
                     if (arguments != null)

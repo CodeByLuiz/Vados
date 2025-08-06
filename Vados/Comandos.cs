@@ -31,6 +31,23 @@ namespace Vados
             { "arquivo", WordType.Object },
             //Conectores
             { "para", WordType.Connector },
+            
+            { "chamado", WordType.Connector },
+            { "chamada", WordType.Connector },
+            { "nomeado", WordType.Connector },
+            { "nomeada", WordType.Connector },
+            { "com o nome", WordType.Connector },
+            
+        };
+
+        static List<string> wordGroups = new List<string>()
+        {
+            "com o nome",
+            "com nome",
+            "de nome",
+            "com o título",
+            "com título",
+            "de título",
         };
 
 
@@ -144,6 +161,67 @@ namespace Vados
             }
 
             return null;
+        }
+
+
+        public static List<string> IdentifyWordGroups(List<string> words)
+        {
+            List<string> newWords = new List<string>();
+            
+            //Para cada palavra de determinada lista
+            for (int i = 0; i < words.Count(); i++) {
+                string temporaryWord = "";
+                int wordCount = 0;
+
+                for (int j = 0; j < wordGroups.Count(); j++)
+                {
+                    string actualWordGroup = wordGroups[j];
+                    List<string> groupSeparateWords = actualWordGroup.Split(" ").ToList();
+                    wordCount = groupSeparateWords.Count;
+
+                    //Checar se formam um grupo conhecido
+                    for(var k = 0; k < groupSeparateWords.Count; k++)
+                    {
+                        string wordToCheck = words[i + k];
+
+                        //Parar de juntar as palavras se alguma não fizer parte do grupo
+                        if (groupSeparateWords[k] != wordToCheck)
+                        {
+                            temporaryWord = "";
+                            break;
+                        }
+
+                        //Juntar palavras
+                        temporaryWord += wordToCheck;
+
+                        if (k != groupSeparateWords.Count - 1)
+                        {
+                            //Adicionar espaço entre as palavras
+                            temporaryWord += " ";
+                        }
+                    }
+
+                    //Parar de checar outros grupos de palavras se já encontrar um
+                    if (temporaryWord != "")
+                    {
+                        break;
+                    }
+                }
+
+                //Adicionar grupo à nova lista (como uma única palavra)
+                if (temporaryWord != "")
+                {
+                    newWords.Add(temporaryWord);
+                    i += wordCount - 1;
+                }
+                //Adicionar palavra única à nova lista caso não seja um grupo
+                else
+                {
+                    newWords.Add(words[i]);
+                }
+            }
+
+            return newWords;
         }
 
 

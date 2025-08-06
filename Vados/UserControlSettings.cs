@@ -129,17 +129,20 @@ namespace Vados
             }
             else
             {
-                
-                HashSet<string> porra = new HashSet<string>();
-                porra = Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt");
 
-                foreach (var x in Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt")) 
-                {
-                    listateste.Items.Add(x);
-                }
+                //HashSet<string> porra = new HashSet<string>();
+                //porra = Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt");
+
+                //foreach (var x in Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt")) 
+                //{
+                //    listateste.Items.Add(x);
+                //}
+
+                Comandos.MoverUnsArquivos(".txt", "inferno 2", "desgraça", "");
+
             }
-            
         }
+        
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {

@@ -450,8 +450,8 @@ namespace Vados
                             
                             foreach (var arquivo in Directory.GetFiles(atual))
                             {
-                                string nome = Path.GetFileName(arquivo);
-                                if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+                               
+                                if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
                                 {
                                     MessageBox.Show($"Arquivo encontrado: {arquivo}");
                                     return arquivo;
@@ -490,10 +490,15 @@ namespace Vados
         }
 
 
-        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio)  // procura e retorna multiplos arquivos
+        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio="", string criterio3 = "")  // procura e retorna multiplos arquivos
         {
             //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
-            if (pastaRoot != null) { pastaRoot = SearchFolders(pastaRoot, true); }
+            int i = 1;
+            if (pastaRoot != null) 
+            { 
+                pastaRoot = SearchFolders(pastaRoot, true); 
+                 i = Directory.GetFiles(pastaRoot).Length;
+            }
             
             string root = @"" + driveverifica(null);
             var caminhos = new List<string>();
@@ -575,6 +580,11 @@ namespace Vados
                             }
                         }
 
+                        i-=1;
+                        if(i == 0)
+                        {
+                            return resultados;
+                        }
 
                     }
                 }
@@ -609,7 +619,7 @@ namespace Vados
             }
         }
 
-        public static string MultiTask(string criterio, string pastaAbuscar,string destino, string criterio2, string comando)
+        public static void MoverUnsArquivos(string criterio, string pastaAbuscar,string destino, string criterio2="")
         {
             // os criterios são os criterios de busca, a var pastaAbuscar é a pasta aonde ele vai procurar os multplos arquivos a serem buscados, a var destino é aonde colocar esses arquivos 
 
@@ -617,23 +627,18 @@ namespace Vados
              caminhos = MultiSearch(criterio, pastaAbuscar, criterio2);
 
 
-            switch (comando) {
-                case "mover arquivo":
 
-                    foreach (var item in caminhos)
-                    {
-                        MoverArquivo(item, destino);
+            foreach (var item in caminhos)
+            {
+                MessageBox.Show(item + "  " + destino);
+                MoverArquivo(item, destino);
 
-                    }
-
-                    break;
-
-                   }
+            }
             
 
 
 
-            return "oi";
+            
         }
 
 
@@ -861,7 +866,11 @@ namespace Vados
             
             try
             {
+                MessageBox.Show("nome1  "+nome);
+
                 nome = SearchFolders(nome, false);
+
+                MessageBox.Show("nome2 "+nome);
                 destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
                 MessageBox.Show(destino+nome," dsdasdasdadasdaasda");
                 // SearchFolders(destino, true) + @"\" + nome + "." + ext;

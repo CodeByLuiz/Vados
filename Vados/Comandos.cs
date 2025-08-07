@@ -6,6 +6,7 @@ using System.Security.Policy;
 using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.Metadata;
 
 namespace Vados
 {
@@ -64,24 +65,24 @@ namespace Vados
         }
 
 
-        public static List<WordType> CommandGetDetails(string command)
+        public static List<object> CommandGetDetails(string command)
         {
             //Retorna uma lista de palavras necessárias para realizar o comando
             switch (command)
             {
                 case "criar":
-                    return new List<WordType>() { WordType.Object, WordType.Value };
+                    return new List<object>() {WordType.Object, new List<string>() { "chamada", "chamado", "nomeado", "nomeada" }, WordType.Value };
 
                 case "renomear":
-                    return new List<WordType>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value };
+                    return new List<object>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value };
 
                 case "excluir":
-                    return new List<WordType>() { WordType.Object, WordType.Value };
+                    return new List<object>() { WordType.Object, WordType.Value };
 
 
                 //Lista vazia se não identificar o comando
                 default:
-                    return new List<WordType>();
+                    return new List<object>();
             }
         }
 
@@ -118,7 +119,7 @@ namespace Vados
         {
             string command = "";
             List<string> arguments = new List<string>();
-            List<WordType> typeOrder = null;
+            List<object> typeOrder = null;
             int typeIndex = 0;
 
             //Checar se o comando possui todas as palavras necessárias
@@ -140,18 +141,27 @@ namespace Vados
                 if (command == "") continue;
 
 
-                //Checar se é o tipo de palavra correta
-                WordType expectedType = typeOrder[typeIndex];
+                //Checar se é o tipo de palavra correto ou uma palavra aceita
+                var expected = typeOrder[typeIndex];
 
-                if (type == expectedType)
+                //Se for tipo de palavra
+                if (expected is WordType && type == (WordType)expected)
                 {
-                    typeIndex += 1;
-
                     //Definir argumentos pro comando
                     if (type == WordType.Object || type == WordType.Value)
                     {
                         arguments.Add(word);
                     }
+
+                    typeIndex += 1;
+                    continue;
+
+                }
+
+                //Se for palavra específica aceita
+                if (expected is List<string> && ((List<string>)expected).Contains(word))
+                {
+                    typeIndex += 1;
                 }
             }
 

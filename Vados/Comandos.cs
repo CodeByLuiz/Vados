@@ -65,24 +65,33 @@ namespace Vados
         }
 
 
-        public static List<object> CommandGetDetails(string command)
+        public static List<List<object>> CommandGetDetails(string command)
         {
             //Retorna uma lista de palavras necessárias para realizar o comando
             switch (command)
             {
                 case "criar":
-                    return new List<object>() {WordType.Object, new List<string>() { "chamada", "chamado", "nomeado", "nomeada" }, WordType.Value };
+                    return new List<List<object>>() {
+                        new List<object>() {WordType.Object, new List<string>() { "chamada", "chamado", "nomeado", "nomeada" }, WordType.Value },
+                        new List<object>() {WordType.Object, WordType.Value },
+                    };
 
                 case "renomear":
-                    return new List<object>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value };
+                    return new List<List<object>>()
+                    {
+                        new List<object>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value },
+                    };
 
                 case "excluir":
-                    return new List<object>() { WordType.Object, WordType.Value };
+                    return new List<List<object>>()
+                    {
+                        new List<object>() { WordType.Object, WordType.Value },
+                    };
 
 
                 //Lista vazia se não identificar o comando
                 default:
-                    return new List<object>();
+                    return new List<List<object>>();
             }
         }
 
@@ -119,57 +128,78 @@ namespace Vados
         {
             string command = "";
             List<string> arguments = new List<string>();
-            List<object> typeOrder = null;
-            int typeIndex = 0;
+            List<List<object>> orderList = null;
+            int startIndex = 0;
 
-            //Checar se o comando possui todas as palavras necessárias
+            //Definir comando
             for (int i = 0; i < words.Count; i++)
             {
                 string word = words[i].ToLower();
                 WordType type = WordGetType(word);
-                
+
                 //Definir comando
-                if (command == "" && type == WordType.Command)
+                if (type == WordType.Command)
                 {
                     command = word;
-                    typeOrder = CommandGetDetails(command);
-                    arguments.Add(word);
-                    continue;
-                }
-
-                //Ignorar palavras antes do comando
-                if (command == "") continue;
-
-
-                //Checar se é o tipo de palavra correto ou uma palavra aceita
-                var expected = typeOrder[typeIndex];
-
-                //Se for tipo de palavra
-                if (expected is WordType && type == (WordType)expected)
-                {
-                    //Definir argumentos pro comando
-                    if (type == WordType.Object || type == WordType.Value)
-                    {
-                        arguments.Add(word);
-                    }
-
-                    typeIndex += 1;
-                    continue;
-
-                }
-
-                //Se for palavra específica aceita
-                if (expected is List<string> && ((List<string>)expected).Contains(word))
-                {
-                    typeIndex += 1;
+                    orderList = CommandGetDetails(command);
+                    startIndex = i + 1;
+                    break;
                 }
             }
 
+            //Retornar nulo se não for nenhum comando
+            if (command == "") return null;
 
-            //Retornar argumentos se o comando estiver correto
-            if (typeOrder != null && typeIndex == typeOrder.Count)
+            //MessageBox.Show(words[startIndex].ToString());
+
+
+            //Checar todas as ordens de palavras aceitas pelo comando
+            for (int i = 0; i < orderList.Count; i++)
             {
-                return arguments;
+                arguments.Clear();
+                arguments.Add(command);
+                List<object> typeOrder = orderList[i];
+                int typeIndex = 0;
+
+                //Checar se o comando possui todas as palavras necessárias
+                for (int j = startIndex; j < words.Count; j++)
+                {
+                    string word = words[j].ToLower();
+                    var expected = typeOrder[typeIndex];
+
+                    //Se for tipo de palavra
+                    if (expected is WordType)
+                    {
+                        WordType actualType = WordGetType(word);
+                        MessageBox.Show(word.ToString() + ", " + expected.ToString());
+
+                        if (actualType == (WordType)expected)
+                        {
+                            //Definir argumentos pro comando
+                            if (actualType == WordType.Object || actualType == WordType.Value)
+                            {
+                                arguments.Add(word);
+                            }
+
+                            typeIndex += 1;
+                            continue;
+                        }
+
+                    }
+
+                    //Se for palavra específica aceita
+                    if (expected is List<string> && ((List<string>)expected).Contains(word))
+                    {
+                        typeIndex += 1;
+                    }
+                }
+
+
+                //Retornar argumentos se o comando estiver correto
+                if (typeIndex == typeOrder.Count)
+                {
+                    return arguments;
+                }
             }
 
             return null;

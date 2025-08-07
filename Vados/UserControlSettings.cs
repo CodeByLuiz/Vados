@@ -124,7 +124,7 @@ namespace Vados
             if (cbExtensoes.Text == "pasta")
             {
 
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true));
+                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false, 24000));
 
             }
             else

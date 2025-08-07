@@ -355,7 +355,7 @@ namespace Vados
         #endregion
 
 
-        public static string SearchFolders(string aprocurar, bool comando) // busca recursivamente por pastas ou arquivos
+        public static string SearchFolders(string aprocurar, bool comando, long criteriodata=0, string criterio2= null) // busca recursivamente por pastas ou arquivos
         {
             //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
             // por exemplo no comando de criar arquivos, ele sera TRUE, pq ele ira localizar a PASTA onde o arquivo sera criado
@@ -420,6 +420,7 @@ namespace Vados
                             foreach (var caminho in Directory.GetDirectories(atual))
                             {
                                 string nomePasta = Path.GetFileName(caminho);
+                                
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                                     continue;
 
@@ -428,18 +429,20 @@ namespace Vados
                                     caminhos.Add(caminho);
                                     //fila.Enqueue(caminho);
                                     InserirNoInicio(fila, caminho);
-                                    if (caminho.Contains(aprocurar) && atual.Contains(aprocurar) )
-                                    {
-                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(atual+" situação 1 "+ aprocurar);
-                                        return atual;
-                                    }
-                                    else if (caminho.Contains(aprocurar)) 
-                                    {
-                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(caminho+" situação 2 " + aprocurar);
-                                        return caminho;
-                                    }
+                                    FileInfo caminhoinfo = new FileInfo(caminho); 
+
+                                        if (caminho.Contains(aprocurar) && atual.Contains(aprocurar))
+                                        {
+                                            MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+                                            MessageBox.Show(atual + " situação 1 " + aprocurar);
+                                            return atual;
+                                        }
+                                        else if (caminho.Contains(aprocurar))
+                                        {
+                                            MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
+                                            MessageBox.Show(caminho + " situação 2 " + aprocurar);
+                                            return caminho;
+                                        }
                                         
                                 }
                             }
@@ -450,12 +453,27 @@ namespace Vados
                             
                             foreach (var arquivo in Directory.GetFiles(atual))
                             {
-                               
-                                if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+
+                                FileInfo caminhoinfo = new FileInfo (arquivo); 
+
+                                if (criteriodata != 0)
                                 {
-                                    MessageBox.Show($"Arquivo encontrado: {arquivo}");
-                                    return arquivo;
+                                    if (caminhoinfo.Length >= criteriodata * 0.8 && caminhoinfo.Length <= criteriodata * 1.2)
+                                    {
+                                        MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriodata);
+                                        return arquivo;
+                                    }
                                 }
+                                else
+                                {
+                                    if(arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        MessageBox.Show($"Arquivo encontrado: {arquivo}");
+                                        return arquivo;
+                                    }
+                                }
+
+                                
                             }
 
                             
@@ -597,6 +615,7 @@ namespace Vados
             MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
             return resultados;
         }
+
 
 
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)

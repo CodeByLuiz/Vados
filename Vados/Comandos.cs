@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -565,6 +567,104 @@ namespace Vados
             return null;
         }
 
+      
+        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio) 
+        {
+            //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
+            pastaRoot = SearchFolders(pastaRoot,true);
+            
+            string root = @"" + driveverifica(null);
+            var caminhos = new List<string>();
+            var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var resultados = new HashSet<string>();
+            var ignorar = new List<string>
+            {
+                "$RECYCLE.BIN",
+                "System Volume Information",
+                "Recovery",
+                "Config.Msi",
+                "Windows",
+                "Program Files (x86)",
+                "Program Files"
+            };
+
+            var prioridades = new List<string>
+            {
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+
+                Path.Combine(root),
+            };
+
+            var fila = new Queue<string>();
+            foreach (var pasta in prioridades)
+            {
+                if (Directory.Exists(pasta))
+                {
+                    fila.Enqueue(pasta);
+                    caminhos.Add(pasta);
+                }
+            }
+
+            fila.Enqueue(root);
+
+            while (fila.Count > 0)
+            {
+                var atual = fila.Dequeue();
+                try
+                {
+                    foreach (var arquivo in Directory.GetFiles(atual))
+                    {
+                        string nome = Path.GetFileName(arquivo);
+                        if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && nome.Contains(outrocriterio) && arquivo.Contains(pastaRoot) )
+                        {
+                           MessageBox.Show($"Arquivo encontrado: {arquivo}");
+                            resultados.Add(arquivo);
+
+                        }
+
+
+                        foreach (var caminho in Directory.GetDirectories(atual))
+                        {
+                            string nomePasta = Path.GetFileName(caminho);
+                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                                continue;
+
+                            //fila.Enqueue(caminho);
+
+
+                            if (visitados.Add(caminho))
+                            {
+                                Comandos.InserirNoInicio(fila, caminho);
+                            }
+                        }
+
+
+                    }
+                }
+
+                catch (Exception)
+                {
+
+                }
+            }
+            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+            return resultados;
+        }
+
 
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
         {
@@ -584,6 +684,16 @@ namespace Vados
             {
                 fila.Enqueue(filaTemporaria.Dequeue());
             }
+        }
+
+        public static string MultiTask(string criterio, string pastaAbuscar, string criterio2)
+        {
+            // esse aqui pode buscar pelo nome e extensão   
+            MultiSearch(criterio, pastaAbuscar, criterio2);
+
+
+
+            return "oi";
         }
 
 
@@ -662,21 +772,28 @@ namespace Vados
 
         public static void CriarArquivo(string nome, string extension, string path) // cria arquivo
         {
+            
             try
             {
+                string nomefinal;
+
                 if (path == "")
                 {
                     path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
+                    nomefinal = CriarNome(nome, path,extension);
                 }
                 else
                 {
                     path = SearchFolders(path, true) + @"\" + nome + "." + extension;
                     MessageBox.Show(path);
+                    nomefinal = CriarNome(nome, path, extension);
                 }
+               
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path)+ @"\" + nomefinal + "." + extension);
 
-                using (FileStream fs = File.Create(path)) ;
-                Console.WriteLine("Arquivo" + nome + "Criado com sucesso");
-                AbrirGerenciador(path);
+                using (FileStream fs = File.Create(pathfinal))
+                Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
+                AbrirGerenciador(pathfinal);
             }
             catch (Exception ex)
             {
@@ -710,6 +827,16 @@ namespace Vados
             string path = SearchFolders(nome, true);
             if (Directory.Exists(path))
             {
+
+                foreach (string arquivo in Directory.GetFiles(path))
+                {
+                    File.Delete(arquivo);
+                }
+                foreach(string subPasta in Directory.GetDirectories(path))
+                {
+                    ExcluirPasta(subPasta);
+                    
+                }
                 Directory.Delete(path);
                 Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
             }
@@ -765,6 +892,136 @@ namespace Vados
         }
 
 
+        public static void MoverPasta(string nome, string destino)
+        {
+            try
+            {
+                destino = SearchFolders(destino, true) + @"\" + nome;
+                nome = SearchFolders(nome, true);
+                MessageBox.Show(destino);
+
+
+                if (Directory.Exists(destino))
+                {
+                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                    return;
+                }
+
+                Directory.Move(nome, destino);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao mover pasta: " + ex.Message);
+            }  
+        }
+
+        public static void MoverArquivo(string nome, string destino,string ext) 
+        {
+            try
+            {
+                nome = SearchFolders(nome, false);
+                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+                MessageBox.Show(destino," dsdasdasdadasdaasda");
+                // SearchFolders(destino, true) + @"\" + nome + "." + ext;
+
+                MessageBox.Show(destino);
+
+
+                if (File.Exists(destino))
+                {
+                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    return;
+                }
+
+                File.Move(nome, destino);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
+            }
+
+
+        }
+
+        public static void DuplicarPasta(string nome, string destino)
+        {
+            try
+            {
+                nome = SearchFolders(nome, true);
+                if (string.IsNullOrWhiteSpace(destino))
+                {
+                    destino = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
+                }
+                else
+                {
+                    destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+
+                }
+
+
+                MessageBox.Show(destino + " negocio infernal que pode estar dando erro");
+                if (Directory.Exists(destino))
+                {
+                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                    return;
+                }
+
+                Directory.CreateDirectory(destino);
+                foreach (string arquivo in Directory.GetFiles(nome))
+                {
+
+
+                    string nomeArquivo = Path.GetFileName(arquivo);
+                    string destinoArquivo = Path.Combine(destino, nomeArquivo);
+                    File.Copy(arquivo, destinoArquivo, true);
+
+                }
+                foreach (string subPasta in Directory.GetDirectories(nome))
+                {
+                    string nomeSubPasta = Path.GetFileName(subPasta);
+                    string destinoSubPasta = Path.Combine(destino, nomeSubPasta);
+                    MessageBox.Show(destinoSubPasta);
+                    MessageBox.Show(nomeSubPasta);
+                    DuplicarPasta(subPasta, destino);
+                }
+
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erro ao duplicar pasta: " + ex.Message);
+            }
+        }
+
+        public static void DuplicarArquivo(string nome, string destino)
+        {
+
+            try
+            {
+
+                nome = SearchFolders(nome, false);
+                MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
+                string ext = Path.GetExtension(nome);
+                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+
+                if (File.Exists(destino))
+                {
+                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    return;
+                }
+
+                File.Move(nome, destino);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao duplicar arquivo: " + ex.Message);
+            }
+
+            
+
+        }
+
+
         public static void DarAdm()// da permissões de administrador
         {
             try
@@ -817,6 +1074,39 @@ namespace Vados
             Process.Start("shutdown", "/r /t 5");
             Application.Exit();
         }
+
+        public static void AbrirArquivo(string nome)
+        {
+           string arquivo = SearchFolders(nome,false);
+
+            var psi = new ProcessStartInfo()
+            {
+                UseShellExecute= true,
+                FileName = arquivo,
+            };
+            Process.Start(psi);
+        }
+
+        public static string CriarNome(string nome, string path,string extension)
+        {
+            int contador = 1;
+            string nomefinal = nome;
+
+            if (File.Exists(path))
+            {
+                while (File.Exists(path))
+                {
+                    nomefinal = $"{nome}({contador})";
+                    contador++;
+                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "."+ extension);
+                }
+               
+            }
+            MessageBox.Show(nomefinal);
+            return nomefinal;
+        }
+        
+
     }
 
 }

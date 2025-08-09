@@ -29,6 +29,8 @@ namespace Vados
             { "criar", WordType.Command },
             { "renomear", WordType.Command },
             { "excluir", WordType.Command },
+            { "mover", WordType.Command },
+            { "duplicar", WordType.Command },
             //Objetos
             { "pasta", WordType.Object },
             { "arquivo", WordType.Object },
@@ -94,33 +96,45 @@ namespace Vados
         }
 
 
+        //Retorna a ordem de palavras necessárias para realizar o comando
         public static List<List<object>> CommandGetWordOrder(string command)
         {
-            //Retorna a ordem de palavras necessárias para realizar o comando
-            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo" };
+            //Lista de palavras para indicar o nome do arquivo/pasta
+            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "" };
+            //Palavras específicas
+            List<string> folder = new List<string>() { "pasta" };
+            List<string> to = new List<string>() { "para" };
 
             switch (command)
             {
                 case "criar":
                     return new List<List<object>>() {
                         new List<object>() {WordType.Object, namingConnectors, WordType.Value },
-                        new List<object>() {WordType.Object, WordType.Value },
+                        //new List<object>() {WordType.Object, WordType.Value },
                     };
 
                 case "renomear":
-                    List<string> para = new List<string>() { "para" };
 
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, WordType.Value, para, WordType.Value },
-                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
+                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, WordType.Value },
+                        //new List<object>() { WordType.Object, WordType.Value, to, WordType.Value },
                     };
 
                 case "excluir":
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, WordType.Value },
                         new List<object>() { WordType.Object, namingConnectors, WordType.Value },
+                        //new List<object>() { WordType.Object, WordType.Value },
+                    };
+
+                case "mover":
+                    return new List<List<object>>()
+                    {
+                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, folder, namingConnectors, WordType.Value },
+                        //new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, folder, WordType.Value },
+                        //new List<object>() { WordType.Object, WordType.Value, to, folder, namingConnectors, WordType.Value },
+                        //new List<object>() { WordType.Object, WordType.Value, to, folder, WordType.Value },
                     };
 
 
@@ -155,6 +169,12 @@ namespace Vados
                     if (obj == "pasta") { ExcluirPasta(name); }
                     if (obj == "arquivo") { ExcluirArquivo(name, "txt"); }
                     break;
+
+                case "mover":
+                    string destiny = arguments[2];
+                    if (obj == "pasta") { MoverPasta(name, destiny); }
+                    if (obj == "arquivo") { MoverArquivo(name, destiny, "txt"); }
+                    break;
             }
         }
 
@@ -171,7 +191,7 @@ namespace Vados
             {
                 string word = words[i].ToLower();
                 string possibleCommand = CommandGetSynonym(word);
-                MessageBox.Show(possibleCommand);
+                //MessageBox.Show(possibleCommand);
                 WordType type = WordGetType(possibleCommand);
 
                 //Definir comando
@@ -201,7 +221,6 @@ namespace Vados
                 {
                     string word = words[j].ToLower();
                     var expected = typeOrder[typeIndex];
-                    MessageBox.Show(word + ", " + expected.ToString());
 
                     //Se for tipo de palavra
                     if (expected is WordType)
@@ -226,8 +245,18 @@ namespace Vados
                     if (expected is List<string>)
                     {
                         List<string> list = (List<string>)expected;
-                        if (list.Contains(word))
+                        bool containsWord = list.Contains(word);
+
+                        //Seguir para a próxima palavra se a atual estiver na lista
+                        if (containsWord)
                         {
+                            typeIndex += 1;
+                        }
+
+                        //Checar a mesma palavra mas com o próximo tipo esperado (caso não esteja na lista, que não é obrigatória)
+                        if (!containsWord && list.Contains(""))
+                        {
+                            j -= 1;
                             typeIndex += 1;
                         }
                     }

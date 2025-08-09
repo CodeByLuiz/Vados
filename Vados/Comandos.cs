@@ -19,7 +19,7 @@ namespace Vados
         {
             Command,
             Object,
-            Connector,
+            Connector,  //Não será mais necessário
             Value,
         };
 
@@ -34,13 +34,27 @@ namespace Vados
             { "arquivo", WordType.Object },
             //Conectores
             { "para", WordType.Connector },
-            
-            { "chamado", WordType.Connector },
-            { "chamada", WordType.Connector },
-            { "nomeado", WordType.Connector },
-            { "nomeada", WordType.Connector },
-            { "com o nome", WordType.Connector },
-            
+        };
+
+        static Dictionary<string, string> commandSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            //Criar
+            { "criar", "criar" },
+            { "crie", "criar" },
+            //Renomear
+            { "renomear", "renomear" },
+            { "renomeie", "renomear" },
+            { "mudar o nome", "renomear" },
+            { "mude o nome", "renomear" },
+            { "trocar o nome", "renomear" },
+            { "troque o nome", "renomear" },
+            //Excluir
+            { "excluir", "excluir" },
+            { "exclua", "excluir" },
+            { "deletar", "excluir" },
+            { "delete", "excluir" },
+            { "apagar", "excluir" },
+            { "apague", "excluir" },
         };
 
         static List<string> wordGroups = new List<string>()
@@ -48,9 +62,13 @@ namespace Vados
             "com o nome",
             "com nome",
             "de nome",
-            "com o título",
-            "com título",
-            "de título",
+            "com o titulo",
+            "com titulo",
+            "de titulo",
+            "mudar o nome",
+            "mude o nome",
+            "trocar o nome",
+            "troque o nome",
         };
 
 
@@ -65,27 +83,44 @@ namespace Vados
         }
 
 
-        public static List<List<object>> CommandGetDetails(string command)
+        public static string CommandGetSynonym(string command)
         {
-            //Retorna uma lista de palavras necessárias para realizar o comando
+            if (commandSynonyms.TryGetValue(command, out string synonym))
+            {
+                return synonym;
+            }
+
+            return "";
+        }
+
+
+        public static List<List<object>> CommandGetWordOrder(string command)
+        {
+            //Retorna a ordem de palavras necessárias para realizar o comando
+            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo" };
+
             switch (command)
             {
                 case "criar":
                     return new List<List<object>>() {
-                        new List<object>() {WordType.Object, new List<string>() { "chamada", "chamado", "nomeado", "nomeada" }, WordType.Value },
+                        new List<object>() {WordType.Object, namingConnectors, WordType.Value },
                         new List<object>() {WordType.Object, WordType.Value },
                     };
 
                 case "renomear":
+                    List<string> para = new List<string>() { "para" };
+
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, WordType.Value, WordType.Connector, WordType.Value },
+                        new List<object>() { WordType.Object, WordType.Value, para, WordType.Value },
+                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
                     };
 
                 case "excluir":
                     return new List<List<object>>()
                     {
                         new List<object>() { WordType.Object, WordType.Value },
+                        new List<object>() { WordType.Object, namingConnectors, WordType.Value },
                     };
 
 
@@ -135,13 +170,15 @@ namespace Vados
             for (int i = 0; i < words.Count; i++)
             {
                 string word = words[i].ToLower();
-                WordType type = WordGetType(word);
+                string possibleCommand = CommandGetSynonym(word);
+                MessageBox.Show(possibleCommand);
+                WordType type = WordGetType(possibleCommand);
 
                 //Definir comando
                 if (type == WordType.Command)
                 {
-                    command = word;
-                    orderList = CommandGetDetails(command);
+                    command = possibleCommand;
+                    orderList = CommandGetWordOrder(command);
                     startIndex = i + 1;
                     break;
                 }
@@ -149,8 +186,6 @@ namespace Vados
 
             //Retornar nulo se não for nenhum comando
             if (command == "") return null;
-
-            //MessageBox.Show(words[startIndex].ToString());
 
 
             //Checar todas as ordens de palavras aceitas pelo comando
@@ -166,12 +201,12 @@ namespace Vados
                 {
                     string word = words[j].ToLower();
                     var expected = typeOrder[typeIndex];
+                    MessageBox.Show(word + ", " + expected.ToString());
 
                     //Se for tipo de palavra
                     if (expected is WordType)
                     {
                         WordType actualType = WordGetType(word);
-                        MessageBox.Show(word.ToString() + ", " + expected.ToString());
 
                         if (actualType == (WordType)expected)
                         {
@@ -188,9 +223,13 @@ namespace Vados
                     }
 
                     //Se for palavra específica aceita
-                    if (expected is List<string> && ((List<string>)expected).Contains(word))
+                    if (expected is List<string>)
                     {
-                        typeIndex += 1;
+                        List<string> list = (List<string>)expected;
+                        if (list.Contains(word))
+                        {
+                            typeIndex += 1;
+                        }
                     }
                 }
 

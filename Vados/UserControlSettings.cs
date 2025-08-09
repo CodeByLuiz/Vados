@@ -123,8 +123,13 @@ namespace Vados
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
+                
+                foreach (var item in Comandos.SearchFolders(".txt", false, pastaRoot: "Desktop")) 
+                {
+                    listateste.Items.Add(item);
+                }
 
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false, 24000));
+                //listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false, 24000));
 
             }
             else
@@ -137,8 +142,9 @@ namespace Vados
                 //{
                 //    listateste.Items.Add(x);
                 //}
+                //Task.Run(() => Comandos.MoverUnsArquivos(".txt", "Desktop", "pasta de coisa"));
 
-                Comandos.MoverUnsArquivos(".txt", "inferno 2", "desgraça", "");
+                
 
             }
         }

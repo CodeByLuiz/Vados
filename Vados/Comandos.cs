@@ -57,6 +57,13 @@ namespace Vados
             { "delete", "excluir" },
             { "apagar", "excluir" },
             { "apague", "excluir" },
+            //Mover
+            { "mover", "mover" },
+            { "mova", "mover" },
+            { "transferir", "mover" },
+            { "transfera", "mover" },
+            { "realocar", "mover" },
+            { "realoque", "mover" },
         };
 
         static List<string> wordGroups = new List<string>()
@@ -154,24 +161,45 @@ namespace Vados
             {
                 case "criar":
                     if (obj == "pasta") { CriarPasta(name, ""); }
-                    if (obj == "arquivo") { CriarArquivo(name, "txt", ""); }
+                    if (obj == "arquivo")
+                    {
+                        //Extrair extensão do arquivo
+                        string fileName = Path.GetFileNameWithoutExtension(name);
+                        string extension = Path.GetExtension(name);
+                        MessageBox.Show(extension);
+
+                        CriarArquivo(name, "", "");
+                    }
                     break;
+
 
                 case "renomear":
                     string oldName = arguments[2];
                     string newName = arguments[3];
 
                     if (obj == "pasta") { RenomearPasta(oldName, newName); }
-                    if (obj == "arquivo") { RenomearArquivo(oldName, newName, "txt"); }
+                    if (obj == "arquivo") {
+                        //Extrair extensão do antigo e do novo nome
+                        string oldFileName = Path.GetFileNameWithoutExtension(oldName);
+                        string oldExtension = Path.GetExtension(oldName);
+                        if (oldExtension != "") oldExtension = oldExtension.Remove(0, 1);   //Remove o . da extensão
+                        string newFileName = Path.GetFileNameWithoutExtension(newName);
+                        string newExtension = Path.GetExtension(newName);
+                        if (newExtension != "") newExtension = newExtension.Remove(0, 1);   //Remove o . da extensão
+
+                        RenomearArquivo(oldFileName, oldExtension, newFileName, newExtension);
+                    }
                     break;
+
 
                 case "excluir":
                     if (obj == "pasta") { ExcluirPasta(name); }
                     if (obj == "arquivo") { ExcluirArquivo(name, "txt"); }
                     break;
 
+
                 case "mover":
-                    string destiny = arguments[2];
+                    string destiny = arguments[3];
                     if (obj == "pasta") { MoverPasta(name, destiny); }
                     if (obj == "arquivo") { MoverArquivo(name, destiny, "txt"); }
                     break;
@@ -958,15 +986,15 @@ namespace Vados
         }
 
 
-        public static void RenomearArquivo(string nome, string novoNome, string extensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        public static void RenomearArquivo(string nome, string extensao, string novoNome, string novaExtensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
 
             //string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
             nome = nome + "." + extensao;
             string path = SearchFolders(nome,false);
             
-
-            string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome + "." + extensao);
+            novoNome = novoNome + "." + novaExtensao;
+            string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome);
           
             if (File.Exists(path))
             {

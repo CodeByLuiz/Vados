@@ -166,9 +166,9 @@ namespace Vados
                         //Extrair extensão do arquivo
                         string fileName = Path.GetFileNameWithoutExtension(name);
                         string extension = Path.GetExtension(name);
-                        MessageBox.Show(extension);
+                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
 
-                        CriarArquivo(name, "", "");
+                        CriarArquivo(fileName, extension, "");
                     }
                     break;
 
@@ -187,6 +187,7 @@ namespace Vados
                         string newExtension = Path.GetExtension(newName);
                         if (newExtension != "") newExtension = newExtension.Remove(0, 1);   //Remove o . da extensão
 
+
                         RenomearArquivo(oldFileName, oldExtension, newFileName, newExtension);
                     }
                     break;
@@ -194,14 +195,28 @@ namespace Vados
 
                 case "excluir":
                     if (obj == "pasta") { ExcluirPasta(name); }
-                    if (obj == "arquivo") { ExcluirArquivo(name, "txt"); }
+                    if (obj == "arquivo") {
+                        //Extrair extensão do arquivo
+                        string fileName = Path.GetFileNameWithoutExtension(name);
+                        string extension = Path.GetExtension(name);
+                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+
+                        ExcluirArquivo(fileName, extension);
+                    }
                     break;
 
 
                 case "mover":
                     string destiny = arguments[3];
                     if (obj == "pasta") { MoverPasta(name, destiny); }
-                    if (obj == "arquivo") { MoverArquivo(name, destiny, "txt"); }
+                    if (obj == "arquivo") {
+                        //Extrair extensão do arquivo
+                        string fileName = Path.GetFileNameWithoutExtension(name);
+                        string extension = Path.GetExtension(name);
+                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+
+                        MoverArquivo(fileName, destiny, extension);
+                    }
                     break;
             }
         }
@@ -990,12 +1005,22 @@ namespace Vados
         {
 
             //string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
-            nome = nome + "." + extensao;
+            //Nome antigo + extensao
+            if (!String.IsNullOrEmpty(extensao))
+            {
+                nome = nome + "." + extensao;
+            }
+            MessageBox.Show(nome);
             string path = SearchFolders(nome,false);
-            
-            novoNome = novoNome + "." + novaExtensao;
+
+            //Nome novo + nova extensao
+            if (!String.IsNullOrEmpty(novaExtensao))
+            {
+                novoNome = novoNome + "." + novaExtensao;
+            }
             string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome);
-          
+
+
             if (File.Exists(path))
             {
                 File.Move(path, novoPath);

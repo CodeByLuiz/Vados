@@ -14,6 +14,8 @@ namespace Vados
     {
         #region TEXTO PARA COMANDO
 
+        #region DICIONÁRIOS / LISTAS
+
         //Funções das palavras
         public enum WordType
         {
@@ -34,8 +36,6 @@ namespace Vados
             //Objetos
             { "pasta", WordType.Object },
             { "arquivo", WordType.Object },
-            //Conectores
-            { "para", WordType.Connector },
         };
 
         static Dictionary<string, string> commandSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -64,6 +64,8 @@ namespace Vados
             { "transfera", "mover" },
             { "realocar", "mover" },
             { "realoque", "mover" },
+            { "colocar", "mover" },
+            { "coloque", "mover" },
         };
 
         static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
@@ -95,6 +97,7 @@ namespace Vados
             "mude o nome",
             "trocar o nome",
             "troque o nome",
+            "dentro da",
             "power point"
         };
 
@@ -131,6 +134,8 @@ namespace Vados
             return new List<string>();
         }
 
+        #endregion
+
 
         //Retorna a ordem de palavras necessárias para realizar o comando
         public static List<List<object>> CommandGetWordOrder(string command)
@@ -138,39 +143,34 @@ namespace Vados
             //Lista de palavras para indicar o nome do arquivo/pasta
             List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "" };
             //Palavras específicas
-            List<string> folder = new List<string>() { "pasta" };
-            List<string> to = new List<string>() { "para" };
+            List<string> pasta = new List<string>() { "pasta" };
+            List<string> para = new List<string>() { "para" };
 
             switch (command)
             {
                 case "criar":
                     return new List<List<object>>() {
-                        new List<object>() {WordType.Object, namingConnectors, WordType.Value },
-                        //new List<object>() {WordType.Object, WordType.Value },
+                        new List<object>() { 1, WordType.Object, new List<string>() { "de", "" }, WordType.Value, namingConnectors, WordType.Value },
+                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value },
                     };
 
                 case "renomear":
 
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, WordType.Value },
-                        //new List<object>() { WordType.Object, WordType.Value, to, WordType.Value },
+                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
                     };
 
                 case "excluir":
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, namingConnectors, WordType.Value },
-                        //new List<object>() { WordType.Object, WordType.Value },
+                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value },
                     };
 
                 case "mover":
                     return new List<List<object>>()
                     {
-                        new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, folder, namingConnectors, WordType.Value },
-                        //new List<object>() { WordType.Object, namingConnectors, WordType.Value, to, folder, WordType.Value },
-                        //new List<object>() { WordType.Object, WordType.Value, to, folder, namingConnectors, WordType.Value },
-                        //new List<object>() { WordType.Object, WordType.Value, to, folder, WordType.Value },
+                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, new List<string>() { "para", "dentro da" }, pasta, namingConnectors, WordType.Value },
                     };
 
 
@@ -183,19 +183,41 @@ namespace Vados
 
         public static void ExecuteCommand(List<string> arguments)
         {
-            string obj = arguments[1];
-            string name = arguments[2];
+            int situation = int.Parse(arguments[0]);
+            string obj = arguments[2];
+            string name = arguments[3];
 
-            switch (arguments[0])
+            switch (arguments[1])
             {
                 case "criar":
                     if (obj == "pasta") { CriarPasta(name, ""); }
                     if (obj == "arquivo")
                     {
-                        //Extrair extensão do arquivo
-                        string fileName = Path.GetFileNameWithoutExtension(name);
-                        string extension = Path.GetExtension(name);
-                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+                        string fileName = name;
+                        string extension = "";
+
+                        //Quando não há extensão ou a extensão está junto do nome do arquivo (ex: arquivo.txt)
+                        if (situation == 0)
+                        {
+                            //Extrair extensão do arquivo
+                            fileName = Path.GetFileNameWithoutExtension(name);
+                            extension = Path.GetExtension(name);
+                            if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+                        }
+
+                        //Quando o formato do arquivo está por extenso (ex: arquivo de texto)
+                        if (situation == 1)
+                        {
+                            fileName = arguments[4];
+
+                            //Definir extensão
+                            string extensionWord = arguments[3];
+                            List<string> extensions = WordGetExtensions(extensionWord);
+                            if (extensions.Count != 0)
+                            {
+                                extension = WordGetExtensions(extensionWord)[0];
+                            }
+                        }
 
                         CriarArquivo(fileName, extension, "");
                     }
@@ -203,8 +225,8 @@ namespace Vados
 
 
                 case "renomear":
-                    string oldName = arguments[2];
-                    string newName = arguments[3];
+                    string oldName = arguments[3];
+                    string newName = arguments[4];
 
                     if (obj == "pasta") { RenomearPasta(oldName, newName); }
                     if (obj == "arquivo") {
@@ -236,7 +258,7 @@ namespace Vados
 
 
                 case "mover":
-                    string destiny = arguments[3];
+                    string destiny = arguments[4];
                     if (obj == "pasta") { MoverPasta(name, destiny); }
                     if (obj == "arquivo") {
                         //Extrair extensão do arquivo
@@ -263,7 +285,6 @@ namespace Vados
             {
                 string word = words[i].ToLower();
                 string possibleCommand = CommandGetSynonym(word);
-                //MessageBox.Show(possibleCommand);
                 WordType type = WordGetType(possibleCommand);
 
                 //Definir comando
@@ -283,14 +304,20 @@ namespace Vados
             //Checar todas as ordens de palavras aceitas pelo comando
             for (int i = 0; i < orderList.Count; i++)
             {
-                arguments.Clear();
-                arguments.Add(command);
                 List<object> typeOrder = orderList[i];
-                int typeIndex = 0;
+                int typeIndex = 1;  //Pular primeiro elemento, que indica a situação do comando
+
+                //Adicionar situação e commando nos argumentos
+                arguments.Clear();
+                int commandSituation = (int)(typeOrder[0]);
+                arguments.Add(commandSituation.ToString());
+                arguments.Add(command);
 
                 //Checar se o comando possui todas as palavras necessárias
                 for (int j = startIndex; j < words.Count; j++)
                 {
+                    if (typeIndex >= typeOrder.Count) break;
+
                     string word = words[j].ToLower();
                     var expected = typeOrder[typeIndex];
 

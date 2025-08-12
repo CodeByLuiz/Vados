@@ -142,16 +142,21 @@ namespace Vados
         {
             //Lista de palavras para indicar o nome do arquivo/pasta
             List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "" };
+            //Indica a pasta de destino
+            List<string> dentro = new List<string>() { "na", "dentro da"};
             //Palavras específicas
             List<string> pasta = new List<string>() { "pasta" };
             List<string> para = new List<string>() { "para" };
+            List<string> de = new List<string>() { "de", "" };
 
             switch (command)
             {
                 case "criar":
                     return new List<List<object>>() {
-                        new List<object>() { 1, WordType.Object, new List<string>() { "de", "" }, WordType.Value, namingConnectors, WordType.Value },
+                        new List<object>() { 1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
+                        new List<object>() { 1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
                         new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value },
+                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
                     };
 
                 case "renomear":
@@ -316,7 +321,7 @@ namespace Vados
                 //Checar se o comando possui todas as palavras necessárias
                 for (int j = startIndex; j < words.Count; j++)
                 {
-                    if (typeIndex >= typeOrder.Count) break;
+                    if (typeIndex >= typeOrder.Count) break;    //Parar se tiver mais palavras que o esperado
 
                     string word = words[j].ToLower();
                     var expected = typeOrder[typeIndex];

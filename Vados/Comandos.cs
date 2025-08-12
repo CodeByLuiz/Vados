@@ -66,6 +66,23 @@ namespace Vados
             { "realoque", "mover" },
         };
 
+        static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
+        {
+            //Criar
+            { "texto", new List<string>() { "txt", "doc", "docx", "rtf", "odt", "md" } },
+            { "imagem", new List<string>() { "png", "jpg", "jpeg", "bmp", "ico" } },
+            { "video", new List<string>() { "mp4", "avi", "mov" } },
+            { "audio", new List<string>() { "mp3", "wav", "ogg" } },
+            { "apresentacao", new List<string>() { "odp", "ppt", "pptx" } },
+            { "web", new List<string>() { "htm", "html", "css", "js", "php", "xps", "asp" } },
+            { "executavel", new List<string>() { "exe", "lnk" } },
+            { "atalho", new List<string>() { "lnk" } },
+            { "compactado", new List<string>() { "zip", "rar", "7z" } },
+            { "power point", new List<string>() { "ppt", "pptx" } },
+            { "word", new List<string>() { "doc", "docx" } },
+            { "excel", new List<string>() { "xls", "xlsx" } },
+        };
+
         static List<string> wordGroups = new List<string>()
         {
             "com o nome",
@@ -78,6 +95,7 @@ namespace Vados
             "mude o nome",
             "trocar o nome",
             "troque o nome",
+            "power point"
         };
 
 
@@ -100,6 +118,17 @@ namespace Vados
             }
 
             return "";
+        }
+
+
+        public static List<string> WordGetExtensions(string word)
+        {
+            if (wordExtensions.TryGetValue(word, out List<string> extensions))
+            {
+                return extensions;
+            }
+
+            return new List<string>();
         }
 
 

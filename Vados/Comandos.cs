@@ -169,13 +169,13 @@ namespace Vados
         public static List<List<object>> CommandGetWordOrder(string command)
         {
             //Lista de palavras para indicar o nome do arquivo/pasta
-            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "" };
+            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "denominado", "denominada", "intitulado", "intitulada", "" };
             //Indica a pasta de destino
             List<string> dentro = new List<string>() { "na", "dentro da" };
             //Palavras específicas
             List<string> pasta = new List<string>() { "pasta" };
             List<string> para = new List<string>() { "para" };
-            List<string> de = new List<string>() { "de", "" };
+            List<string> de = new List<string>() { "de" };
 
             switch (command)
             {
@@ -183,7 +183,7 @@ namespace Vados
                     return new List<List<object>>() {
                         new List<object>() { 1.1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
                         new List<object>() { 1.0, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
-                        new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
+                        new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
                         new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
                     };
 
@@ -218,7 +218,7 @@ namespace Vados
         {
             double situation = Convert.ToDouble(arguments[0]);
             int mainSituation = (int)(Math.Floor(situation));
-            int subSituation = (int)(Math.Truncate(situation));
+            int subSituation = (int)((situation - mainSituation) * 10);
             MessageBox.Show(mainSituation.ToString() + "." + subSituation.ToString());
 
             string obj = arguments[2];
@@ -358,8 +358,10 @@ namespace Vados
                 arguments.Add(commandSituation.ToString());
                 arguments.Add(command);
 
+                int j = startIndex;
+
                 //Checar se o comando possui todas as palavras necessárias
-                for (int j = startIndex; j < words.Count; j++)
+                for (j = startIndex; j < words.Count; j++)
                 {
                     if (typeIndex >= typeOrder.Count) break;    //Parar se tiver mais palavras que o esperado
 
@@ -408,7 +410,7 @@ namespace Vados
 
 
                 //Retornar argumentos se o comando estiver correto
-                if (typeIndex == typeOrder.Count)
+                if (typeIndex == typeOrder.Count && j == words.Count)
                 {
                     return arguments;
                 }
@@ -502,7 +504,7 @@ namespace Vados
                     if (c == namer)
                     {
                         namer = '\0';
-                        break;
+                        continue;
                     }
 
                     //Iniciar junção

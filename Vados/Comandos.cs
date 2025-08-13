@@ -43,9 +43,23 @@ namespace Vados
             //Criar
             { "criar", "criar" },
             { "crie", "criar" },
+            { "gerar", "criar" },
+            { "gere", "criar" },
+            { "produzir", "criar" },
+            { "produza", "criar" },
+            { "formar", "criar" },
+            { "forme", "criar" },
+            { "construir", "criar" },
+            { "construa", "criar" },
+            { "fazer", "criar" },
+            { "faça", "criar" },
             //Renomear
             { "renomear", "renomear" },
             { "renomeie", "renomear" },
+            { "alterar o nome", "renomear" },
+            { "altere o nome", "renomear" },
+            { "rebatizar", "renomear" },
+            { "rebatize", "renomear" },
             { "mudar o nome", "renomear" },
             { "mude o nome", "renomear" },
             { "trocar o nome", "renomear" },
@@ -57,6 +71,10 @@ namespace Vados
             { "delete", "excluir" },
             { "apagar", "excluir" },
             { "apague", "excluir" },
+            { "remover", "excluir" },
+            { "remova", "excluir" },
+            { "eliminar", "excluir" },
+            { "elimine", "excluir" },
             //Mover
             { "mover", "mover" },
             { "mova", "mover" },
@@ -66,6 +84,14 @@ namespace Vados
             { "realoque", "mover" },
             { "colocar", "mover" },
             { "coloque", "mover" },
+            { "deslocar", "mover" },
+            { "desloque", "mover" },
+            { "levar", "mover" },
+            { "leve", "mover" },
+            { "transportar", "mover" },
+            { "transporte", "mover" },
+            { "enviar", "mover" },
+            { "envie", "mover" },
         };
 
         static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
@@ -97,6 +123,8 @@ namespace Vados
             "mude o nome",
             "trocar o nome",
             "troque o nome",
+            "alterar o nome",
+            "altere o nome",
             "dentro da",
             "power point"
         };
@@ -143,7 +171,7 @@ namespace Vados
             //Lista de palavras para indicar o nome do arquivo/pasta
             List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "" };
             //Indica a pasta de destino
-            List<string> dentro = new List<string>() { "na", "dentro da"};
+            List<string> dentro = new List<string>() { "na", "dentro da" };
             //Palavras específicas
             List<string> pasta = new List<string>() { "pasta" };
             List<string> para = new List<string>() { "para" };
@@ -153,29 +181,29 @@ namespace Vados
             {
                 case "criar":
                     return new List<List<object>>() {
-                        new List<object>() { 1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
-                        new List<object>() { 1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
-                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value },
-                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
+                        new List<object>() { 1.1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
+                        new List<object>() { 1.0, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
+                        new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, WordType.Value },
+                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
                     };
 
                 case "renomear":
 
                     return new List<List<object>>()
                     {
-                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
+                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
                     };
 
                 case "excluir":
                     return new List<List<object>>()
                     {
-                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value },
+                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
                     };
 
                 case "mover":
                     return new List<List<object>>()
                     {
-                        new List<object>() { 0, WordType.Object, namingConnectors, WordType.Value, new List<string>() { "para", "dentro da" }, pasta, namingConnectors, WordType.Value },
+                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, new List<string>() { "para", "dentro da" }, pasta, namingConnectors, WordType.Value },
                     };
 
 
@@ -188,7 +216,11 @@ namespace Vados
 
         public static void ExecuteCommand(List<string> arguments)
         {
-            int situation = int.Parse(arguments[0]);
+            double situation = Convert.ToDouble(arguments[0]);
+            int mainSituation = (int)(Math.Floor(situation));
+            int subSituation = (int)(Math.Truncate(situation));
+            MessageBox.Show(mainSituation.ToString() + "." + subSituation.ToString());
+
             string obj = arguments[2];
             string name = arguments[3];
 
@@ -200,9 +232,10 @@ namespace Vados
                     {
                         string fileName = name;
                         string extension = "";
+                        string destinyFolder = "";
 
-                        //Quando não há extensão ou a extensão está junto do nome do arquivo (ex: arquivo.txt)
-                        if (situation == 0)
+                        //Quando não há extensão ou a extensão está junto do nome do arquivo (ex: "nome.txt")
+                        if (mainSituation == 0)
                         {
                             //Extrair extensão do arquivo
                             fileName = Path.GetFileNameWithoutExtension(name);
@@ -210,8 +243,8 @@ namespace Vados
                             if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
                         }
 
-                        //Quando o formato do arquivo está por extenso (ex: arquivo de texto)
-                        if (situation == 1)
+                        //Quando o formato do arquivo está por extenso (ex: "arquivo de texto")
+                        if (mainSituation == 1)
                         {
                             fileName = arguments[4];
 
@@ -224,7 +257,14 @@ namespace Vados
                             }
                         }
 
-                        CriarArquivo(fileName, extension, "");
+                        //Pasta de destino
+                        if (subSituation == 1)
+                        {
+                            destinyFolder = arguments.Last();
+                        }
+
+                        MessageBox.Show(destinyFolder);
+                        CriarArquivo(fileName, extension, destinyFolder);
                     }
                     break;
 
@@ -314,7 +354,7 @@ namespace Vados
 
                 //Adicionar situação e commando nos argumentos
                 arguments.Clear();
-                int commandSituation = (int)(typeOrder[0]);
+                double commandSituation = (double)(typeOrder[0]);
                 arguments.Add(commandSituation.ToString());
                 arguments.Add(command);
 
@@ -446,6 +486,7 @@ namespace Vados
 
             char[] separators = { ' ', ',' };
             char[] charList = str.ToCharArray();
+            char namer = '\0';
 
             string currentWord = "";
 
@@ -454,15 +495,32 @@ namespace Vados
                 char c = charList[i];
                 bool breakWord = false;
 
-                //Checar se o caractere é um separador
-                for (var j = 0; j < separators.Length; j++)
+                //Checar se o caractere é um nomeador   (junta palavras que estão entre eles)
+                if (c == '\"' || c == '\'')
                 {
-                    char s = separators[j];
-
-                    if (c == s)
+                    //Fechar junção
+                    if (c == namer)
                     {
-                        breakWord = true;
+                        namer = '\0';
                         break;
+                    }
+
+                    //Iniciar junção
+                    namer = c;
+                    continue;
+                }
+
+                //Checar se o caractere é um separador
+                if (namer == '\0') {
+                    for (var j = 0; j < separators.Length; j++)
+                    {
+                        char s = separators[j];
+
+                        if (c == s)
+                        {
+                            breakWord = true;
+                            break;
+                        }
                     }
                 }
 

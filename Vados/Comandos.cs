@@ -219,7 +219,7 @@ namespace Vados
         #endregion
 
 
-        public static string SearchFolders(string aprocurar, bool comando) // busca recursivamente por pastas ou arquivos
+        public static string SearchFolders(string aprocurar, bool comando, List<string> ignorar ,List<string> prioridades) // busca recursivamente por pastas ou arquivos
         {
             //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
             // por exemplo no comando de criar arquivos, ele sera TRUE, pq ele ira localizar a PASTA onde o arquivo sera criado
@@ -228,37 +228,7 @@ namespace Vados
             string root = @"" + driveverifica(null);
             var caminhos = new List<string>();
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var ignorar = new List<string>
-            {
-                "$RECYCLE.BIN",
-                "System Volume Information",
-                "Recovery",
-                "Config.Msi",
-                "Windows",
-                "Program Files (x86)",
-                "Program Files"
-            };
-
-            var prioridades = new List<string>
-            {
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
-
-                Path.Combine(root),
-            };
+           
 
             var fila = new Queue<string>();
             foreach (var pasta in prioridades)
@@ -422,7 +392,7 @@ namespace Vados
                 }
                 else
                 {
-                    path = SearchFolders(path, true) + @"\" + nome;
+                    path = SearchFolders(path, true, Global.ignorarPadrao,Global.prioridadesPadrao) + @"\" + nome;
 
                 }
 
@@ -462,7 +432,7 @@ namespace Vados
                 }
                 else
                 {
-                    path = SearchFolders(path, true) + @"\" + nome + "." + extension;
+                    path = SearchFolders(path, true, Global.ignorarPadrao, Global.prioridadesPadrao) + @"\" + nome + "." + extension;
                     MessageBox.Show(path);
                     nomefinal = CriarNome(nome, path, extension);
                 }
@@ -484,7 +454,7 @@ namespace Vados
 
         public static void ExcluirArquivo(string nome, string extension) //exclui arquivo
         {
-            string path = SearchFolders(nome /*+ "." + extension*/, false);
+            string path = SearchFolders(nome /*+ "." + extension*/, false, Global.ignorarPadrao, Global.prioridadesPadrao);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -502,7 +472,7 @@ namespace Vados
 
         public static void ExcluirPasta(string nome) // exclui pasta
         {
-            string path = SearchFolders(nome, true);
+            string path = SearchFolders(nome, true, Global.ignorarPadrao, Global.prioridadesPadrao);
             if (Directory.Exists(path))
             {
                 Directory.Delete(path);
@@ -523,7 +493,7 @@ namespace Vados
 
             //string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
             nome = nome + "." + extensao;
-            string path = SearchFolders(nome,false);
+            string path = SearchFolders(nome,false, Global.ignorarPadrao, Global.prioridadesPadrao);
             
 
             string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome + "." + extensao);
@@ -543,7 +513,7 @@ namespace Vados
         public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
 
-            string path = SearchFolders(nome, true);
+            string path = SearchFolders(nome, true, Global.ignorarPadrao, Global.prioridadesPadrao);
             MessageBox.Show(path);
 
             string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
@@ -615,7 +585,7 @@ namespace Vados
 
         public static void AbrirArquivo(string nome)
         {
-           string arquivo = SearchFolders(nome,false);
+           string arquivo = SearchFolders(nome,false, Global.ignorarPadrao, Global.prioridadesPadrao);
 
             var psi = new ProcessStartInfo()
             {
@@ -644,7 +614,16 @@ namespace Vados
             return nomefinal;
         }
         
-
+        public static void ExecutarAplicativo(string nome)
+        {
+         
+           
+            ProcessStartInfo processInfo = new ProcessStartInfo();
+            processInfo.FileName = SearchFolders(nome, false, Global.ignorarExecutaveis, Global.prioridadesExecutaveis);
+            processInfo.UseShellExecute = true;
+            Process.Start(processInfo);
+           
+        }
     }
 
 }

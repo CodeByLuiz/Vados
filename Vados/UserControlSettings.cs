@@ -124,12 +124,12 @@ namespace Vados
             if (cbExtensoes.Text == "pasta")
             {
 
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true));
+                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true, Global.ignorarPadrao, Global.prioridadesPadrao));
 
             }
             else
             {
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false));
+                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false, Global.ignorarPadrao, Global.prioridadesPadrao));
 
             }
         }
@@ -143,6 +143,11 @@ namespace Vados
         {
             string NomeArquivo = txtNome.Text;
             Comandos.AbrirArquivo(NomeArquivo);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Comandos.ExecutarAplicativo(txtNomeAplicativo.Text);
         }
     }
 }

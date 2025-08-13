@@ -1083,7 +1083,7 @@ namespace Vados
                     }
 
 
-                    MessageBox.Show(destino + " negocio infernal que pode estar dando erro");
+                    MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
                     if (Directory.Exists(destinoNovo))
                     {
                         MessageBox.Show("Já existe uma pasta com esse nome no destino.");

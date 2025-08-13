@@ -274,7 +274,8 @@ namespace Vados
                     string newName = arguments[4];
 
                     if (obj == "pasta") { RenomearPasta(oldName, newName); }
-                    if (obj == "arquivo") {
+                    if (obj == "arquivo")
+                    {
                         //Extrair extensão do antigo e do novo nome
                         string oldFileName = Path.GetFileNameWithoutExtension(oldName);
                         string oldExtension = Path.GetExtension(oldName);
@@ -291,7 +292,8 @@ namespace Vados
 
                 case "excluir":
                     if (obj == "pasta") { ExcluirPasta(name); }
-                    if (obj == "arquivo") {
+                    if (obj == "arquivo")
+                    {
                         //Extrair extensão do arquivo
                         string fileName = Path.GetFileNameWithoutExtension(name);
                         string extension = Path.GetExtension(name);
@@ -305,7 +307,8 @@ namespace Vados
                 case "mover":
                     string destiny = arguments[4];
                     if (obj == "pasta") { MoverPasta(name, destiny); }
-                    if (obj == "arquivo") {
+                    if (obj == "arquivo")
+                    {
                         //Extrair extensão do arquivo
                         string fileName = Path.GetFileNameWithoutExtension(name);
                         string extension = Path.GetExtension(name);
@@ -423,9 +426,10 @@ namespace Vados
         public static List<string> IdentifyWordGroups(List<string> words)
         {
             List<string> newWords = new List<string>();
-            
+
             //Para cada palavra de determinada lista
-            for (int i = 0; i < words.Count(); i++) {
+            for (int i = 0; i < words.Count(); i++)
+            {
                 string temporaryWord = "";
                 int wordCount = 0;
 
@@ -436,7 +440,7 @@ namespace Vados
                     wordCount = groupSeparateWords.Count;
 
                     //Checar se formam um grupo conhecido
-                    for(var k = 0; k < groupSeparateWords.Count; k++)
+                    for (var k = 0; k < groupSeparateWords.Count; k++)
                     {
                         string wordToCheck = words[i + k];
 
@@ -513,7 +517,8 @@ namespace Vados
                 }
 
                 //Checar se o caractere é um separador
-                if (namer == '\0') {
+                if (namer == '\0')
+                {
                     for (var j = 0; j < separators.Length; j++)
                     {
                         char s = separators[j];
@@ -542,7 +547,8 @@ namespace Vados
             }
 
             //Adicionar última palavra
-            if (currentWord != "") {
+            if (currentWord != "")
+            {
                 words.Add(currentWord);
             }
 
@@ -778,26 +784,26 @@ namespace Vados
                                     caminhos.Add(caminho);
                                     //fila.Enqueue(caminho);
                                     InserirNoInicio(fila, caminho);
-                                    if (caminho.Contains(aprocurar) && atual.Contains(aprocurar) )
+                                    if (caminho.Contains(aprocurar) && atual.Contains(aprocurar))
                                     {
                                         MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(atual+" situação 1 "+ aprocurar);
+                                        MessageBox.Show(atual + " situação 1 " + aprocurar);
                                         return atual;
                                     }
-                                    else if (caminho.Contains(aprocurar)) 
+                                    else if (caminho.Contains(aprocurar))
                                     {
                                         MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(caminho+" situação 2 " + aprocurar);
+                                        MessageBox.Show(caminho + " situação 2 " + aprocurar);
                                         return caminho;
                                     }
-                                        
+
                                 }
                             }
 
                             break;
                         case false:
 
-                            
+
                             foreach (var arquivo in Directory.GetFiles(atual))
                             {
                                 string nome = Path.GetFileName(arquivo);
@@ -808,7 +814,7 @@ namespace Vados
                                 }
                             }
 
-                            
+
                             foreach (var caminho in Directory.GetDirectories(atual))
                             {
                                 string nomePasta = Path.GetFileName(caminho);
@@ -826,8 +832,8 @@ namespace Vados
 
                             break;
                     }
-                    
-                    
+
+
                 }
 
                 catch (Exception)
@@ -839,12 +845,12 @@ namespace Vados
             return null;
         }
 
-      
-        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio) 
+
+        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio)
         {
             //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
-            pastaRoot = SearchFolders(pastaRoot,true);
-            
+            pastaRoot = SearchFolders(pastaRoot, true);
+
             string root = @"" + driveverifica(null);
             var caminhos = new List<string>();
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -901,9 +907,9 @@ namespace Vados
                     foreach (var arquivo in Directory.GetFiles(atual))
                     {
                         string nome = Path.GetFileName(arquivo);
-                        if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && nome.Contains(outrocriterio) && arquivo.Contains(pastaRoot) )
+                        if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && nome.Contains(outrocriterio) && arquivo.Contains(pastaRoot))
                         {
-                           MessageBox.Show($"Arquivo encontrado: {arquivo}");
+                            MessageBox.Show($"Arquivo encontrado: {arquivo}");
                             resultados.Add(arquivo);
 
                         }
@@ -942,16 +948,16 @@ namespace Vados
         {
             Queue<T> filaTemporaria = new Queue<T>();
 
-            
+
             while (fila.Count > 0)
             {
                 filaTemporaria.Enqueue(fila.Dequeue());
             }
 
-           
+
             fila.Enqueue(novoElemento);
 
-           
+
             while (filaTemporaria.Count > 0)
             {
                 fila.Enqueue(filaTemporaria.Dequeue());
@@ -1010,7 +1016,7 @@ namespace Vados
         {
             try
             {
-                if (path == "") 
+                if (path == "")
                 {
                     path = Path.Combine(Global.DefaultFolder + @"\" + nome);
                 }
@@ -1044,7 +1050,7 @@ namespace Vados
 
         public static void CriarArquivo(string nome, string extension, string path) // cria arquivo
         {
-            
+
             try
             {
                 string nomefinal;
@@ -1052,7 +1058,7 @@ namespace Vados
                 if (path == "")
                 {
                     path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
-                    nomefinal = CriarNome(nome, path,extension);
+                    nomefinal = CriarNome(nome, path, extension);
                 }
                 else
                 {
@@ -1060,11 +1066,11 @@ namespace Vados
                     MessageBox.Show(path);
                     nomefinal = CriarNome(nome, path, extension);
                 }
-               
-                string pathfinal = Path.Combine(Path.GetDirectoryName(path)+ @"\" + nomefinal + "." + extension);
+
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path) + @"\" + nomefinal + "." + extension);
 
                 using (FileStream fs = File.Create(pathfinal))
-                Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
+                    Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
                 AbrirGerenciador(pathfinal);
             }
             catch (Exception ex)
@@ -1104,10 +1110,10 @@ namespace Vados
                 {
                     File.Delete(arquivo);
                 }
-                foreach(string subPasta in Directory.GetDirectories(path))
+                foreach (string subPasta in Directory.GetDirectories(path))
                 {
                     ExcluirPasta(subPasta);
-                    
+
                 }
                 Directory.Delete(path);
                 Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
@@ -1132,14 +1138,14 @@ namespace Vados
                 nome = nome + "." + extensao;
             }
             MessageBox.Show(nome);
-            string path = SearchFolders(nome,false);
+            string path = SearchFolders(nome, false);
 
             //Nome novo + nova extensao
             if (!String.IsNullOrEmpty(novaExtensao))
             {
                 novoNome = novoNome + "." + novaExtensao;
             }
-            string novoPath = Path.Combine(Path.GetDirectoryName(path) +@"\"+ novoNome);
+            string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
 
 
             if (File.Exists(path))
@@ -1194,16 +1200,16 @@ namespace Vados
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao mover pasta: " + ex.Message);
-            }  
+            }
         }
 
-        public static void MoverArquivo(string nome, string destino,string ext) 
+        public static void MoverArquivo(string nome, string destino, string ext)
         {
             try
             {
                 nome = SearchFolders(nome, false);
                 destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
-                MessageBox.Show(destino," dsdasdasdadasdaasda");
+                MessageBox.Show(destino, " dsdasdasdadasdaasda");
                 // SearchFolders(destino, true) + @"\" + nome + "." + ext;
 
                 MessageBox.Show(destino);
@@ -1217,7 +1223,7 @@ namespace Vados
 
                 File.Move(nome, destino);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
             }
@@ -1268,7 +1274,7 @@ namespace Vados
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Erro ao duplicar pasta: " + ex.Message);
             }
@@ -1299,7 +1305,7 @@ namespace Vados
                 MessageBox.Show("Erro ao duplicar arquivo: " + ex.Message);
             }
 
-            
+
 
         }
 
@@ -1359,17 +1365,17 @@ namespace Vados
 
         public static void AbrirArquivo(string nome)
         {
-           string arquivo = SearchFolders(nome,false);
+            string arquivo = SearchFolders(nome, false);
 
             var psi = new ProcessStartInfo()
             {
-                UseShellExecute= true,
+                UseShellExecute = true,
                 FileName = arquivo,
             };
             Process.Start(psi);
         }
 
-        public static string CriarNome(string nome, string path,string extension)
+        public static string CriarNome(string nome, string path, string extension)
         {
             int contador = 1;
             string nomefinal = nome;
@@ -1380,14 +1386,14 @@ namespace Vados
                 {
                     nomefinal = $"{nome}({contador})";
                     contador++;
-                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "."+ extension);
+                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "." + extension);
                 }
-               
+
             }
             MessageBox.Show(nomefinal);
             return nomefinal;
         }
-        
+
 
     }
 

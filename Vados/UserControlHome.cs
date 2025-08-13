@@ -41,6 +41,39 @@ namespace Vados
         bool setTextboxWidth = false;
         bool textboxActive = false;
 
+
+        public void PerformCommand(string command)
+        {
+            if (textboxActive == true)
+            {
+                //Realizar comando
+                List<string> words = Comandos.SeparateWords(command);
+                words = Comandos.IdentifyWordGroups(words);
+                MessageBox.Show(String.Join(", ", words.ToArray()));
+                List<string> arguments = Comandos.ValidateCommand(words);
+
+                if (arguments != null)
+                {
+                    MessageBox.Show(String.Join(", ", arguments.ToArray()));
+                    Comandos.ExecuteCommand(arguments);
+                }
+            }
+        }
+
+
+        //Realizar comando quando apertar enter
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Enter)
+            {
+                PerformCommand(txtComando.Text);
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+
         public UserControlHome()
         {
             InitializeComponent();
@@ -292,26 +325,21 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                string command = txtComando.Text;
-
-                if (textboxActive == true)
-                {
-                    //Realizar comando
-                    List<string> words = Comandos.SeparateWords(command);
-                    words = Comandos.IdentifyWordGroups(words);
-                    MessageBox.Show(String.Join(", ", words.ToArray()));
-                    List<string> arguments = Comandos.ValidateCommand(words);
-
-                    if (arguments != null)
-                    {
-                        MessageBox.Show(String.Join(", ", arguments.ToArray()));
-                        Comandos.ExecuteCommand(arguments);
-                    }
-                }
+                PerformCommand(txtComando.Text);
             }
 
             #endregion
 
+        }
+
+        private void UserControlHome_KeyDown(object sender, KeyEventArgs e)
+        {
+            MessageBox.Show("enter");
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                PerformCommand(txtComando.Text);
+            }
         }
     }
 }

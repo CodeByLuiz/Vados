@@ -103,7 +103,7 @@ namespace Vados
             }
             else
             {
-                Comandos.RenomearArquivo(nome, novoNome, extension);
+                Comandos.RenomearArquivo(nome, extension, novoNome, extension);
             }
 
         }

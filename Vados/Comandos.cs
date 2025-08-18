@@ -6,6 +6,7 @@ using System.Security.Policy;
 using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Reflection.Metadata;
 
 namespace Vados
@@ -588,139 +589,276 @@ namespace Vados
 
         #region FUNÇÃO TESTE
 
-        //    public static List<string> funcaoteste(string aprocurar, bool comando)
+        //public static HashSet<string> funcaoteste(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = null, int? varcontrole = 1) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        //{
+
+        //    // PRA QUE SERVE CADA PARÂMETRO:
+
+        //    // aprocurar: o nome do arquivo ou pasta que você quer procurar
+        //    // comando: se for TRUE, ele procura por pastas, se for FALSE, ele procura por arquivos
+        //    // criteriosize: se for diferente de 0, ele procura por arquivos com tamanho próximo ao valor especificado
+        //    // criterio2: é um segundo critério de busca, se for especificado, ele procura por arquivos que contenham esse critério no nome
+        //    // pastaRoot: é a pasta aonde ele vai procurar, se for nulo, ele procura em todas as pastas do computador
+        //    // varcontrole: é um controle de quantas pastas ou arquivos ele vai procurar, se for nulo, ele procura em todas as pastas ou arquivos
+
+        //    string root = driveverifica(null);
+        //    var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //    var resultados = new HashSet<string>();
+        //    var ignorar = new List<string> // lista de pastas que serão ignoradas na busca
         //    {
-        //        string root = @"" + driveverifica(null);
-        //        var caminhos = new List<string>();
-        //        var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        //        var ignorar = new List<string>
-        //{
-        //    "$RECYCLE.BIN",
-        //    "System Volume Information",
-        //    "Recovery",
-        //    "Config.Msi",
-        //    "Windows",
-        //    "Program Files (x86)",
-        //    "Program Files"
-        //};
-        //        var prioridades = new List<string>
-        //{
-        //    Path.Combine(root, @"Vados"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-        //    Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-        //    //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+        //        "$RECYCLE.BIN",
+        //        "System Volume Information",
+        //        "Recovery",
+        //        "Config.Msi",
+        //        "Windows",
+        //        "Program Files (x86)",
+        //        "Program Files"
+        //    };
 
-        //    Path.Combine(root),
-        //};
+        //    var prioridades = new List<string> // lista de pastas que serão priorizadas na busca
+        //    {
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+        //        //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-        //        var fila = new Queue<string>();
-        //        foreach (var pasta in prioridades)
+        //        Path.Combine(root),
+        //    };
+
+        //    // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
+        //    if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
+        //    {
+        //        pastaRoot = funcaoteste(pastaRoot, true).FirstOrDefault();
+        //        varcontrole = null;//Directory.GetDirectories(pastaRoot).Length;
+        //        MessageBox.Show(aprocurar);
+        //        prioridades.Add(pastaRoot);
+
+        //    }
+        //    else if (!string.IsNullOrEmpty(pastaRoot) && comando == false)
+        //    {
+        //        MessageBox.Show("antes pasta "+pastaRoot+" aprocurar: "+aprocurar);
+        //        pastaRoot = funcaoteste(pastaRoot, true).FirstOrDefault();
+        //        varcontrole = null;//Directory.GetFiles(pastaRoot).Length;
+        //        MessageBox.Show("de pasta " + pastaRoot + " aprocurar: " + aprocurar);
+        //        prioridades.Add(pastaRoot);
+        //    }
+
+        //    var fila = new Queue<string>();
+        //    foreach (var pasta in prioridades)
+        //    {
+        //        if (Directory.Exists(pasta))
         //        {
-        //            if (Directory.Exists(pasta))
-        //            {
-        //                fila.Enqueue(pasta);
-        //                //caminhos.Add(pasta);
-        //            }
+        //            fila.Enqueue(pasta);
+
         //        }
+        //    }
 
-        //        fila.Enqueue(root);
-
-        //        while (fila.Count > 0)
+        //    while (fila.Count > 0)
+        //    {
+        //        var atual = fila.Dequeue();// remove o primeiro elemento da fila e o retorna
+        //        try
         //        {
-        //            var atual = fila.Dequeue();
-        //            try
+        //            switch (comando)
         //            {
-        //                switch (comando)
-        //                {
-        //                    case true:
+        //                case true:
 
-        //                        foreach (var caminho in Directory.GetDirectories(atual))
+
+
+        //                    foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
+        //                    {
+        //                        string nomePasta = Path.GetFileName(caminho); // pega o nome da pasta atual a partir do caminho completo
+
+        //                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+        //                            continue;
+
+        //                        if (visitados.Add(caminho)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
         //                        {
-        //                            string nomePasta = Path.GetFileName(caminho);
-        //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-        //                                continue;
-
-        //                            if (visitados.Add(caminho))
-        //                            {
-        //                                caminhos.Add(caminho);
-        //                                //fila.Enqueue(caminho);
-        //                                Comandos.InserirNoInicio(fila, caminho);
-        //                                if (caminho.Contains(aprocurar))
-        //                                {
-        //                                    MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-        //                                    return caminhos;
-        //                                }
-        //                                // MessageBox.Show(caminho);
-        //                            }
-
-
-        //                        }
-
-        //                        break;
-        //                    case false:
-
-
-        //                        foreach (var arquivo in Directory.GetFiles(atual))
-        //                        {
-        //                            string nome = Path.GetFileName(arquivo);
-        //                            if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
-        //                            {
-        //                                MessageBox.Show($"Arquivo encontrado: {arquivo}");
-        //                                return caminhos;
-        //                            }
-        //                        }
-
-
-        //                        foreach (var caminho in Directory.GetDirectories(atual))
-        //                        {
-        //                            string nomePasta = Path.GetFileName(caminho);
-        //                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-        //                                continue;
 
         //                            //fila.Enqueue(caminho);
+        //                            InserirNoInicio(fila, caminho); // insere o caminho atual no inicio da fila
+        //                            FileInfo caminhoinfo = new FileInfo(caminho); // cria um objeto FileInfo a partir do caminho atual para pegar suas informaões
+
+        //                            // adicionam o caminho atual ou o caminho completo a lista de resultados
+
+        //                            if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
+        //                            {
+        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+        //                                MessageBox.Show(caminho + " situação 3 " + aprocurar);
+        //                                resultados.Add(caminho);
+
+        //                                if (varcontrole != null && varcontrole > 0)
+        //                                {
+        //                                    varcontrole -= 1;
+        //                                }
+
+        //                            }else if (caminho.Contains(aprocurar) && atual.Contains(aprocurar)) // caso o caminho desejado seja o caminho atual, ele o retorna
+        //                            {
+        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+        //                                MessageBox.Show(atual + " situação 1 " + aprocurar);
+        //                                resultados.Add(atual);
+
+        //                                if (varcontrole != null && varcontrole > 0)
+        //                                {
+        //                                    varcontrole -= 1;
+        //                                }
+
+        //                            }
+        //                            else if (caminho.Contains(aprocurar)) // caso o caminho desejado esteja dentro do caminho atual, ele o retorna
+        //                            {
+        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+        //                                MessageBox.Show(caminho + " situação 2 " + aprocurar);
+        //                                resultados.Add(caminho);
+
+        //                                if (varcontrole != null && varcontrole > 0)
+        //                                {
+        //                                    varcontrole -= 1;
+        //                                }
+
+        //                            }
+                                   
+
+
+        //                            if (varcontrole != null && varcontrole <= 0) // se todas as pastas dentro da pastaRoot forem visitadas, elas são retornadas
+        //                            {
+        //                                MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
+
+        //                                return resultados;
+        //                            }
+
+        //                        }
+        //                    }
+
+        //                    break;
+        //                case false:
+
+
+
+        //                    foreach (var arquivo in Directory.GetFiles(atual)) // percorre todos os arquivos dentro da pasta atual
+        //                    {
+
+        //                        FileInfo caminhoinfo = new FileInfo(arquivo); // mesma coisa do bglh de pasta
+        //                        if (visitados.Add(arquivo)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
+        //                        {
+        //                            if (criteriosize != 0) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+        //                            {
+        //                                if (caminhoinfo.Length >= criteriosize * 0.8 && caminhoinfo.Length <= criteriosize * 1.2)
+        //                                {
+        //                                    MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
+        //                                    resultados.Add(arquivo);
+
+        //                                    if (varcontrole != null && varcontrole > 0)
+        //                                    {
+        //                                        varcontrole -= 1;
+        //                                    }
+
+        //                                }
+        //                            }
+        //                            else
+        //                            {
+        //                                if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta root
+        //                                {
+        //                                    MessageBox.Show($"Arquivo encontrado pr: {arquivo}");
+        //                                    resultados.Add(arquivo);
+
+        //                                    if (varcontrole != null && varcontrole > 0)
+        //                                    {
+        //                                        varcontrole -= 1;
+        //                                    }
+
+
+        //                                }
+        //                                else if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
+        //                                {
+        //                                    MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
+        //                                    resultados.Add(arquivo);
+
+        //                                    if (varcontrole != null && varcontrole > 0)
+        //                                    {
+        //                                        varcontrole -= 1;
+        //                                    }
+
+
+        //                                }
+        //                            }
+        //                            if (varcontrole != null && varcontrole <= 0)
+        //                            {
+        //                                MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
+        //                                return resultados;
+        //                            }
+
+        //                        }
+        //                    }
+
+
+        //                    foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
+        //                    {
+        //                        string nomePasta = Path.GetFileName(caminho);
+        //                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+        //                            continue;
+
+        //                        //fila.Enqueue(caminho);
+
+
+        //                        if (visitados.Add(caminho))
+        //                        {
         //                            Comandos.InserirNoInicio(fila, caminho);
         //                        }
 
-        //                        break;
-        //                }
+        //                    }
 
-
+        //                    break;
         //            }
 
-        //            catch (Exception)
-        //            {
+                    
 
-        //            }
+
         //        }
-        //        MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-        //        return null;
+
+        //        catch (Exception)
+        //        {
+
+        //        }
         //    }
+        //    if (resultados != null)
+        //    {
+        //        MessageBox.Show("bolete");
+        //        return resultados;
+        //    }
+        //    MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
+        //    return null;
+        //}
 
 
         #endregion
 
 
-        public static string SearchFolders(string aprocurar, bool comando) // busca recursivamente por pastas ou arquivos
+        public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = null, int? varcontrole = 1) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         {
-            //muito cuidado quando usar o "comando", TRUE é para quando ele age diretamente em pastas e FALSE é para quando ele age em arquivos
-            // por exemplo no comando de criar arquivos, ele sera TRUE, pq ele ira localizar a PASTA onde o arquivo sera criado
 
+            // PRA QUE SERVE CADA PARÂMETRO:
 
-            string root = @"" + driveverifica(null);
-            var caminhos = new List<string>();
+            // aprocurar: o nome do arquivo ou pasta que você quer procurar
+            // comando: se for TRUE, ele procura por pastas, se for FALSE, ele procura por arquivos
+            // criteriosize: se for diferente de 0, ele procura por arquivos com tamanho próximo ao valor especificado
+            // criterio2: é um segundo critério de busca, se for especificado, ele procura por arquivos que contenham esse critério no nome
+            // pastaRoot: é a pasta aonde ele vai procurar, se for nulo, ele procura em todas as pastas do computador
+            // varcontrole: é um controle de quantas pastas ou arquivos ele vai procurar, se for nulo, ele procura em todas as pastas ou arquivos
+
+            string root = driveverifica(null);
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var ignorar = new List<string>
+            var resultados = new HashSet<string>();
+            var ignorar = new List<string> // lista de pastas que serão ignoradas na busca
             {
                 "$RECYCLE.BIN",
                 "System Volume Information",
@@ -731,7 +869,7 @@ namespace Vados
                 "Program Files"
             };
 
-            var prioridades = new List<string>
+            var prioridades = new List<string> // lista de pastas que serão priorizadas na busca
             {
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
@@ -752,49 +890,105 @@ namespace Vados
                 Path.Combine(root),
             };
 
+            // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
+            if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
+            {
+                pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
+                varcontrole = null;//Directory.GetDirectories(pastaRoot).Length;
+               
+                prioridades.Add(pastaRoot);
+
+            }
+            else if (!string.IsNullOrEmpty(pastaRoot) && comando == false)
+            {
+                
+                pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
+                varcontrole = null;//Directory.GetFiles(pastaRoot).Length;
+               
+                prioridades.Add(pastaRoot);
+            }
+
             var fila = new Queue<string>();
             foreach (var pasta in prioridades)
             {
                 if (Directory.Exists(pasta))
                 {
                     fila.Enqueue(pasta);
-                    caminhos.Add(pasta);
+
                 }
             }
 
-            fila.Enqueue(root);
-
             while (fila.Count > 0)
             {
-                var atual = fila.Dequeue();
+                var atual = fila.Dequeue();// remove o primeiro elemento da fila e o retorna
                 try
                 {
                     switch (comando)
                     {
                         case true:
 
-                            foreach (var caminho in Directory.GetDirectories(atual))
+
+
+                            foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
                             {
-                                string nomePasta = Path.GetFileName(caminho);
+                                string nomePasta = Path.GetFileName(caminho); // pega o nome da pasta atual a partir do caminho completo
+
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                                     continue;
 
-                                if (visitados.Add(caminho))
+                                if (visitados.Add(caminho)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
                                 {
-                                    caminhos.Add(caminho);
+
                                     //fila.Enqueue(caminho);
-                                    InserirNoInicio(fila, caminho);
-                                    if (caminho.Contains(aprocurar) && atual.Contains(aprocurar))
+                                    InserirNoInicio(fila, caminho); // insere o caminho atual no inicio da fila
+                                    FileInfo caminhoinfo = new FileInfo(caminho); // cria um objeto FileInfo a partir do caminho atual para pegar suas informaões
+
+                                    // adicionam o caminho atual ou o caminho completo a lista de resultados
+
+                                    if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
                                     {
-                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(atual + " situação 1 " + aprocurar);
-                                        return atual;
+                                        //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+                                        //MessageBox.Show(caminho + " situação 3 " + aprocurar);
+                                        resultados.Add(caminho);
+
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+
                                     }
-                                    else if (caminho.Contains(aprocurar))
+                                    else if (caminho.Contains(aprocurar) && atual.Contains(aprocurar)) // caso o caminho desejado seja o caminho atual, ele o retorna
                                     {
-                                        MessageBox.Show($"Foram encontrados d {caminhos.Count} caminhos de pastas.");
-                                        MessageBox.Show(caminho + " situação 2 " + aprocurar);
-                                        return caminho;
+                                        //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+                                        //MessageBox.Show(atual + " situação 1 " + aprocurar);
+                                        resultados.Add(atual);
+
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+
+                                    }
+                                    else if (caminho.Contains(aprocurar)) // caso o caminho desejado esteja dentro do caminho atual, ele o retorna
+                                    {
+                                        //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
+                                        //MessageBox.Show(caminho + " situação 2 " + aprocurar);
+                                        resultados.Add(caminho);
+
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+
+                                    }
+
+
+
+                                    if (varcontrole != null && varcontrole <= 0) // se todas as pastas dentro da pastaRoot forem visitadas, elas são retornadas
+                                    {
+                                      //  MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
+
+                                        return resultados;
                                     }
 
                                 }
@@ -803,19 +997,64 @@ namespace Vados
                             break;
                         case false:
 
-
-                            foreach (var arquivo in Directory.GetFiles(atual))
+                            foreach (var arquivo in Directory.GetFiles(atual)) // percorre todos os arquivos dentro da pasta atual
                             {
-                                string nome = Path.GetFileName(arquivo);
-                                if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase))
+
+                                FileInfo caminhoinfo = new FileInfo(arquivo); // mesma coisa do bglh de pasta
+                                if (visitados.Add(arquivo)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
                                 {
-                                    MessageBox.Show($"Arquivo encontrado: {arquivo}");
-                                    return arquivo;
+                                    if (criteriosize != 0) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+                                    {
+                                        if (caminhoinfo.Length >= criteriosize * 0.8 && caminhoinfo.Length <= criteriosize * 1.2)
+                                        {
+                                            //MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
+                                            resultados.Add(arquivo);
+
+                                            if (varcontrole != null && varcontrole > 0)
+                                            {
+                                                varcontrole -= 1;
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta root
+                                        {
+                                            //MessageBox.Show($"Arquivo encontrado pr: {arquivo}");
+                                            resultados.Add(arquivo);
+
+                                            if (varcontrole != null && varcontrole > 0)
+                                            {
+                                                varcontrole -= 1;
+                                            }
+
+
+                                        }
+                                        else if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
+                                        {
+                                            //MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
+                                            resultados.Add(arquivo);
+
+                                            if (varcontrole != null && varcontrole > 0)
+                                            {
+                                                varcontrole -= 1;
+                                            }
+
+
+                                        }
+                                    }
+                                    if (varcontrole != null && varcontrole <= 0)
+                                    {
+                                        //MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
+                                        return resultados;
+                                    }
+
                                 }
                             }
 
 
-                            foreach (var caminho in Directory.GetDirectories(atual))
+                            foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
                             {
                                 string nomePasta = Path.GetFileName(caminho);
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
@@ -828,11 +1067,11 @@ namespace Vados
                                 {
                                     Comandos.InserirNoInicio(fila, caminho);
                                 }
+
                             }
 
                             break;
                     }
-
 
                 }
 
@@ -840,108 +1079,17 @@ namespace Vados
                 {
 
                 }
+            }
+            if (resultados != null)
+            {
+                MessageBox.Show("bolete");
+                return resultados;
             }
             MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
             return null;
         }
 
 
-        public static HashSet<string> MultiSearch(string aprocurar, string pastaRoot, string outrocriterio)
-        {
-            //pasta root é a pasta aonde ele vai procurar, se for vazio ele procura em todas as pastas do computador
-            pastaRoot = SearchFolders(pastaRoot, true);
-
-            string root = @"" + driveverifica(null);
-            var caminhos = new List<string>();
-            var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var resultados = new HashSet<string>();
-            var ignorar = new List<string>
-            {
-                "$RECYCLE.BIN",
-                "System Volume Information",
-                "Recovery",
-                "Config.Msi",
-                "Windows",
-                "Program Files (x86)",
-                "Program Files"
-            };
-
-            var prioridades = new List<string>
-            {
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
-
-                Path.Combine(root),
-            };
-
-            var fila = new Queue<string>();
-            foreach (var pasta in prioridades)
-            {
-                if (Directory.Exists(pasta))
-                {
-                    fila.Enqueue(pasta);
-                    caminhos.Add(pasta);
-                }
-            }
-
-            fila.Enqueue(root);
-
-            while (fila.Count > 0)
-            {
-                var atual = fila.Dequeue();
-                try
-                {
-                    foreach (var arquivo in Directory.GetFiles(atual))
-                    {
-                        string nome = Path.GetFileName(arquivo);
-                        if (nome.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && nome.Contains(outrocriterio) && arquivo.Contains(pastaRoot))
-                        {
-                            MessageBox.Show($"Arquivo encontrado: {arquivo}");
-                            resultados.Add(arquivo);
-
-                        }
-
-
-                        foreach (var caminho in Directory.GetDirectories(atual))
-                        {
-                            string nomePasta = Path.GetFileName(caminho);
-                            if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-                                continue;
-
-                            //fila.Enqueue(caminho);
-
-
-                            if (visitados.Add(caminho))
-                            {
-                                Comandos.InserirNoInicio(fila, caminho);
-                            }
-                        }
-
-
-                    }
-                }
-
-                catch (Exception)
-                {
-
-                }
-            }
-            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-            return resultados;
-        }
 
 
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
@@ -964,14 +1112,26 @@ namespace Vados
             }
         }
 
-        public static string MultiTask(string criterio, string pastaAbuscar, string criterio2)
+        public static void MoverUnsArquivos(string criterio, string Pastaroot1,string destino, string crit2="")
         {
-            // esse aqui pode buscar pelo nome e extensão   
-            MultiSearch(criterio, pastaAbuscar, criterio2);
+            // os criterios são os criterios de busca, a var pastaAbuscar é a pasta aonde ele vai procurar os multplos arquivos a serem buscados, a var destino é aonde colocar esses arquivos 
+
+            var caminhos = new HashSet<string>();
+             caminhos = SearchPaths(criterio,false,pastaRoot:Pastaroot1, criterio2:crit2);
 
 
 
-            return "oi";
+            foreach (var item in caminhos)
+            {
+                
+               // MoverArquivo(item, destino);
+
+            }
+
+
+
+            return;
+            
         }
 
 
@@ -1016,13 +1176,13 @@ namespace Vados
         {
             try
             {
-                if (path == "")
+                if (path == "") 
                 {
-                    path = Path.Combine(Global.DefaultFolder + @"\" + nome);
+                    path = Path.Combine(Global.DefaultFolder , nome);
                 }
                 else
                 {
-                    path = SearchFolders(path, true) + @"\" + nome;
+                    path = Path.Combine(SearchPaths(path, true).FirstOrDefault(), nome);
 
                 }
 
@@ -1057,17 +1217,16 @@ namespace Vados
 
                 if (path == "")
                 {
-                    path = Path.Combine(Global.DefaultFolder + @"\" + nome + "." + extension);
-                    nomefinal = CriarNome(nome, path, extension);
+                    path = Path.Combine(Global.DefaultFolder, nome , extension);
+                    nomefinal = CriarNome(nome, path,extension);
                 }
                 else
                 {
-                    path = SearchFolders(path, true) + @"\" + nome + "." + extension;
+                    path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome, extension);
                     MessageBox.Show(path);
                     nomefinal = CriarNome(nome, path, extension);
                 }
-
-                string pathfinal = Path.Combine(Path.GetDirectoryName(path) + @"\" + nomefinal + "." + extension);
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path), nomefinal, extension);
 
                 using (FileStream fs = File.Create(pathfinal))
                     Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
@@ -1082,48 +1241,75 @@ namespace Vados
         }
 
 
-        public static void ExcluirArquivo(string nome, string extension) //exclui arquivo
+        public static void ExcluirArquivo(List<string> paths) //exclui arquivo
         {
-            string path = SearchFolders(nome /*+ "." + extension*/, false);
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-                Console.WriteLine("Arquivo" + nome + "Excluido com sucesso");
-            }
-            else
-            {
 
-                MessageBox.Show("esse arquivo não existe");
+
+           try { 
+
+            //string path = SearchPaths(nome, false).FirstOrDefault();
+
+            foreach (string path in paths) {
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    //Console.WriteLine("Arquivo" + nome + "Excluido com sucesso");
+                }
+                else
+                {
+
+                    MessageBox.Show("esse arquivo não existe");
+                }
+
             }
+           }
+           catch (Exception ex){
+                MessageBox.Show("Não foi possivel excluir estes arquivos: "+ex.Message);
+           }
+            
 
 
         }
 
 
-        public static void ExcluirPasta(string nome) // exclui pasta
+        public static void ExcluirPasta(List<string> paths) // exclui pasta
         {
-            string path = SearchFolders(nome, true);
-            if (Directory.Exists(path))
+            //string path = SearchPaths(nome, true).FirstOrDefault();
+
+            try
             {
 
-                foreach (string arquivo in Directory.GetFiles(path))
+                foreach (string path in paths)
                 {
-                    File.Delete(arquivo);
+
+                    if (Directory.Exists(path))
+                    {
+
+                        foreach (string arquivo in Directory.GetFiles(path))
+                        {
+                            File.Delete(arquivo);
+                        }
+                        foreach (string subPasta in Directory.GetDirectories(path))
+                        {
+                            var subpastas = new List<string>();
+                            subpastas.Add(subPasta);
+                            ExcluirPasta(subpastas);
+
+                        }
+                        Directory.Delete(path);
+                        //Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
+                    }
+                    else
+                    {
+                        MessageBox.Show("essa pasta não existe");
+
+                    }
                 }
-                foreach (string subPasta in Directory.GetDirectories(path))
-                {
-                    ExcluirPasta(subPasta);
-
-                }
-                Directory.Delete(path);
-                Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
             }
-            else
-            {
-                MessageBox.Show("essa pasta não existe");
-
+            catch (Exception ex) {
+                MessageBox.Show("Não foi possivel excluir estas pastas: " + ex.Message);
             }
-
 
         }
 
@@ -1138,7 +1324,7 @@ namespace Vados
                 nome = nome + "." + extensao;
             }
             MessageBox.Show(nome);
-            string path = SearchFolders(nome, false);
+            string path = SearchPaths(nome,false).FirstOrDefault();
 
             //Nome novo + nova extensao
             if (!String.IsNullOrEmpty(novaExtensao))
@@ -1163,7 +1349,7 @@ namespace Vados
         public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
 
-            string path = SearchFolders(nome, true);
+            string path = SearchPaths(nome, true).FirstOrDefault();
             MessageBox.Show(path);
 
             string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
@@ -1180,22 +1366,26 @@ namespace Vados
         }
 
 
-        public static void MoverPasta(string nome, string destino)
+        public static void MoverPasta(List<string> Pathnomes, string destino)
         {
             try
             {
-                destino = SearchFolders(destino, true) + @"\" + nome;
-                nome = SearchFolders(nome, true);
-                MessageBox.Show(destino);
+                // destino = SearchPaths(destino, true) + @"\" + nome;
+                //nome = SearchPaths(nome, true).FirstOrDefault();
+                //MessageBox.Show(destino);
 
-
-                if (Directory.Exists(destino))
+                foreach (string nome in Pathnomes)
                 {
-                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                    return;
-                }
+                    string destinoNovo = Path.Combine(destino, Path.GetDirectoryName(nome));
 
-                Directory.Move(nome, destino);
+                    if (Directory.Exists(destino))
+                    {
+                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                        return;
+                    }
+
+                    Directory.Move(nome, destino);
+                }
             }
             catch (Exception ex)
             {
@@ -1203,76 +1393,80 @@ namespace Vados
             }
         }
 
-        public static void MoverArquivo(string nome, string destino, string ext)
+        public static void MoverArquivo(List<string> Pathnomes, string destino) 
         {
             try
             {
-                nome = SearchFolders(nome, false);
-                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
-                MessageBox.Show(destino, " dsdasdasdadasdaasda");
-                // SearchFolders(destino, true) + @"\" + nome + "." + ext;
-
-                MessageBox.Show(destino);
-
-
-                if (File.Exists(destino))
+                //nome = SearchPaths(nome, false).FirstOrDefault();
+                // SearchPaths(destino, true) + @"\" + nome + "." + ext;
+                foreach (string nome in Pathnomes)
                 {
-                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                    return;
+                    
+                    string destinoNovo = Path.Combine(destino,Path.GetFileName(nome));
+                    if (File.Exists(destino))
+                    {
+                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                        return;
+                    }
+                    File.Move(nome, destinoNovo);
                 }
-
-                File.Move(nome, destino);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
             }
 
-
+            return;
         }
 
-        public static void DuplicarPasta(string nome, string destino)
+        public static void DuplicarPasta(List<string> Pathnome, string destino)
         {
             try
             {
-                nome = SearchFolders(nome, true);
-                if (string.IsNullOrWhiteSpace(destino))
+                //nome = SearchPaths(nome, true).FirstOrDefault();
+
+                foreach (string nome in Pathnome)
                 {
-                    destino = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
+                    string destinoNovo;
+                    if (string.IsNullOrEmpty(destino))
+                    {
+                         destinoNovo = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
+                    }
+                    else
+                    {
+                         destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
+
+                    }
+
+
+                    MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
+                    if (Directory.Exists(destinoNovo))
+                    {
+                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
+                        return;
+                    }
+
+                    Directory.CreateDirectory(destinoNovo);
+                    foreach (string arquivo in Directory.GetFiles(nome))
+                    {
+
+
+                        string nomeArquivo = Path.GetFileName(arquivo);
+                        string destinoArquivo = Path.Combine(destinoNovo, nomeArquivo);
+                        File.Copy(arquivo, destinoArquivo, true);
+
+                    }
+                    foreach (string subPasta in Directory.GetDirectories(nome))
+                    {
+                        string nomeSubPasta = Path.GetFileName(subPasta);
+                        string destinoSubPasta = Path.Combine(destinoNovo, nomeSubPasta);
+                        MessageBox.Show(destinoSubPasta);
+                        MessageBox.Show(nomeSubPasta);
+                        var subpastas = new List<string>();
+                        subpastas.Add(subPasta);
+                        DuplicarPasta(subpastas, destinoNovo);
+                    }
                 }
-                else
-                {
-                    destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
-
-                }
-
-
-                MessageBox.Show(destino + " negocio infernal que pode estar dando erro");
-                if (Directory.Exists(destino))
-                {
-                    MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                    return;
-                }
-
-                Directory.CreateDirectory(destino);
-                foreach (string arquivo in Directory.GetFiles(nome))
-                {
-
-
-                    string nomeArquivo = Path.GetFileName(arquivo);
-                    string destinoArquivo = Path.Combine(destino, nomeArquivo);
-                    File.Copy(arquivo, destinoArquivo, true);
-
-                }
-                foreach (string subPasta in Directory.GetDirectories(nome))
-                {
-                    string nomeSubPasta = Path.GetFileName(subPasta);
-                    string destinoSubPasta = Path.Combine(destino, nomeSubPasta);
-                    MessageBox.Show(destinoSubPasta);
-                    MessageBox.Show(nomeSubPasta);
-                    DuplicarPasta(subPasta, destino);
-                }
-
             }
             catch (Exception ex)
             {
@@ -1280,24 +1474,29 @@ namespace Vados
             }
         }
 
-        public static void DuplicarArquivo(string nome, string destino)
+        public static void DuplicarArquivo(List<string> Pathnomes, string destino)
         {
 
             try
             {
 
-                nome = SearchFolders(nome, false);
-                MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
-                string ext = Path.GetExtension(nome);
-                destino = Path.Combine(SearchFolders(destino, true), Path.GetFileName(nome));
+                //nome = SearchPaths(nome, false).FirstOrDefault();
+                //MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
+                //string ext = Path.GetExtension(nome);
+                
 
-                if (File.Exists(destino))
+                foreach (string nome in Pathnomes)
                 {
-                    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                    return;
-                }
+                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
 
-                File.Move(nome, destino);
+                    if (File.Exists(destino))
+                    {
+                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                        return;
+                    }
+
+                    File.Move(nome, destino);
+                }
 
             }
             catch (Exception ex)
@@ -1365,7 +1564,7 @@ namespace Vados
 
         public static void AbrirArquivo(string nome)
         {
-            string arquivo = SearchFolders(nome, false);
+           string arquivo = SearchPaths(nome,false).FirstOrDefault();
 
             var psi = new ProcessStartInfo()
             {
@@ -1386,7 +1585,8 @@ namespace Vados
                 {
                     nomefinal = $"{nome}({contador})";
                     contador++;
-                    path = Path.Combine(Path.GetDirectoryName(path) + @"/" + nomefinal + "." + extension);
+                  
+                    path = Path.Combine(Path.GetDirectoryName(path), nomefinal, extension);
                 }
 
             }

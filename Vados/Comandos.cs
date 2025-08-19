@@ -182,6 +182,13 @@ namespace Vados
             {
                 case "criar":
                     return new List<List<object>>() {
+                        /* ---- SITUAÇÕES ----
+                        0.0 -> sem extensão, sem pasta de destino
+                        0.1 -> sem extensão, pasta de destino
+                        1.0 -> extensão, sem pasta de destino
+                        1.0 -> extensão, pasta de destino
+                        */
+
                         new List<object>() { 1.1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
                         new List<object>() { 1.0, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
                         new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
@@ -189,7 +196,6 @@ namespace Vados
                     };
 
                 case "renomear":
-
                     return new List<List<object>>()
                     {
                         new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
@@ -224,6 +230,7 @@ namespace Vados
 
             string obj = arguments[2];
             string name = arguments[3];
+            List<string> paths;
 
             switch (arguments[1])
             {
@@ -232,17 +239,7 @@ namespace Vados
                     if (obj == "arquivo")
                     {
                         string fileName = name;
-                        string extension = "";
                         string destinyFolder = "";
-
-                        //Quando não há extensão ou a extensão está junto do nome do arquivo (ex: "nome.txt")
-                        if (mainSituation == 0)
-                        {
-                            //Extrair extensão do arquivo
-                            fileName = Path.GetFileNameWithoutExtension(name);
-                            extension = Path.GetExtension(name);
-                            if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
-                        }
 
                         //Quando o formato do arquivo está por extenso (ex: "arquivo de texto")
                         if (mainSituation == 1)
@@ -254,7 +251,7 @@ namespace Vados
                             List<string> extensions = WordGetExtensions(extensionWord);
                             if (extensions.Count != 0)
                             {
-                                extension = WordGetExtensions(extensionWord)[0];
+                                fileName += "." + WordGetExtensions(extensionWord)[0];
                             }
                         }
 
@@ -265,7 +262,7 @@ namespace Vados
                         }
 
                         MessageBox.Show(destinyFolder);
-                        CriarArquivo(fileName, extension, destinyFolder);
+                        CriarArquivo(fileName, destinyFolder);
                     }
                     break;
 
@@ -275,49 +272,26 @@ namespace Vados
                     string newName = arguments[4];
 
                     if (obj == "pasta") { RenomearPasta(oldName, newName); }
-                    if (obj == "arquivo")
-                    {
-                        //Extrair extensão do antigo e do novo nome
-                        string oldFileName = Path.GetFileNameWithoutExtension(oldName);
-                        string oldExtension = Path.GetExtension(oldName);
-                        if (oldExtension != "") oldExtension = oldExtension.Remove(0, 1);   //Remove o . da extensão
-                        string newFileName = Path.GetFileNameWithoutExtension(newName);
-                        string newExtension = Path.GetExtension(newName);
-                        if (newExtension != "") newExtension = newExtension.Remove(0, 1);   //Remove o . da extensão
-
-
-                        RenomearArquivo(oldFileName, oldExtension, newFileName, newExtension);
-                    }
+                    if (obj == "arquivo") { RenomearArquivo(oldName, newName); }
                     break;
-
 
                 case "excluir":
-                    if (obj == "pasta") { ExcluirPasta(name); }
-                    if (obj == "arquivo")
-                    {
-                        //Extrair extensão do arquivo
-                        string fileName = Path.GetFileNameWithoutExtension(name);
-                        string extension = Path.GetExtension(name);
-                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+                    paths = SearchPaths(name, obj == "pasta").ToList();
 
-                        ExcluirArquivo(fileName, extension);
-                    }
+                    if (obj == "pasta") { ExcluirPasta(paths); }
+                    if (obj == "arquivo") { ExcluirArquivo(paths); }
                     break;
 
-
+                
                 case "mover":
                     string destiny = arguments[4];
-                    if (obj == "pasta") { MoverPasta(name, destiny); }
-                    if (obj == "arquivo")
-                    {
-                        //Extrair extensão do arquivo
-                        string fileName = Path.GetFileNameWithoutExtension(name);
-                        string extension = Path.GetExtension(name);
-                        if (extension != "") extension = extension.Remove(0, 1);   //Remove o . da extensão
+                    string destinyPath = SearchPaths(destiny, true).FirstOrDefault();
+                    paths = SearchPaths(name, obj == "pasta").ToList();
 
-                        MoverArquivo(fileName, destiny, extension);
-                    }
+                    if (obj == "pasta") { MoverPasta(paths, destiny); }
+                    if (obj == "arquivo") { MoverArquivo(paths, destinyPath); }
                     break;
+                
             }
         }
 
@@ -1090,8 +1064,6 @@ namespace Vados
         }
 
 
-
-
         public static void InserirNoInicio<T>(Queue<T> fila, T novoElemento)
         {
             Queue<T> filaTemporaria = new Queue<T>();
@@ -1111,6 +1083,7 @@ namespace Vados
                 fila.Enqueue(filaTemporaria.Dequeue());
             }
         }
+
 
         public static void MoverUnsArquivos(string criterio, string Pastaroot1,string destino, string crit2="")
         {
@@ -1207,36 +1180,33 @@ namespace Vados
             }
         }
 
-
-        public static void CriarArquivo(string nome, string extension, string path) // cria arquivo
+        public static void CriarArquivo(string nome, string path) // cria arquivo
         {
 
             try
             {
-                string nomefinal;
-
+                //Criar na pasta padrão
                 if (path == "")
                 {
-                    path = Path.Combine(Global.DefaultFolder, nome , extension);
-                    nomefinal = CriarNome(nome, path,extension);
+                    path = Path.Combine(Global.DefaultFolder, nome);
                 }
+                //Criar na pasta especificada
                 else
                 {
-                    path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome, extension);
-                    MessageBox.Show(path);
-                    nomefinal = CriarNome(nome, path, extension);
+                    path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome);
+                    //MessageBox.Show(path);
                 }
-                string pathfinal = Path.Combine(Path.GetDirectoryName(path), nomefinal, extension);
+
+                string nomefinal = CriarNome(nome, path);
+                string pathfinal = Path.Combine(Path.GetDirectoryName(path), nomefinal);
 
                 using (FileStream fs = File.Create(pathfinal))
-                    Console.WriteLine("Arquivo" + nomefinal + "Criado com sucesso");
+                Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
                 AbrirGerenciador(pathfinal);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao criar arquivo: " + ex.Message);
-
-
             }
         }
 
@@ -1271,7 +1241,6 @@ namespace Vados
 
 
         }
-
 
         public static void ExcluirPasta(List<string> paths) // exclui pasta
         {
@@ -1314,37 +1283,21 @@ namespace Vados
         }
 
 
-        public static void RenomearArquivo(string nome, string extensao, string novoNome, string novaExtensao) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        public static void RenomearArquivo(string nome, string novoNome) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
-
-            //string path = Path.Combine(Global.DefaultFolder + nome + "." + extensao);
-            //Nome antigo + extensao
-            if (!String.IsNullOrEmpty(extensao))
-            {
-                nome = nome + "." + extensao;
-            }
-            MessageBox.Show(nome);
-            string path = SearchPaths(nome,false).FirstOrDefault();
-
-            //Nome novo + nova extensao
-            if (!String.IsNullOrEmpty(novaExtensao))
-            {
-                novoNome = novoNome + "." + novaExtensao;
-            }
-            string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
-
+            string path = SearchPaths(nome, false).FirstOrDefault();
+            string novoPath = Path.Combine(Path.GetDirectoryName(path), novoNome);
 
             if (File.Exists(path))
             {
                 File.Move(path, novoPath);
-                Console.WriteLine("Arquivo" + nome + "Renomeado para " + novoNome);
+                Console.WriteLine("Arquivo " + nome + " renomeado para " + novoNome);
             }
             else
             {
                 MessageBox.Show("esse arquivo não existe");
             }
         }
-
 
         public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
@@ -1401,7 +1354,7 @@ namespace Vados
                 // SearchPaths(destino, true) + @"\" + nome + "." + ext;
                 foreach (string nome in Pathnomes)
                 {
-                    
+                    MessageBox.Show("Nome do arquivo: " + Path.GetFileName(nome));
                     string destinoNovo = Path.Combine(destino,Path.GetFileName(nome));
                     if (File.Exists(destino))
                     {
@@ -1418,6 +1371,7 @@ namespace Vados
 
             return;
         }
+
 
         public static void DuplicarPasta(List<string> Pathnome, string destino)
         {
@@ -1562,6 +1516,7 @@ namespace Vados
             Application.Exit();
         }
 
+
         public static void AbrirArquivo(string nome)
         {
            string arquivo = SearchPaths(nome,false).FirstOrDefault();
@@ -1574,7 +1529,8 @@ namespace Vados
             Process.Start(psi);
         }
 
-        public static string CriarNome(string nome, string path, string extension)
+
+        public static string CriarNome(string nome, string path)
         {
             int contador = 1;
             string nomefinal = nome;
@@ -1586,11 +1542,11 @@ namespace Vados
                     nomefinal = $"{nome}({contador})";
                     contador++;
                   
-                    path = Path.Combine(Path.GetDirectoryName(path), nomefinal, extension);
+                    path = Path.Combine(Path.GetDirectoryName(path), nomefinal);
                 }
 
             }
-            MessageBox.Show(nomefinal);
+            MessageBox.Show("Nome: " + nomefinal);
             return nomefinal;
         }
 

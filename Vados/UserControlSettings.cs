@@ -17,20 +17,12 @@ namespace Vados
 
     public partial class UserControlSettings : UserControl
     {
-
-
-
-
         public event EventHandler<LoadPageEventArgs> loadPage;
 
         public UserControlSettings()
         {
             InitializeComponent();
-
-
         }
-
-
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -62,7 +54,7 @@ namespace Vados
 
                 foreach (string x in nomes)
                 {
-                    Comandos.CriarArquivo(x, extension, @"C:\Users\ETEC\Desktop\pasta teste");
+                    Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
                 }
             }
 
@@ -103,7 +95,7 @@ namespace Vados
             }
             else
             {
-                Comandos.RenomearArquivo(nome, extension, novoNome, extension);
+                Comandos.RenomearArquivo(nome, novoNome);
             }
 
         }

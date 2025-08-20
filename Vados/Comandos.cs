@@ -97,7 +97,6 @@ namespace Vados
 
         static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
         {
-            //Criar
             { "texto", new List<string>() { "txt", "doc", "docx", "rtf", "odt", "md" } },
             { "imagem", new List<string>() { "png", "jpg", "jpeg", "bmp", "ico" } },
             { "video", new List<string>() { "mp4", "avi", "mov" } },

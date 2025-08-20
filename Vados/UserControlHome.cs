@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -46,17 +47,44 @@ namespace Vados
         {
             if (textboxActive == true)
             {
-                //Realizar comando
-                List<string> words = Comandos.SeparateWords(command);
-                words = Comandos.IdentifyWordGroups(words);
-                MessageBox.Show(String.Join(", ", words.ToArray()));
-                List<string> arguments = Comandos.ValidateCommand(words);
+                ////Realizar comando
+                //List<string> words = Comandos.SeparateWords(command);
+                //words = Comandos.IdentifyWordGroups(words);
+                //MessageBox.Show(String.Join(", ", words.ToArray()));
+                //List<string> arguments = Comandos.ValidateCommand(words);
 
-                if (arguments != null)
+                //if (arguments != null)
+                //{
+                //    MessageBox.Show(String.Join(", ", arguments.ToArray()));
+                //    Comandos.ExecuteCommand(arguments);
+                //}
+                List<string> objects = new List<string>()
                 {
-                    MessageBox.Show(String.Join(", ", arguments.ToArray()));
-                    Comandos.ExecuteCommand(arguments);
-                }
+                    "arquivo",
+                    "arquivos",
+                    "documento",
+                    "documentos",
+                    "pasta",
+                    "pastas",
+                    "diretorio",
+                    "diretorios",
+                };
+
+                List<string> extensions = new List<string>()
+                {
+                    "texto",
+                    "imagem",
+                    "video",
+                    "audio",
+                };
+
+                List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "denominado", "denominada", "intitulado", "intitulada" };
+
+                ObjectExtractor extractor = new ObjectExtractor(objects, extensions, namingConnectors);
+                var groups = extractor.Extract(txtComando.Text, new CommandCriteria());
+
+                string str = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+                MessageBox.Show(str);
             }
         }
 

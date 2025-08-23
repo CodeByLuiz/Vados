@@ -17,6 +17,10 @@ namespace Vados
 
         System.Windows.Forms.Timer timer;
 
+
+        private Image micIcon;
+
+
         //Variáveis do botão do microfone
         float circleSizeDefault = 325;
         float circleSize = 325;
@@ -45,17 +49,18 @@ namespace Vados
         {
             InitializeComponent();
 
+
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16; //~60 FPS
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            micIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png"));
+            txtComando.Select(0, 0);
+
         }
 
-        private void btnTrocarPagina_Click(object sender, EventArgs e)
-        {
-            //Ir para página de configurações
-            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        }
+     
 
         private void txtComando_Click(object sender, EventArgs e)
         {
@@ -91,7 +96,7 @@ namespace Vados
             #region BOTÃO DO MICROFONE
 
             circleX = middleX - circleSize / 2;
-            circleY = 335 - circleSize / 2;
+            circleY = middleY - circleSize / 2 - 60;
 
             //Sombra do círculo
             int shadowOffset = 15;
@@ -107,7 +112,7 @@ namespace Vados
 
 
             //Contorno do círculo
-            int outlineSize = 25;
+            float outlineSize = Math.Max(2f, Math.Min(circleSize * 0.05f, 25f));
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
             RectangleF rect = new RectangleF(circleX, circleY, circleSize, circleSize);
@@ -122,10 +127,32 @@ namespace Vados
 
 
             //Microfone
-            int sizeDiff = 120;
-            string imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png");
-            Image micIcon = Image.FromFile(imgPath);
-            e.Graphics.DrawImage(micIcon, new RectangleF(circleX + sizeDiff / 2, circleY + sizeDiff / 2, circleSize - sizeDiff, circleSize - sizeDiff));
+            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            float innerD = circleSize - outlineSize;
+            float innerX = circleX + outlineSize / 2f;
+            float innerY = circleY + outlineSize / 2f;
+
+            float targetBox = innerD * 0.60f; // ocupa 60% do círculo interno
+            float aspect = (float)micIcon.Width / micIcon.Height;
+            float drawW, drawH;
+
+            if (aspect >= 1f)
+            {
+                drawW = targetBox;
+                drawH = targetBox / aspect;
+            }
+            else
+            {
+                drawH = targetBox;
+                drawW = targetBox * aspect;
+            }
+
+            float drawX = innerX + (innerD - drawW) / 2f;
+            float drawY = innerY + (innerD - drawH) / 2f;
+
+            e.Graphics.DrawImage(micIcon, drawX, drawY, drawW, drawH);
 
             #endregion
 
@@ -158,8 +185,8 @@ namespace Vados
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
 
-            imgPath = Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png");
-            Image sendIcon = Image.FromFile(imgPath);
+            string sendimgPath = Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png");
+            Image sendIcon = Image.FromFile(sendimgPath);
             e.Graphics.DrawImage(sendIcon, txtIconX, txtIconY, txtIconSize, txtIconSize);
 
             #endregion
@@ -188,14 +215,11 @@ namespace Vados
             if (distance <= circleSize / 2)
             {
                 //Aumentar tamanho do círculo
-                circleSizeTarget = 300;
-                circleHovering = true;
-                pnlBottom.Cursor = Cursors.Hand;
+                circleSizeTarget = circleSizeDefault * 1.1f;
             }
             else
             {
                 //Resetar tamanho do círculo
-                circleHovering = false;
                 circleSizeTarget = circleSizeDefault;
             }
 
@@ -222,6 +246,7 @@ namespace Vados
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
+
             //Ajustar tamanho do botão do microfone
             circleSize += (circleSizeTarget - circleSize) / 3;
 
@@ -236,9 +261,24 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            #region AJUSTAR TEXTBOX
-
+            #region ajustar label
             int middleX = this.Width / 2;
+            int middleY = this.Height / 2;
+
+            circleSizeDefault = Math.Min(this.Width * 0.20f, 325);
+            circleSizeTarget = circleSizeDefault;
+            circleSize = circleSizeDefault;
+
+            circleX = middleX - circleSize / 2;
+            circleY = middleY - circleSize / 2 - 60;
+
+            int labelX = this.Width / 2 - lblText.Width / 2;
+            int labelY = (int)(circleY + circleSize + 10);
+
+            lblText.Location = new Point(labelX, labelY);
+            #endregion
+
+            #region AJUSTAR TEXTBOX
 
             //Ajustar tamanho para definir as variáveis corretamente
             if (setTextboxWidth == true)
@@ -251,7 +291,8 @@ namespace Vados
             txtComando.Width = (int)newWidth;
 
             //Posição da textbox
-            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtComando.Location.Y);
+            int txtY = labelY + lblText.Height + 35;
+            txtComando.Location = new Point(middleX - txtComando.Width / 2, txtY);
 
             //Variáveis da área atrás da textbox
             float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
@@ -267,10 +308,14 @@ namespace Vados
             setTextboxWidth = true;
 
             #endregion
+            #region Ajustar botao mic
+            circleSizeDefault = Math.Min(this.Width * 0.20f, 325);
+            circleSizeTarget = circleSizeDefault;
+            circleSize = circleSizeDefault;
+            #endregion
 
 
-            //Ajustar label (o que você deseja fazer?)
-            lblText.Location = new Point(middleX - lblText.Width / 2, lblText.Location.Y);
+
 
             pnlBottom.Invalidate();
         }
@@ -304,6 +349,16 @@ namespace Vados
 
             #endregion
 
+        }
+
+        private void btnManual_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnConfigs_Click(object sender, EventArgs e)
+        {
+            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
         }
     }
 }

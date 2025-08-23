@@ -86,7 +86,7 @@ namespace Vados
             path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
             //Linha cima
             path.AddLine(rect.X + radius, rect.Y, rect.Right - radius, rect.Y);
-            //Canto cima direita
+            //Canto cima direitaz
             path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);
             //Linha direita
             path.AddLine(rect.Right, rect.Y + radius, rect.Right, rect.Bottom - radius);

@@ -58,33 +58,28 @@ namespace Vados
                 //    MessageBox.Show(String.Join(", ", arguments.ToArray()));
                 //    Comandos.ExecuteCommand(arguments);
                 //}
-                List<string> objects = new List<string>()
-                {
-                    "arquivo",
-                    "arquivos",
-                    "documento",
-                    "documentos",
-                    "pasta",
-                    "pastas",
-                    "diretorio",
-                    "diretorios",
-                };
+                CommandCriteria criteria = new CommandCriteria();
 
-                List<string> extensions = new List<string>()
-                {
-                    "texto",
-                    "imagem",
-                    "video",
-                    "audio",
-                };
+                //Comando
+                ActionExtractor actionExtractor = new ActionExtractor(Comandos.startWords, Comandos.allCommands);
+                var groups = actionExtractor.Extract(txtComando.Text, criteria);
 
-                List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "denominado", "denominada", "intitulado", "intitulada" };
+                string actionStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+                MessageBox.Show("Comando -> " + actionStr);
 
-                ObjectExtractor extractor = new ObjectExtractor(objects, extensions, namingConnectors);
-                var groups = extractor.Extract(txtComando.Text, new CommandCriteria());
+                //Objeto
+                ObjectExtractor objExtractor = new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords);
+                groups = objExtractor.Extract(txtComando.Text, criteria);
 
-                string str = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-                MessageBox.Show(str);
+                string objStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+                MessageBox.Show("Objeto -> " + objStr);
+
+                //Destino
+                DestinationExtractor destinyExtractor = new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords);
+                groups = destinyExtractor.Extract(txtComando.Text, criteria);
+
+                string destinyStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+                MessageBox.Show("Pasta -> " + destinyStr);
             }
         }
 

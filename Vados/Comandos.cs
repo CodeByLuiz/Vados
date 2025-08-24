@@ -39,6 +39,8 @@ namespace Vados
             { "arquivo", WordType.Object },
         };
 
+
+        //Sinonimo chave de cada variação dos comandos
         static Dictionary<string, string> commandSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             //Criar
@@ -54,6 +56,12 @@ namespace Vados
             { "construa", "criar" },
             { "fazer", "criar" },
             { "faça", "criar" },
+            { "inventar", "criar" },
+            { "invente", "criar" },
+            { "dar a luz", "criar" },
+            { "de a luz", "criar" },
+            { "originar", "criar" },
+            { "origine", "criar" },
             //Renomear
             { "renomear", "renomear" },
             { "renomeie", "renomear" },
@@ -65,6 +73,10 @@ namespace Vados
             { "mude o nome", "renomear" },
             { "trocar o nome", "renomear" },
             { "troque o nome", "renomear" },
+            { "modificar o nome", "renomear" },
+            { "modifique o nome", "renomear" },
+            { "substituir o nome", "renomear" },
+            { "substitua o nome", "renomear" },
             //Excluir
             { "excluir", "excluir" },
             { "exclua", "excluir" },
@@ -76,6 +88,18 @@ namespace Vados
             { "remova", "excluir" },
             { "eliminar", "excluir" },
             { "elimine", "excluir" },
+            { "destruir", "excluir" },
+            { "destrua", "excluir" },
+            { "quebrar", "excluir" },
+            { "quebre", "excluir" },
+            { "anular", "excluir" },
+            { "anule", "excluir" },
+            { "desfazer", "excluir" },
+            { "desfaça", "excluir" },
+            { "extinguir", "excluir" },
+            { "extinga", "excluir" },
+            { "obliterar", "excluir" },
+            { "oblitere", "excluir" },
             //Mover
             { "mover", "mover" },
             { "mova", "mover" },
@@ -93,8 +117,44 @@ namespace Vados
             { "transporte", "mover" },
             { "enviar", "mover" },
             { "envie", "mover" },
+            { "movimentar", "mover" },
+            { "movimente", "mover" },
+            { "translocar", "mover" },
+            { "transloque", "mover" },
         };
 
+        //Todas as variações dos comandos
+        public static List<string> allCommands = new List<string>(commandSynonyms.Keys);
+
+
+        //Todas as variações de pasta
+        public static List<string> folderWords = new List<string>()
+        {
+            "pasta", "pastas", "diretorio", "diretorios"
+        };
+
+        //Sinonimos chave de cada sinônimo dos objetos (pasta / arquivo)
+        static Dictionary<string, string> objectSynonyms = new Dictionary<string, string>()
+        {
+            { "pasta", "pasta" },
+            { "pastas", "pasta" },
+            { "diretorio", "pasta" },
+            { "diretorios", "pasta" },
+            { "arquivo", "arquivo" },
+            { "arquivos", "arquivo" },
+            { "documento", "arquivo" },
+            { "documentos", "arquivo" },
+        };
+
+        //Todas as variações de objetos (pasta / arquivo)
+        public static List<string> allObjects = new List<string>(objectSynonyms.Keys);
+
+
+        //Todos os sinônimos
+        static Dictionary<string, string> wordSynonyms = commandSynonyms.Concat(objectSynonyms).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+
+        //Extensões relacionadas as palavras
         static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
         {
             { "texto", new List<string>() { "txt", "doc", "docx", "rtf", "odt", "md" } },
@@ -110,6 +170,10 @@ namespace Vados
             { "word", new List<string>() { "doc", "docx" } },
             { "excel", new List<string>() { "xls", "xlsx" } },
         };
+
+        //Todas as palavras que indicam extensões
+        public static List<string> allExtensionsWords = new List<string>(wordExtensions.Keys);
+
 
         static List<string> wordGroups = new List<string>()
         {
@@ -130,6 +194,57 @@ namespace Vados
         };
 
 
+        //Formas de começar o comando
+        public static List<string> startWords = new List<string>()
+        {
+            "quero",
+            "eu quero",
+            "quero que",
+            "eu quero que",
+            "quero que voce",
+            "eu quero que voce",
+            "por favor",
+            "por obsequio",
+            "por gentileza",
+        };
+
+        //Formas de indicar a pasta de criação (comando criar)
+        public static List<string> destinationWords = new List<string>()
+        {
+            "na",
+            "dentro da",
+            "com origem na",
+            "com destino na",
+        };
+
+        //Formas de indicar a pasta de destino (comando mover)
+        public static List<string> insideWords = new List<string>()
+        {
+            "na",
+            "para a",
+            "para dentro da",
+        };
+
+        //Formas de nomear o arquivo / pasta
+        public static List<string> namingWords = new List<string>()
+        {
+            "chamado",
+            "chamada",
+            "nomeado",
+            "nomeada",
+            "denominado",
+            "denominada",
+            "intitulado",
+            "intitulada",
+            "de nome",
+            "de titulo",
+            "com nome",
+            "com titulo",
+            "com o nome",
+            "com o titulo",
+        };
+
+
         public static WordType WordGetType(string word)
         {
             if (wordTypes.TryGetValue(word, out WordType result))
@@ -141,9 +256,9 @@ namespace Vados
         }
 
 
-        public static string CommandGetSynonym(string command)
+        public static string WordGetSynonym(string word)
         {
-            if (commandSynonyms.TryGetValue(command, out string synonym))
+            if (wordSynonyms.TryGetValue(word, out string synonym))
             {
                 return synonym;
             }
@@ -306,7 +421,7 @@ namespace Vados
             for (int i = 0; i < words.Count; i++)
             {
                 string word = words[i].ToLower();
-                string possibleCommand = CommandGetSynonym(word);
+                string possibleCommand = WordGetSynonym(word);
                 WordType type = WordGetType(possibleCommand);
 
                 //Definir comando

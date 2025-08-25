@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace Vados
 {
@@ -17,12 +20,41 @@ namespace Vados
         public string Destination;
     }
 
-    public interface CriteriaExtractor
+
+    //Retorna os argumentos do comando
+    public class CommandParser
     {
-        GroupCollection Extract(string command, CommandCriteria criteria);
+        CommandCriteria criteria;
+        List<CriteriaExtractor> extractors;
+
+        public CommandParser(CommandCriteria criteria_, List<CriteriaExtractor> extractors_)
+        {
+            criteria = criteria_;
+            extractors = extractors_;
+        }
+
+        public CommandCriteria Parse(string command)
+        {
+            //Extrair cada argumento do comando
+            for (int i = 0; i < extractors.Count; i++)
+            {
+                CriteriaExtractor extractor = extractors[i];
+
+                extractor.Extract(command, criteria);
+            }
+
+            return criteria;
+        }
     }
 
 
+    public interface CriteriaExtractor
+    {
+        void Extract(string command, CommandCriteria criteria);
+    }
+
+
+    //Extrai o tipo de comando
     public class ActionExtractor : CriteriaExtractor
     {
         List<string> actions;
@@ -34,7 +66,7 @@ namespace Vados
             actions = actions_;
         }
 
-        public GroupCollection Extract(string command, CommandCriteria criteria)
+        public void Extract(string command, CommandCriteria criteria)
         {
             string patternStarts = string.Join("|", starts.Select(Regex.Escape));
             string patternAction = string.Join("|", actions.Select(Regex.Escape));
@@ -51,11 +83,13 @@ namespace Vados
                 criteria.Action = correctAction;
             }
 
-            return match.Groups;
+            string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Comando -> " + actionStr);
         }
     }
 
 
+    //Extrai o objeto (arquivo / pasta), seu nome e seu novo nome
     public class ObjectExtractor : CriteriaExtractor
     {
         List<string> objects;
@@ -69,7 +103,7 @@ namespace Vados
             nominators = nominators_;
         }
 
-        public GroupCollection Extract(string command, CommandCriteria criteria)
+        public void Extract(string command, CommandCriteria criteria)
         {
             string patternObject = string.Join("|", objects.Select(Regex.Escape));
             string patternExtension = string.Join("|", extensions.Select(Regex.Escape));
@@ -106,11 +140,13 @@ namespace Vados
                                  match.Groups[12].Value;
             }
 
-            return match.Groups;
+            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Objeto -> " + objectStr);
         }
     }
 
 
+    //Extrai a pasta de destino
     public class DestinationExtractor : CriteriaExtractor
     {
         List<string> insideIndicators;
@@ -124,7 +160,7 @@ namespace Vados
             nominators = nominators_;
         }
 
-        public GroupCollection Extract(string command, CommandCriteria criteria)
+        public void Extract(string command, CommandCriteria criteria)
         {
             string patternInside = string.Join("|", insideIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
@@ -144,7 +180,8 @@ namespace Vados
                                        match.Groups[7].Value; ;
             }
 
-            return match.Groups;
+            string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Destino -> " + destinationStr);
         }
     }
 }

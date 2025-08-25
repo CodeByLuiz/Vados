@@ -17,29 +17,6 @@ namespace Vados
 
         #region DICIONÁRIOS / LISTAS
 
-        //Funções das palavras
-        public enum WordType
-        {
-            Command,
-            Object,
-            Connector,  //Não será mais necessário
-            Value,
-        };
-
-        static Dictionary<string, WordType> wordTypes = new Dictionary<string, WordType>(StringComparer.OrdinalIgnoreCase)
-        {
-            //Comandos
-            { "criar", WordType.Command },
-            { "renomear", WordType.Command },
-            { "excluir", WordType.Command },
-            { "mover", WordType.Command },
-            { "duplicar", WordType.Command },
-            //Objetos
-            { "pasta", WordType.Object },
-            { "arquivo", WordType.Object },
-        };
-
-
         //Sinonimo chave de cada variação dos comandos
         static Dictionary<string, string> commandSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -175,25 +152,6 @@ namespace Vados
         public static List<string> allExtensionsWords = new List<string>(wordExtensions.Keys);
 
 
-        static List<string> wordGroups = new List<string>()
-        {
-            "com o nome",
-            "com nome",
-            "de nome",
-            "com o titulo",
-            "com titulo",
-            "de titulo",
-            "mudar o nome",
-            "mude o nome",
-            "trocar o nome",
-            "troque o nome",
-            "alterar o nome",
-            "altere o nome",
-            "dentro da",
-            "power point"
-        };
-
-
         //Formas de começar o comando
         public static List<string> startWords = new List<string>()
         {
@@ -212,17 +170,32 @@ namespace Vados
         public static List<string> destinationWords = new List<string>()
         {
             "na",
+            "no",
             "dentro da",
+            "dentro do",
             "com origem na",
+            "com origem no",
             "com destino na",
+            "com destino no",
         };
 
         //Formas de indicar a pasta de destino (comando mover)
         public static List<string> insideWords = new List<string>()
         {
             "na",
+            "no",
+            "pra",
+            "pro",
             "para a",
+            "para o",
+            "pra dentro da",
+            "pra dentro do",
             "para dentro da",
+            "para dentro do",
+            "pra o interior da",
+            "pra o interior do",
+            "para o interior da",
+            "para o interior do",
         };
 
         //Formas de nomear o arquivo / pasta
@@ -245,17 +218,6 @@ namespace Vados
         };
 
 
-        public static WordType WordGetType(string word)
-        {
-            if (wordTypes.TryGetValue(word, out WordType result))
-            {
-                return result;
-            }
-
-            return WordType.Value;
-        }
-
-
         public static string WordGetSynonym(string word)
         {
             if (wordSynonyms.TryGetValue(word, out string synonym))
@@ -265,7 +227,6 @@ namespace Vados
 
             return "";
         }
-
 
         public static List<string> WordGetExtensions(string word)
         {
@@ -280,368 +241,100 @@ namespace Vados
         #endregion
 
 
-        //Retorna a ordem de palavras necessárias para realizar o comando
-        public static List<List<object>> CommandGetWordOrder(string command)
+        public static CommandCriteria CommandGetArguments(string command)
         {
-            //Lista de palavras para indicar o nome do arquivo/pasta
-            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "denominado", "denominada", "intitulado", "intitulada", "" };
-            //Indica a pasta de destino
-            List<string> dentro = new List<string>() { "na", "dentro da" };
-            //Palavras específicas
-            List<string> pasta = new List<string>() { "pasta" };
-            List<string> para = new List<string>() { "para" };
-            List<string> de = new List<string>() { "de" };
+            CommandCriteria criteria = new CommandCriteria();
 
-            switch (command)
+            //Definir tipo de comando
+            ActionExtractor actionExtractor = new ActionExtractor(Comandos.startWords, Comandos.allCommands);
+            actionExtractor.Extract(command, criteria);
+
+
+            //Extrair argumentos para cada tipo de comando
+            CommandParser parser = new CommandParser(criteria, new List<CriteriaExtractor>());
+
+            switch (criteria.Action)
             {
                 case "criar":
-                    return new List<List<object>>() {
-                        /* ---- SITUAÇÕES ----
-                        0.0 -> sem extensão, sem pasta de destino
-                        0.1 -> sem extensão, pasta de destino
-                        1.0 -> extensão, sem pasta de destino
-                        1.0 -> extensão, pasta de destino
-                        */
-
-                        new List<object>() { 1.1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
-                        new List<object>() { 1.0, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
-                        new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
 
                 case "renomear":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                        });
+                    break;
 
                 case "excluir":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                        });
+                    break;
 
                 case "mover":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, new List<string>() { "para", "dentro da" }, pasta, namingConnectors, WordType.Value },
-                    };
-
-
-                //Lista vazia se não identificar o comando
-                default:
-                    return new List<List<object>>();
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
             }
+
+            var arguments = parser.Parse(command);
+            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Destino: {arguments.Destination}");
+            return arguments;
         }
 
 
-        public static void ExecuteCommand(List<string> arguments)
+        public static void ExecuteCommand(CommandCriteria arguments)
         {
-            double situation = Convert.ToDouble(arguments[0]);
-            int mainSituation = (int)(Math.Floor(situation));
-            int subSituation = (int)((situation - mainSituation) * 10);
-            MessageBox.Show(mainSituation.ToString() + "." + subSituation.ToString());
+            string commandType = arguments.Action;
+            string objectType = arguments.ObjectType;
+            string name = arguments.ObjectName;
+            string newName = arguments.ObjectNewName;
+            string destination = arguments.Destination;
 
-            string obj = arguments[2];
-            string name = arguments[3];
-            List<string> paths;
+            //Definir caminhos
+            List<string> namePath = new List<string>();
+            string destinationPath = "";
 
-            switch (arguments[1])
+            if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
+            if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
+
+
+            //Realizar comando
+            switch (commandType)
             {
+                //Criar
                 case "criar":
-                    if (obj == "pasta") { CriarPasta(name, ""); }
-                    if (obj == "arquivo")
-                    {
-                        string fileName = name;
-                        string destinyFolder = "";
-
-                        //Quando o formato do arquivo está por extenso (ex: "arquivo de texto")
-                        if (mainSituation == 1)
-                        {
-                            fileName = arguments[4];
-
-                            //Definir extensão
-                            string extensionWord = arguments[3];
-                            List<string> extensions = WordGetExtensions(extensionWord);
-                            if (extensions.Count != 0)
-                            {
-                                fileName += "." + WordGetExtensions(extensionWord)[0];
-                            }
-                        }
-
-                        //Pasta de destino
-                        if (subSituation == 1)
-                        {
-                            destinyFolder = arguments.Last();
-                        }
-
-                        MessageBox.Show(destinyFolder);
-                        CriarArquivo(fileName, destinyFolder);
-                    }
+                    if (objectType == "pasta") { CriarPasta(name, destination); }
+                    if (objectType == "arquivo") { CriarArquivo(name, destination); }
                     break;
 
-
+                //Renomear
                 case "renomear":
-                    string oldName = arguments[3];
-                    string newName = arguments[4];
-
-                    if (obj == "pasta") { RenomearPasta(oldName, newName); }
-                    if (obj == "arquivo") { RenomearArquivo(oldName, newName); }
+                    if (objectType == "pasta") { RenomearPasta(name, newName); }
+                    if (objectType == "arquivo") { RenomearArquivo(name, newName); }
                     break;
 
                 case "excluir":
-                    paths = SearchPaths(name, obj == "pasta").ToList();
-
-                    if (obj == "pasta") { ExcluirPasta(paths); }
-                    if (obj == "arquivo") { ExcluirArquivo(paths); }
+                    if (objectType == "pasta") { ExcluirPasta(namePath); }
+                    if (objectType == "arquivo") { ExcluirArquivo(namePath); }
                     break;
 
                 
                 case "mover":
-                    string destiny = arguments[4];
-                    string destinyPath = SearchPaths(destiny, true).FirstOrDefault();
-                    paths = SearchPaths(name, obj == "pasta").ToList();
-
-                    if (obj == "pasta") { MoverPasta(paths, destiny); }
-                    if (obj == "arquivo") { MoverArquivo(paths, destinyPath); }
+                    if (objectType == "pasta") { MoverPasta(namePath, destinationPath); }
+                    if (objectType == "arquivo") { MoverArquivo(namePath, destinationPath); }
                     break;
                 
             }
-        }
-
-
-        public static List<string> ValidateCommand(List<string> words)
-        {
-            string command = "";
-            List<string> arguments = new List<string>();
-            List<List<object>> orderList = null;
-            int startIndex = 0;
-
-            //Definir comando
-            for (int i = 0; i < words.Count; i++)
-            {
-                string word = words[i].ToLower();
-                string possibleCommand = WordGetSynonym(word);
-                WordType type = WordGetType(possibleCommand);
-
-                //Definir comando
-                if (type == WordType.Command)
-                {
-                    command = possibleCommand;
-                    orderList = CommandGetWordOrder(command);
-                    startIndex = i + 1;
-                    break;
-                }
-            }
-
-            //Retornar nulo se não for nenhum comando
-            if (command == "") return null;
-
-
-            //Checar todas as ordens de palavras aceitas pelo comando
-            for (int i = 0; i < orderList.Count; i++)
-            {
-                List<object> typeOrder = orderList[i];
-                int typeIndex = 1;  //Pular primeiro elemento, que indica a situação do comando
-
-                //Adicionar situação e commando nos argumentos
-                arguments.Clear();
-                double commandSituation = (double)(typeOrder[0]);
-                arguments.Add(commandSituation.ToString());
-                arguments.Add(command);
-
-                int j = startIndex;
-
-                //Checar se o comando possui todas as palavras necessárias
-                for (j = startIndex; j < words.Count; j++)
-                {
-                    if (typeIndex >= typeOrder.Count) break;    //Parar se tiver mais palavras que o esperado
-
-                    string word = words[j].ToLower();
-                    var expected = typeOrder[typeIndex];
-
-                    //Se for tipo de palavra
-                    if (expected is WordType)
-                    {
-                        WordType actualType = WordGetType(word);
-
-                        if (actualType == (WordType)expected)
-                        {
-                            //Definir argumentos pro comando
-                            if (actualType == WordType.Object || actualType == WordType.Value)
-                            {
-                                arguments.Add(word);
-                            }
-
-                            typeIndex += 1;
-                            continue;
-                        }
-
-                    }
-
-                    //Se for palavra específica aceita
-                    if (expected is List<string>)
-                    {
-                        List<string> list = (List<string>)expected;
-                        bool containsWord = list.Contains(word);
-
-                        //Seguir para a próxima palavra se a atual estiver na lista
-                        if (containsWord)
-                        {
-                            typeIndex += 1;
-                        }
-
-                        //Checar a mesma palavra mas com o próximo tipo esperado (caso não esteja na lista, que não é obrigatória)
-                        if (!containsWord && list.Contains(""))
-                        {
-                            j -= 1;
-                            typeIndex += 1;
-                        }
-                    }
-                }
-
-
-                //Retornar argumentos se o comando estiver correto
-                if (typeIndex == typeOrder.Count && j == words.Count)
-                {
-                    return arguments;
-                }
-            }
-
-            return null;
-        }
-
-
-        public static List<string> IdentifyWordGroups(List<string> words)
-        {
-            List<string> newWords = new List<string>();
-
-            //Para cada palavra de determinada lista
-            for (int i = 0; i < words.Count(); i++)
-            {
-                string temporaryWord = "";
-                int wordCount = 0;
-
-                for (int j = 0; j < wordGroups.Count(); j++)
-                {
-                    string actualWordGroup = wordGroups[j];
-                    List<string> groupSeparateWords = actualWordGroup.Split(" ").ToList();
-                    wordCount = groupSeparateWords.Count;
-
-                    //Checar se formam um grupo conhecido
-                    for (var k = 0; k < groupSeparateWords.Count; k++)
-                    {
-                        string wordToCheck = words[i + k];
-
-                        //Parar de juntar as palavras se alguma não fizer parte do grupo
-                        if (groupSeparateWords[k] != wordToCheck)
-                        {
-                            temporaryWord = "";
-                            break;
-                        }
-
-                        //Juntar palavras
-                        temporaryWord += wordToCheck;
-
-                        if (k != groupSeparateWords.Count - 1)
-                        {
-                            //Adicionar espaço entre as palavras
-                            temporaryWord += " ";
-                        }
-                    }
-
-                    //Parar de checar outros grupos de palavras se já encontrar um
-                    if (temporaryWord != "")
-                    {
-                        break;
-                    }
-                }
-
-                //Adicionar grupo à nova lista (como uma única palavra)
-                if (temporaryWord != "")
-                {
-                    newWords.Add(temporaryWord);
-                    i += wordCount - 1;
-                }
-                //Adicionar palavra única à nova lista caso não seja um grupo
-                else
-                {
-                    newWords.Add(words[i]);
-                }
-            }
-
-            return newWords;
-        }
-
-
-        public static List<string> SeparateWords(string str)
-        {
-            var words = new List<string>();
-            if (str == "") return words;
-
-            char[] separators = { ' ', ',' };
-            char[] charList = str.ToCharArray();
-            char namer = '\0';
-
-            string currentWord = "";
-
-            for (var i = 0; i < charList.Length; i++)
-            {
-                char c = charList[i];
-                bool breakWord = false;
-
-                //Checar se o caractere é um nomeador   (junta palavras que estão entre eles)
-                if (c == '\"' || c == '\'')
-                {
-                    //Fechar junção
-                    if (c == namer)
-                    {
-                        namer = '\0';
-                        continue;
-                    }
-
-                    //Iniciar junção
-                    namer = c;
-                    continue;
-                }
-
-                //Checar se o caractere é um separador
-                if (namer == '\0')
-                {
-                    for (var j = 0; j < separators.Length; j++)
-                    {
-                        char s = separators[j];
-
-                        if (c == s)
-                        {
-                            breakWord = true;
-                            break;
-                        }
-                    }
-                }
-
-                //Adicionar caractere à palavra
-                if (breakWord == false)
-                {
-                    currentWord += c;
-                    continue;
-                }
-
-                //Ir para a próxima palavra (se o caractere for um separador)
-                if (currentWord != "")  //Ignorar palavras vazias
-                {
-                    words.Add(currentWord);
-                    currentWord = "";
-                }
-            }
-
-            //Adicionar última palavra
-            if (currentWord != "")
-            {
-                words.Add(currentWord);
-            }
-
-            return words;
         }
 
         #endregion
@@ -1263,9 +956,9 @@ namespace Vados
         {
             try
             {
-                if (path == "") 
+                if (string.IsNullOrEmpty(path)) 
                 {
-                    path = Path.Combine(Global.DefaultFolder , nome);
+                    path = Path.Combine(Global.DefaultFolder, nome);
                 }
                 else
                 {
@@ -1300,13 +993,14 @@ namespace Vados
             try
             {
                 //Criar na pasta padrão
-                if (path == "")
+                if (string.IsNullOrEmpty(path))
                 {
                     path = Path.Combine(Global.DefaultFolder, nome);
                 }
                 //Criar na pasta especificada
                 else
                 {
+                    MessageBox.Show("pasta especificada");
                     path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome);
                     //MessageBox.Show(path);
                 }

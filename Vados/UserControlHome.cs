@@ -47,39 +47,11 @@ namespace Vados
         {
             if (textboxActive == true)
             {
-                ////Realizar comando
-                //List<string> words = Comandos.SeparateWords(command);
-                //words = Comandos.IdentifyWordGroups(words);
-                //MessageBox.Show(String.Join(", ", words.ToArray()));
-                //List<string> arguments = Comandos.ValidateCommand(words);
+                //Extrair argumentos do comando
+                var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
-                //if (arguments != null)
-                //{
-                //    MessageBox.Show(String.Join(", ", arguments.ToArray()));
-                //    Comandos.ExecuteCommand(arguments);
-                //}
-                CommandCriteria criteria = new CommandCriteria();
-
-                //Comando
-                ActionExtractor actionExtractor = new ActionExtractor(Comandos.startWords, Comandos.allCommands);
-                var groups = actionExtractor.Extract(txtComando.Text, criteria);
-
-                string actionStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-                MessageBox.Show("Comando -> " + actionStr);
-
-                //Objeto
-                ObjectExtractor objExtractor = new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords);
-                groups = objExtractor.Extract(txtComando.Text, criteria);
-
-                string objStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-                MessageBox.Show("Objeto -> " + objStr);
-
-                //Destino
-                DestinationExtractor destinyExtractor = new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords);
-                groups = destinyExtractor.Extract(txtComando.Text, criteria);
-
-                string destinyStr = string.Join(", ", groups.Cast<Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-                MessageBox.Show("Pasta -> " + destinyStr);
+                //Executar comando
+                Comandos.ExecuteCommand(arguments);
             }
         }
 

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,6 +18,8 @@ namespace Vados
 
         System.Windows.Forms.Timer timer;
 
+
+      
 
         private Image micIcon;
 
@@ -60,7 +63,7 @@ namespace Vados
 
         }
 
-     
+       
 
         private void txtComando_Click(object sender, EventArgs e)
         {
@@ -86,6 +89,8 @@ namespace Vados
 
             textboxActive = false;
         }
+
+
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
@@ -359,6 +364,11 @@ namespace Vados
         private void btnConfigs_Click(object sender, EventArgs e)
         {
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
+        }
+
+        private void txtComando_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

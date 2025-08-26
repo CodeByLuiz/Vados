@@ -89,9 +89,9 @@
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1462, 3);
+            btnManual.Location = new Point(1505, 25);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(27, 37);
+            btnManual.Size = new Size(69, 50);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
@@ -102,9 +102,9 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1495, 3);
+            btnConfigs.Location = new Point(1593, 25);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(30, 37);
+            btnConfigs.Size = new Size(65, 50);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
@@ -113,9 +113,9 @@
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(12, 0);
+            imgLogo.Location = new Point(13, 13);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(161, 50);
+            imgLogo.Size = new Size(204, 72);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 5;
             imgLogo.TabStop = false;
@@ -147,6 +147,7 @@
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
+            txtComando.TextChanged += txtComando_TextChanged;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
             // UserControlHome

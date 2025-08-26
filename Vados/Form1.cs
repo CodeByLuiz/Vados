@@ -14,7 +14,14 @@ namespace Vados
         {
             InitializeComponent();
             KeyPreview = true;
+
+
+
+            
         }
+
+
+      
 
         //Função para trocar user control
         public void LoadUserControl(UserControl userControl)
@@ -71,6 +78,11 @@ namespace Vados
 
                 isFullscreen = false;
             }
+        }
+
+        private void panelContainer_Paint(object sender, PaintEventArgs e)
+        {
+           
         }
     }
 }

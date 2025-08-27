@@ -32,6 +32,7 @@ namespace Vados
         float circleY = 0;
         bool circleHovering = false;
         bool lastCircleHovering = false;
+        
 
         //Variáveis da textbox
         int txtAreaPaddingW = 18;
@@ -94,17 +95,23 @@ namespace Vados
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
+          
+            
             int middleX = this.Width / 2;
-            int middleY = this.Height / 2;
+            
+            int middleY = 85 + (lblText.Top - 85) / 2;
+
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
             #region BOTÃO DO MICROFONE
 
             circleX = middleX - circleSize / 2;
-            circleY = middleY - circleSize / 2 - 60;
+            circleY = middleY - circleSize / 2;
+
+            circleY = Math.Clamp(circleY, 0, lblText.Location.Y + 15);
 
             //Sombra do círculo
-            int shadowOffset = 15;
+            int shadowOffset = 25;
 
             GraphicsPath path = new GraphicsPath();
             path.AddEllipse(circleX, circleY + shadowOffset, circleSize, circleSize);
@@ -116,8 +123,11 @@ namespace Vados
             e.Graphics.FillPath(pathBrush, path);
 
 
+
+
+
             //Contorno do círculo
-            float outlineSize = Math.Max(2f, Math.Min(circleSize * 0.05f, 25f));
+             float outlineSize = Math.Max(20f, Math.Min(circleSize * 0.05f, 25f));
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
             RectangleF rect = new RectangleF(circleX, circleY, circleSize, circleSize);
@@ -158,6 +168,12 @@ namespace Vados
             float drawY = innerY + (innerD - drawH) / 2f;
 
             e.Graphics.DrawImage(micIcon, drawX, drawY, drawW, drawH);
+
+
+
+        
+
+
 
             #endregion
 
@@ -267,20 +283,31 @@ namespace Vados
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
             #region ajustar label
-            int middleX = this.Width / 2;
-            int middleY = this.Height / 2;
+            int middleX = this.Width  / 2;
+            int middleY = 85 + (lblText.Top - 85) / 2;
 
-            circleSizeDefault = Math.Min(this.Width * 0.20f, 325);
+
+
+            circleX = middleX - circleSize / 2;
+            circleY = middleY - circleSize / 2;
+
+            int labelX = this.Width / 2 - lblText.Width / 2;
+            int labelY = (int)(circleY + circleSize + lblText.Height);
+
+            labelY = Math.Clamp(lblText.Location.Y, 0, txtComando.Location.Y - 5);
+
+            lblText.Location = new Point(labelX, labelY);
+            #endregion
+
+
+            #region Ajustar botao mic
+            circleSizeDefault = Math.Min(this.Height - circleSize, 325);
             circleSizeTarget = circleSizeDefault;
             circleSize = circleSizeDefault;
 
-            circleX = middleX - circleSize / 2;
-            circleY = middleY - circleSize / 2 - 60;
 
-            int labelX = this.Width / 2 - lblText.Width / 2;
-            int labelY = (int)(circleY + circleSize + 10);
 
-            lblText.Location = new Point(labelX, labelY);
+
             #endregion
 
             #region AJUSTAR TEXTBOX
@@ -296,8 +323,10 @@ namespace Vados
             txtComando.Width = (int)newWidth;
 
             //Posição da textbox
-            int txtY = labelY + lblText.Height + 35;
+            int txtY = labelY + txtComando.Height + lblText.Height;
+            txtY = Math.Clamp(txtComando.Location.Y, 0, this.Height - 10);
             txtComando.Location = new Point(middleX - txtComando.Width / 2, txtY);
+           
 
             //Variáveis da área atrás da textbox
             float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
@@ -313,12 +342,7 @@ namespace Vados
             setTextboxWidth = true;
 
             #endregion
-            #region Ajustar botao mic
-            circleSizeDefault = Math.Min(this.Width * 0.20f, 325);
-            circleSizeTarget = circleSizeDefault;
-            circleSize = circleSizeDefault;
-            #endregion
-
+          
 
 
 

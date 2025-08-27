@@ -126,22 +126,28 @@ namespace Vados
         //Sinonimos chave de cada sinônimo dos objetos (pasta / arquivo)
         static Dictionary<string, string> objectSynonyms = new Dictionary<string, string>()
         {
-            { "pasta", "pasta" },
             { "pastas", "pasta" },
-            { "diretorio", "pasta" },
+            { "pasta", "pasta" },
             { "diretorios", "pasta" },
-            { "arquivo", "arquivo" },
+            { "diretorio", "pasta" },
             { "arquivos", "arquivo" },
-            { "documento", "arquivo" },
+            { "arquivo", "arquivo" },
             { "documentos", "arquivo" },
+            { "documento", "arquivo" },
         };
 
         //Todas as variações de objetos (pasta / arquivo)
         public static List<string> allObjects = new List<string>(objectSynonyms.Keys);
 
-
         //Todos os sinônimos
-        static Dictionary<string, string> wordSynonyms = commandSynonyms.Concat(objectSynonyms).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        static Dictionary<string, string> currentSynonyms = commandSynonyms.Concat(objectSynonyms).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        static Dictionary<string, string> wordSynonyms = new Dictionary<string, string>(currentSynonyms)
+        {
+            { "todos", "todos" },
+            { "todos os", "todos" },
+            { "metade dos", "metade" },
+        };
 
 
         //Extensões relacionadas as palavras
@@ -230,6 +236,14 @@ namespace Vados
             "com o titulo",
         };
 
+        //Formas de indicar a quantidade de arquivos / pastas
+        public static List<string> amountWords = new List<string>()
+        {
+            "todos",
+            "todos os",
+            "metade dos",
+        };
+
 
         public static string WordGetSynonym(string word)
         {
@@ -271,7 +285,7 @@ namespace Vados
                 case "criar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
                             new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
@@ -279,28 +293,28 @@ namespace Vados
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
                         });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
                         });
                     break;
 
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
                             new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Destino: {arguments.Destination}");
+            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Quantidade: {arguments.ObjectAmount} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Destino: {arguments.Destination}");
             return arguments;
         }
 
@@ -312,12 +326,30 @@ namespace Vados
             string name = arguments.ObjectName;
             string newName = arguments.ObjectNewName;
             string destination = arguments.Destination;
+            string amount = arguments.ObjectAmount;
 
             //Definir caminhos
             List<string> namePath = new List<string>();
             string destinationPath = "";
 
             if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
+
+
+            //Identificar quantidade de objetos afetados
+            int GetAmount(int totalAmount, string modifier)
+            {
+                switch(modifier)
+                {
+                    case "":
+                        return 1;
+                    case "todos":
+                        return totalAmount;
+                    case "metade":
+                        return (int)Math.Ceiling((decimal)totalAmount / 2);
+                }
+                
+                return 1;
+            }
 
 
             //Realizar comando

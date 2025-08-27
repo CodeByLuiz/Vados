@@ -152,14 +152,13 @@ namespace Vados
             }
             else
             {
+                int[] datas = new int[3] { 11, 12, 2024 };
 
-                //HashSet<string> porra = new HashSet<string>();
-                //porra = Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt");
+                foreach(var x in Comandos.SearchPaths("",true, data:datas))
+                {
+                    listateste.Items.Add(x);
+                }
 
-                //foreach (var x in Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt")) 
-                //{
-                //    listateste.Items.Add(x);
-                //}
                 //Task.Run(() => Comandos.MoverUnsArquivos(".txt", "Desktop", "pasta de coisa"));
 
                 

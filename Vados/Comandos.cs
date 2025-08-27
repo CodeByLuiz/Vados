@@ -921,21 +921,36 @@ namespace Vados
                                     FileInfo caminhoinfo = new FileInfo(caminho); // cria um objeto FileInfo a partir do caminho atual para pegar suas informaões
 
                                     // adicionam o caminho atual ou o caminho completo a lista de resultados
-                                    if (data!= null && caminho!=pastaRoot)
+                                    if (data!= null && caminho!=pastaRoot && filtroData(caminho, caminhoinfo, data, pastaRoot))
                                     {
-                                       
-                                        if (filtroData(caminho, caminhoinfo, data, pastaRoot))
-                                        {
-                                            MessageBox.Show(caminhoinfo.Directory.Parent.ToString() + ", aaaaaaaaaaaaaa");
+                                        MessageBox.Show(caminhoinfo.Directory.Parent.ToString() + ", aaaaaaaaaaaaaa");
 
+                                        resultados.Add(caminho);
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+                                        
+                                    }
+                                    else if (criteriosize != 0 && caminho!=pastaRoot) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+                                    {
+                                        long arquivoSize = getFolderSize(caminho, criterio: criteriosize);
+                                        //MessageBox.Show(arquivoSize.ToString());
+                                        if (filtroSize(arquivoSize, criteriosize, caminho, pastaRoot))
+                                        {
+                                            MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
                                             resultados.Add(caminho);
+
                                             if (varcontrole != null && varcontrole > 0)
                                             {
                                                 varcontrole -= 1;
                                             }
+
                                         }
+
+
                                     }
-                                    else if (!string.IsNullOrEmpty(pastaRoot) && !string.IsNullOrEmpty(aprocurar) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
+                                    else if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
                                     {
                                         //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
                                         //MessageBox.Show(caminho + " situação 3 " + aprocurar);
@@ -993,30 +1008,26 @@ namespace Vados
                                 FileInfo caminhoinfo = new FileInfo(arquivo); // mesma coisa do bglh de pasta
                                 if (visitados.Add(arquivo)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
                                 {
-                                    if (criteriosize != 0) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+                                    if (criteriosize != 0 && filtroSize(caminhoinfo.Length,criteriosize,arquivo,pastaRoot)) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
                                     {
-                                        if (caminhoinfo.Length >= criteriosize * 0.8 && caminhoinfo.Length <= criteriosize * 1.2)
+                                        MessageBox.Show("deu erradopracacete eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
+                                        resultados.Add(arquivo);
+
+                                        if (varcontrole != null && varcontrole > 0)
                                         {
-                                            //MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
-                                            resultados.Add(arquivo);
-
-                                            if (varcontrole != null && varcontrole > 0)
-                                            {
-                                                varcontrole -= 1;
-                                            }
-
+                                            varcontrole -= 1;
                                         }
+                                        
                                     }
-                                    else if (data!=null)
+                                    else if (data!=null && filtroData(arquivo, caminhoinfo, data, pastaRoot))
                                     {
-                                        if (filtroData(arquivo, caminhoinfo, data, pastaRoot))
+                                        
+                                        resultados.Add(arquivo);
+                                        if (varcontrole != null && varcontrole > 0)
                                         {
-                                            resultados.Add(arquivo);
-                                            if (varcontrole != null && varcontrole > 0)
-                                            {
-                                                varcontrole -= 1;
-                                            }
+                                            varcontrole -= 1;
                                         }
+                                        
                                     }
 
                                     else if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot, StringComparison.OrdinalIgnoreCase)) // retorna o arquivo desejado que esta dentro da pasta root
@@ -1029,7 +1040,7 @@ namespace Vados
                                             varcontrole -= 1;
                                         }
                                     }
-                                    else if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
+                                    else if (!string.IsNullOrEmpty(aprocurar) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
                                     {
                                         //MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
                                         resultados.Add(arquivo);
@@ -1079,6 +1090,10 @@ namespace Vados
             if (resultados != null)
             {
                 MessageBox.Show("bolete");
+                foreach(var x in resultados)
+                {
+                    MessageBox.Show(x);
+                }
                 return resultados;
             }
             MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
@@ -1132,7 +1147,48 @@ namespace Vados
             return false;
         }
 
+        public static bool filtroSize(long arquivosize, long criteriosize, string arquivo, string pastaroot)
+        {
+            MessageBox.Show(arquivosize.ToString());
 
+            if ((arquivosize >= 0) && (arquivosize <= (criteriosize * 1.2)))
+            {
+                //MessageBox.Show(criteriosize.ToString() + ", " + arquivosize);
+                return true;
+                
+            }
+            //MessageBox.Show("merda");
+            return false;
+        }
+
+        public static long getFolderSize(string caminho,long criterio=0, long control=0)
+        {
+            long tamanhoTotal = 0;
+
+            try
+            {
+                
+                tamanhoTotal += Directory.GetFiles(caminho).Sum(arquivo => new FileInfo(arquivo).Length);
+
+                control += tamanhoTotal;
+
+                if( control== 1.5 * criterio && criterio!=0 || tamanhoTotal>= 1.5*criterio)
+                {
+                    return control;
+                }
+
+                foreach (var subPasta in Directory.GetDirectories(caminho))
+                {
+                    tamanhoTotal += getFolderSize(subPasta, control:control);
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+            return tamanhoTotal;
+        }
 
         #endregion
 

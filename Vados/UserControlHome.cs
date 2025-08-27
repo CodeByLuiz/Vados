@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -46,17 +47,11 @@ namespace Vados
         {
             if (textboxActive == true)
             {
-                //Realizar comando
-                List<string> words = Comandos.SeparateWords(command);
-                words = Comandos.IdentifyWordGroups(words);
-                MessageBox.Show(String.Join(", ", words.ToArray()));
-                List<string> arguments = Comandos.ValidateCommand(words);
+                //Extrair argumentos do comando
+                var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
-                if (arguments != null)
-                {
-                    MessageBox.Show(String.Join(", ", arguments.ToArray()));
-                    Comandos.ExecuteCommand(arguments);
-                }
+                //Executar comando
+                Comandos.ExecuteCommand(arguments);
             }
         }
 

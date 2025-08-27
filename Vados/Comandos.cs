@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Reflection.Metadata;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using SHDocVw;
 
 namespace Vados
@@ -218,17 +219,41 @@ namespace Vados
             "para o interior do",
         };
 
+        public static List<string> fromWords = new List<string>()
+        {
+            "da",
+            "do",
+            "pertencente a",
+            "pertencentes a",
+            "que pertence a",
+            "que pertencem a",
+            "que esta dentro da",
+            "que estao dentro da",
+            "que esta no interior da",
+            "que estao no interior da",
+        };
+
+        //Formas de indicar a pasta de posse
+
         //Formas de nomear o arquivo / pasta
         public static List<string> namingWords = new List<string>()
         {
             "chamado",
+            "chamados",
             "chamada",
+            "chamadas",
             "nomeado",
+            "nomeados",
             "nomeada",
+            "nomeadas",
             "denominado",
+            "denominados",
             "denominada",
+            "denominadas",
             "intitulado",
+            "intitulados",
             "intitulada",
+            "intituladas",
             "de nome",
             "de titulo",
             "com nome",
@@ -295,20 +320,23 @@ namespace Vados
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
                             new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
+                            new DestinationExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
+
 
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
                             new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
@@ -329,28 +357,35 @@ namespace Vados
             string destination = arguments.Destination;
             string amount = arguments.ObjectAmount;
 
-            //Definir caminhos
-            List<string> namePath = new List<string>();
-            string destinationPath = "";
 
+            //Retorna os caminhos encontrados conforme os critérios
+            List<string> GetPaths(string name, string objectType, string amount, string destination)
+            {
+                //Buscar apenas um arquivo
+                if (amount == "") return SearchPaths(name, objectType == "pasta", 0, null, destination, 1).ToList();
+
+                //Retornar quantidade especificada de caminhos
+                List<string> paths = SearchPaths(name, objectType == "pasta", 0, null, destination, null).ToList();
+
+                switch (amount)
+                {
+                    case "todos":
+                        break;
+                    case "metade":
+                        int half = (int)Math.Ceiling((decimal)paths.Count / 2);
+                        paths = paths.GetRange(0, half);
+                        break;
+                }
+
+                return paths;
+            }
+
+
+            //Caminho da pasta de destino
+            string destinationPath = "";
             if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
 
-
-            //Identificar quantidade de objetos afetados
-            int GetAmount(int totalAmount, string modifier)
-            {
-                switch(modifier)
-                {
-                    case "":
-                        return 1;
-                    case "todos":
-                        return totalAmount;
-                    case "metade":
-                        return (int)Math.Ceiling((decimal)totalAmount / 2);
-                }
-                
-                return 1;
-            }
+            List<string> paths = new List<string>();
 
 
             //Realizar comando
@@ -369,16 +404,16 @@ namespace Vados
                     break;
 
                 case "excluir":
-                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
-                    if (objectType == "pasta") { ExcluirPasta(namePath); }
-                    if (objectType == "arquivo") { ExcluirArquivo(namePath); }
+                    paths = GetPaths(name, objectType, amount, destination);
+                    if (objectType == "pasta") { ExcluirPasta(paths); }
+                    if (objectType == "arquivo") { ExcluirArquivo(paths); }
                     break;
 
                 
                 case "mover":
-                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
-                    if (objectType == "pasta") { MoverPasta(namePath, destinationPath); }
-                    if (objectType == "arquivo") { MoverArquivo(namePath, destinationPath); }
+                    paths = GetPaths(name, objectType, amount, destination);
+                    if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
+                    if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
                     break;
                 
             }
@@ -459,7 +494,7 @@ namespace Vados
         }
 
 
-        #region busca 
+        #region BUSCA 
           
         public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = "", int? varcontrole = 1, int[] data = null) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         {

@@ -138,11 +138,12 @@ namespace Vados
 
             string SearchArquivo = txtSearch.Text;
 
+            /*
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
-                
-                foreach (var item in Comandos.SearchPaths(".txt", false, pastaRoot: "Desktop")) 
+
+                foreach (var item in Comandos.SearchPaths(SearchArquivo, false, varcontrole:null))
                 {
                     listateste.Items.Add(item);
                 }
@@ -163,6 +164,12 @@ namespace Vados
 
                 
 
+            }
+            */
+
+            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, varcontrole:null))
+            {
+                listateste.Items.Add(item);
             }
         }
         

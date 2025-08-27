@@ -13,12 +13,12 @@ namespace Vados
 {
     public class CommandCriteria
     {
-        public string Action;           //Tipo de comando
-        public string ObjectType;       //Tipo de objeto (arquivo / pasta)
-        public string ObjectName;       //Nome do objeto
-        public string ObjectAmount;     //Quantidade de objetos ("todos")
-        public string ObjectNewName;    //Novo nome do objeto (ao renomear)
-        public string Destination;      //Nome da pasta de destino
+        public string Action = "";           //Tipo de comando
+        public string ObjectType = "";       //Tipo de objeto (arquivo / pasta)
+        public string ObjectName = "";       //Nome do objeto
+        public string ObjectAmount = "";     //Quantidade de objetos ("todos")
+        public string ObjectNewName = "";    //Novo nome do objeto (ao renomear)
+        public string Destination = "";      //Nome da pasta de destino
     }
 
 
@@ -97,13 +97,17 @@ namespace Vados
         List<string> amount;
         List<string> extensions;
         List<string> nominators;
+        List<string> stopWords;
 
-        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_)
+        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_, List<string> stopWords_ = null)
         {
             amount = amount_;
             objects = objects_;
             extensions = extensions_;
             nominators = nominators_;
+            stopWords = stopWords_;
+
+            if (stopWords == null) stopWords = new List<string>();
         }
 
         public void Extract(string command, CommandCriteria criteria)
@@ -126,18 +130,6 @@ namespace Vados
                 string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
                 criteria.ObjectType = obj;
 
-                //Nome do objeto
-                string name = match.Groups[9].Success ? match.Groups[9].Value : 
-                              match.Groups[10].Success ? match.Groups[10].Value :
-                              match.Groups[11].Value;
-                var extension = Comandos.WordGetExtensions(match.Groups[5].Value);
-                if (extension.Count() != 0)
-                {
-                    name += "." + extension[0];
-                }
-
-                criteria.ObjectName = name;
-
                 //Novo nome
                 criteria.ObjectNewName = match.Groups[13].Success ? match.Groups[13].Value :
                                  match.Groups[14].Success ? match.Groups[14].Value :
@@ -145,6 +137,22 @@ namespace Vados
 
                 //Quantidade
                 criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
+
+                //Nome do objeto
+                string name = match.Groups[9].Success ? match.Groups[9].Value :
+                              match.Groups[10].Success ? match.Groups[10].Value :
+                              match.Groups[11].Value;
+
+                if (stopWords.Contains(name.ToLower())) return; //Checar se o nome não é uma das palavras de parada
+
+                var extension = Comandos.WordGetExtensions(match.Groups[5].Value);
+                if (extension.Count() != 0)
+                {
+                    //Adicionar a extensão ao nome
+                    name += "." + extension[0];
+                }
+
+                criteria.ObjectName = name;
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));

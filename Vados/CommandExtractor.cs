@@ -19,6 +19,7 @@ namespace Vados
         public string ObjectAmount = "";     //Quantidade de objetos ("todos")
         public string ObjectNewName = "";    //Novo nome do objeto (ao renomear)
         public string Destination = "";      //Nome da pasta de destino
+        public string Origin = "";
     }
 
 
@@ -157,6 +158,75 @@ namespace Vados
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             MessageBox.Show("Objeto -> " + objectStr);
+        }
+    }
+
+
+    //Extrai o objeto (arquivo / pasta), seu nome e seu novo nome
+    public class NewNameExtractor : CriteriaExtractor
+    {
+        public NewNameExtractor(){}
+
+        public void Extract(string command, CommandCriteria criteria)
+        {
+            string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
+
+            string pattern = $@"\b(\s+(para|pra)\s({patternName}))";
+
+            //Checar se o padrão está no comando
+            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+
+            //Extrair argumentos
+            if (match.Success)
+            {
+                //Novo nome
+                criteria.ObjectNewName = match.Groups[3].Success ? match.Groups[3].Value :
+                                 match.Groups[4].Success ? match.Groups[4].Value :
+                                 match.Groups[5].Value;
+            }
+
+            string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Novo nome -> " + newNameStr);
+        }
+    }
+
+
+    //Extrai a pasta de origem
+    public class OriginExtractor : CriteriaExtractor
+    {
+        List<string> fromIndicators;
+        List<string> folders;
+        List<string> nominators;
+
+        public OriginExtractor(List<string> fromIndicators_, List<string> folders_, List<string> nominators_)
+        {
+            fromIndicators = fromIndicators_;
+            folders = folders_;
+            nominators = nominators_;
+        }
+
+        public void Extract(string command, CommandCriteria criteria)
+        {
+            string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
+            string patternFolder = string.Join("|", folders.Select(Regex.Escape));
+            string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
+            string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
+
+            string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
+
+            //Checar se o padrão está no comando
+            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+
+            //Extrair argumentos
+            if (match.Success)
+            {
+                criteria.Origin = match.Groups[5].Success ? match.Groups[5].Value :
+                                       match.Groups[6].Success ? match.Groups[6].Value :
+                                       match.Groups[7].Value; ;
+            }
+
+            string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Origem -> " + originStr);
         }
     }
 

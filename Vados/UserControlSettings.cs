@@ -91,11 +91,11 @@ namespace Vados
             string novoNome = txtNovoNome.Text;
             if (extension == "pasta")
             {
-                Comandos.RenomearPasta(nome, novoNome);
+                Comandos.RenomearPasta(nome, novoNome, "");
             }
             else
             {
-                Comandos.RenomearArquivo(nome, novoNome);
+                Comandos.RenomearArquivo(nome, novoNome, "");
             }
 
         }

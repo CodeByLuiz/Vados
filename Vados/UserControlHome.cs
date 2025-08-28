@@ -108,7 +108,8 @@ namespace Vados
             circleX = middleX - circleSize / 2;
             circleY = middleY - circleSize / 2;
 
-            circleY = Math.Clamp(circleY, 0, lblText.Location.Y + 15);
+            circleY = Math.Clamp((int)circleY, 0, lblText.Location.Y - (int)circleSize + 85);
+
 
             //Sombra do círculo
             int shadowOffset = 25;
@@ -226,7 +227,7 @@ namespace Vados
 
             lastCircleHovering = circleHovering;
 
-            //Aumentar tamanho do botão do microfone quando passar o mouse
+            //Diminuir  tamanho do botão do microfone quando passar o mouse
             PointF middle = new PointF(circleX + circleSize / 2, circleY + circleSize / 2);
             float distanceX = middle.X - mouseX;
             float distanceY = middle.Y - mouseY;
@@ -235,8 +236,8 @@ namespace Vados
             //Checar se o mouse está dentro do círculo
             if (distance <= circleSize / 2)
             {
-                //Aumentar tamanho do círculo
-                circleSizeTarget = circleSizeDefault * 1.1f;
+                //Diminuir tamanho do círculo
+                circleSizeTarget = circleSizeDefault * 0.9f;
             }
             else
             {
@@ -272,10 +273,9 @@ namespace Vados
             circleSize += (circleSizeTarget - circleSize) / 3;
 
             if (Math.Abs(circleSizeTarget - circleSize) < 1)
-            {
                 circleSize = circleSizeTarget;
-                return;
-            }
+                
+            
 
             pnlBottom.Invalidate();
         }
@@ -301,9 +301,9 @@ namespace Vados
 
 
             #region Ajustar botao mic
-            circleSizeDefault = Math.Min(this.Height - circleSize, 325);
+            circleSizeDefault = Math.Min(this.Height * 0.4f, 325);
             circleSizeTarget = circleSizeDefault;
-            circleSize = circleSizeDefault;
+            
 
 
 

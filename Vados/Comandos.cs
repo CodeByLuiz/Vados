@@ -11,6 +11,7 @@ using System.Reflection.Metadata;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Cryptography;
 using SHDocVw;
+using System.Runtime.InteropServices;
 
 namespace Vados
 {
@@ -579,7 +580,7 @@ namespace Vados
                                         //MessageBox.Show(arquivoSize.ToString());
                                         if (filtroSize(arquivoSize, criteriosize, caminho, pastaRoot))
                                         {
-                                            MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
+                                            MessageBox.Show("deu certo eu acho caminho: " + arquivoSize + " " + criteriosize);
                                             resultados.Add(caminho);
 
                                             if (varcontrole != null && varcontrole > 0)
@@ -788,12 +789,12 @@ namespace Vados
             return false;
         }
 
-<<<<<<< HEAD
+
         public static bool filtroSize(long arquivosize, long criteriosize, string arquivo, string pastaroot)
         {
-            MessageBox.Show(arquivosize.ToString());
+            //MessageBox.Show(arquivosize.ToString());
 
-            if ((arquivosize >= 0) && (arquivosize <= (criteriosize * 1.2)))
+            if ((arquivosize >= criteriosize * 0.8 && arquivosize <= criteriosize * 1.2))
             {
                 //MessageBox.Show(criteriosize.ToString() + ", " + arquivosize);
                 return true;
@@ -831,9 +832,6 @@ namespace Vados
 
             return tamanhoTotal;
         }
-
-=======
->>>>>>> 911f2f5171f47aebd5bc24f7dd2ea4dbfea2748d
         #endregion
           
 

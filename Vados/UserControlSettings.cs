@@ -152,7 +152,7 @@ namespace Vados
             }
             else
             {
-               foreach(var item in Comandos.SearchPaths("", true, criteriosize:20000))
+               foreach(var item in Comandos.SearchPaths("", true, criteriosize:8000))
                 {
                     listateste.Items.Add(item);
                 }

@@ -13,13 +13,14 @@ namespace Vados
 {
     public class CommandCriteria
     {
-        public string Action = "";           //Tipo de comando
-        public string ObjectType = "";       //Tipo de objeto (arquivo / pasta)
-        public string ObjectName = "";       //Nome do objeto
-        public string ObjectAmount = "";     //Quantidade de objetos ("todos")
-        public string ObjectNewName = "";    //Novo nome do objeto (ao renomear)
-        public string Destination = "";      //Nome da pasta de destino
-        public string Origin = "";
+        public string Action = "";          //Tipo de comando
+        public string ObjectType = "";      //Tipo de objeto (arquivo / pasta)
+        public string ObjectName = "";      //Nome do objeto
+        public string ObjectAmount = "";    //Quantidade de objetos ("todos")
+        public string ObjectNewName = "";   //Novo nome do objeto (ao renomear)
+        public string ObjectFormat = ""; //Formato do objeto (pode ser várias extensões)
+        public string Origin = "";          //Nome da pasta de origem 
+        public string Destination = "";     //Nome da pasta de destino
     }
 
 
@@ -131,6 +132,9 @@ namespace Vados
                 string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
                 criteria.ObjectType = obj;
 
+                //Formato do objeto
+                criteria.ObjectFormat = match.Groups[5].Value;
+
                 //Novo nome
                 criteria.ObjectNewName = match.Groups[13].Success ? match.Groups[13].Value :
                                  match.Groups[14].Success ? match.Groups[14].Value :
@@ -145,13 +149,6 @@ namespace Vados
                               match.Groups[11].Value;
 
                 if (stopWords.Contains(name.ToLower())) return; //Checar se o nome não é uma das palavras de parada
-
-                var extension = Comandos.WordGetExtensions(match.Groups[5].Value);
-                if (extension.Count() != 0)
-                {
-                    //Adicionar a extensão ao nome
-                    name += "." + extension[0];
-                }
 
                 criteria.ObjectName = name;
             }

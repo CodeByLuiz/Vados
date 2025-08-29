@@ -12,6 +12,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using SHDocVw;
+using System.Text.RegularExpressions;
+using System.IO;
 
 namespace Vados
 {
@@ -345,7 +347,7 @@ namespace Vados
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Quantidade: {arguments.ObjectAmount} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Origem: {arguments.Origin} - Destino: {arguments.Destination}");
+            MessageBox.Show($"Comando: {arguments.Action}\r\nObjeto: {arguments.ObjectType}\r\nFormato: {arguments.ObjectFormat}\r\nQuantidade: {arguments.ObjectAmount}\r\nNome: {arguments.ObjectName}\r\nNovo nome: {arguments.ObjectNewName}\r\nOrigem: {arguments.Origin}\r\nDestino: {arguments.Destination}");
             return arguments;
         }
 
@@ -356,21 +358,50 @@ namespace Vados
             string objectType = arguments.ObjectType;
             string name = arguments.ObjectName;
             string newName = arguments.ObjectNewName;
+            string format = arguments.ObjectFormat;
             string origin = arguments.Origin;
             string destination = arguments.Destination;
             string amount = arguments.ObjectAmount;
 
 
+            //Adicionar extensão ao nome
+            if (name != "")
+            {
+                var extension = Comandos.WordGetExtensions(format);
+                if (extension.Count() != 0)
+                {
+                    name += "." + extension[0];
+                }
+            }
+
+
             //Retorna os caminhos encontrados conforme os critérios
-            List<string> GetPaths(string name, string objectType, string amount, string folder)
+            List<string> GetPaths(string name, string objectType, string amountIndicator, string folder)
             {
                 //Buscar apenas um arquivo
-                if (amount == "") return SearchPaths(name, objectType == "pasta", 0, null, folder, 1).ToList();
+                if (amountIndicator == "") {
+                    return SearchPaths(name, objectType == "pasta", pastaRoot: folder, varcontrole: 1).ToList();
+                }
 
-                //Retornar quantidade especificada de caminhos
-                List<string> paths = SearchPaths(name, objectType == "pasta", 0, null, folder, null).ToList();
+                //Retornar todos os caminhos correspondentes
+                List<string> paths = new List<string>();
 
-                switch (amount)
+                if (name == "")
+                {
+                    //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
+                    foreach(string extension in Comandos.WordGetExtensions(format))
+                    {
+                        List<string> newPaths = SearchPaths("." + extension, objectType == "pasta", pastaRoot: folder, varcontrole: null).ToList();
+                        paths.AddRange(newPaths);
+                    }
+                }
+                else
+                {
+                    //Procura normal usando o nome
+                    paths = SearchPaths(name, objectType == "pasta", pastaRoot: folder, varcontrole: null).ToList();
+                }
+
+                switch (amountIndicator)
                 {
                     case "todos":
                         break;
@@ -500,7 +531,7 @@ namespace Vados
 
 
         #region BUSCA 
-          
+
         public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = "", int? varcontrole = 1, int[] data = null) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         {
 
@@ -549,22 +580,40 @@ namespace Vados
             };
 
             // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
-            if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
-            {
-                pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = Directory.GetDirectories(pastaRoot).Length;
-               
-                prioridades.Add(pastaRoot);
+            int? maxLength = varcontrole;
 
-            }
-            else if (!string.IsNullOrEmpty(pastaRoot) && comando == false)
-            {
-                
+            if (!string.IsNullOrEmpty(pastaRoot)) {
                 pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = Directory.GetFiles(pastaRoot).Length;
-               
-                prioridades.Add(pastaRoot);
+                if (string.IsNullOrEmpty(pastaRoot)) return null;
+                //Buscar apenas na pasta determinada
+                prioridades = new List<string>() { pastaRoot };
+
+                //Quantidade máxima a ser buscada
+                if (comando == true)
+                {
+                    //Pastas
+                    maxLength = Directory.GetDirectories(pastaRoot).Length;
+
+                }
+                else if (comando == false)
+                {
+                    //Arquivos
+                    maxLength = Directory.GetFiles(pastaRoot).Length;
+                }
             }
+
+            //Redefinir quantidade de caminhos a serem buscados
+            if (varcontrole != null)
+            {
+                varcontrole = Math.Min((int)varcontrole, (int)maxLength);
+            }
+            else
+            {
+                varcontrole = maxLength;
+            }
+
+            MessageBox.Show(varcontrole.ToString());
+
 
             var fila = new Queue<string>();
             foreach (var pasta in prioridades)
@@ -1018,6 +1067,8 @@ namespace Vados
         public static void RenomearArquivo(string nome, string novoNome, string pastaOrigem) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
             string path = SearchPaths(nome, false, pastaRoot:pastaOrigem).FirstOrDefault();
+            if (path == null) return;
+
             string novoPath = Path.Combine(Path.GetDirectoryName(path), novoNome);
 
             if (File.Exists(path))
@@ -1080,25 +1131,24 @@ namespace Vados
 
         public static void MoverArquivo(List<string> Pathnomes, string destino) 
         {
-            try
+            //nome = SearchPaths(nome, false).FirstOrDefault();
+            // SearchPaths(destino, true) + @"\" + nome + "." + ext;
+            foreach (string nome in Pathnomes)
             {
-                //nome = SearchPaths(nome, false).FirstOrDefault();
-                // SearchPaths(destino, true) + @"\" + nome + "." + ext;
-                foreach (string nome in Pathnomes)
+                try
                 {
                     MessageBox.Show("Nome do arquivo: " + Path.GetFileName(nome));
                     string destinoNovo = Path.Combine(destino,Path.GetFileName(nome));
                     if (File.Exists(destino))
                     {
                         MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        return;
                     }
                     File.Move(nome, destinoNovo);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
+                }
             }
 
             return;

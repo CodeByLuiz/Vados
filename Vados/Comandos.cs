@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using SHDocVw;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Globalization;
 
 namespace Vados
 {
@@ -49,7 +50,7 @@ namespace Vados
             { "construir", "criar" },
             { "construa", "criar" },
             { "fazer", "criar" },
-            { "faça", "criar" },
+            { "faca", "criar" },
             { "inventar", "criar" },
             { "invente", "criar" },
             { "dar a luz", "criar" },
@@ -89,7 +90,7 @@ namespace Vados
             { "anular", "excluir" },
             { "anule", "excluir" },
             { "desfazer", "excluir" },
-            { "desfaça", "excluir" },
+            { "desfaca", "excluir" },
             { "extinguir", "excluir" },
             { "extinga", "excluir" },
             { "obliterar", "excluir" },
@@ -453,6 +454,25 @@ namespace Vados
                     break;
                 
             }
+        }
+
+
+        //Remover acentos das palavras
+        public static string RemoveDiacritics(string text)
+        {
+            var normalizedStr = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedStr.EnumerateRunes())
+            {
+                var unicodeCategory = Rune.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
         #endregion

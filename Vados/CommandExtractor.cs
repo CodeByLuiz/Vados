@@ -76,7 +76,7 @@ namespace Vados
             string pattern = $@"^(({patternStarts})\s+)?({patternAction})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair comando
             if (match.Success)
@@ -123,7 +123,7 @@ namespace Vados
             string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?(\s+para\s({patternName}))?";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)
@@ -171,7 +171,7 @@ namespace Vados
             string pattern = $@"\b(\s+(para|pra)\s({patternName}))";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)
@@ -212,7 +212,7 @@ namespace Vados
             string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)
@@ -252,7 +252,7 @@ namespace Vados
             string pattern = $@"\b({patternInside})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)

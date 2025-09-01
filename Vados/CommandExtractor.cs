@@ -120,7 +120,7 @@ namespace Vados
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?(\s+para\s({patternName}))?";
+            string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -134,11 +134,6 @@ namespace Vados
 
                 //Formato do objeto
                 criteria.ObjectFormat = match.Groups[5].Value;
-
-                //Novo nome
-                criteria.ObjectNewName = match.Groups[13].Success ? match.Groups[13].Value :
-                                 match.Groups[14].Success ? match.Groups[14].Value :
-                                 match.Groups[15].Value;
 
                 //Quantidade
                 criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);

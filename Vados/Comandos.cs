@@ -116,6 +116,17 @@ namespace Vados
             { "movimente", "mover" },
             { "translocar", "mover" },
             { "transloque", "mover" },
+            //Duplicar
+            { "duplicar", "duplicar" },
+            { "duplique", "duplicar" },
+            { "copiar", "duplicar" },
+            { "copie", "duplicar" },
+            { "repetir", "duplicar" },
+            { "repita", "duplicar" },
+            { "reproduzir", "duplicar" },
+            { "reproduza", "duplicar" },
+            { "imitar", "duplicar" },
+            { "imite", "duplicar" },
         };
 
         //Todas as variações dos comandos
@@ -345,6 +356,16 @@ namespace Vados
                             new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
+
+
+                case "duplicar":
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
             }
 
             var arguments = parser.Parse(command);
@@ -452,7 +473,13 @@ namespace Vados
                     if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
                     if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
                     break;
-                
+
+                case "duplicar":
+                    paths = GetPaths(name, objectType, amount, origin);
+                    if (objectType == "pasta") { DuplicarPasta(paths, destinationPath); }
+                    if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
+                    break;
+
             }
         }
 
@@ -1175,13 +1202,13 @@ namespace Vados
         }
 
 
-        public static void DuplicarPasta(List<string> Pathnome, string destino)
+        public static void DuplicarPasta(List<string> paths, string destino)
         {
             try
             {
                 //nome = SearchPaths(nome, true).FirstOrDefault();
 
-                foreach (string nome in Pathnome)
+                foreach (string nome in paths)
                 {
                     string destinoNovo;
                     if (string.IsNullOrEmpty(destino))
@@ -1195,7 +1222,7 @@ namespace Vados
                     }
 
 
-                    MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
+                    //MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
                     if (Directory.Exists(destinoNovo))
                     {
                         MessageBox.Show("Já existe uma pasta com esse nome no destino.");
@@ -1244,16 +1271,18 @@ namespace Vados
                 foreach (string nome in Pathnomes)
                 {
                     string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
+                    MessageBox.Show(destinoNovo);
 
-                    if (File.Exists(destino))
+                    if (File.Exists(destinoNovo))
                     {
                         MessageBox.Show("Já existe um arquivo com esse nome no destino.");
                         return;
                     }
 
-                    File.Move(nome, destino);
+                    File.Copy(nome, destinoNovo, false);
                 }
 
+                OpenFileExplorer(destino, false);
             }
             catch (Exception ex)
             {

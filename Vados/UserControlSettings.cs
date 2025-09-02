@@ -152,17 +152,10 @@ namespace Vados
             }
             else
             {
-
-                //HashSet<string> porra = new HashSet<string>();
-                //porra = Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt");
-
-                //foreach (var x in Comandos.MultiSearch(SearchArquivo, "inferno 2", ".txt")) 
-                //{
-                //    listateste.Items.Add(x);
-                //}
-                //Task.Run(() => Comandos.MoverUnsArquivos(".txt", "Desktop", "pasta de coisa"));
-
-                
+               foreach(var item in Comandos.SearchPaths("", true, criteriosize:8000))
+                {
+                    listateste.Items.Add(item);
+                }
 
             }
         }

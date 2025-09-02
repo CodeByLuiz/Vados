@@ -8,37 +8,31 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection.Metadata;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Security.Cryptography;
+using SHDocVw;
+using System.Runtime.InteropServices;
 
 namespace Vados
 {
     internal class Comandos
     {
+        #region FUNÇÕES DO WINDOWS
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        #endregion
+
+
         #region TEXTO PARA COMANDO
 
         #region DICIONÁRIOS / LISTAS
 
-        //Funções das palavras
-        public enum WordType
-        {
-            Command,
-            Object,
-            Connector,  //Não será mais necessário
-            Value,
-        };
-
-        static Dictionary<string, WordType> wordTypes = new Dictionary<string, WordType>(StringComparer.OrdinalIgnoreCase)
-        {
-            //Comandos
-            { "criar", WordType.Command },
-            { "renomear", WordType.Command },
-            { "excluir", WordType.Command },
-            { "mover", WordType.Command },
-            { "duplicar", WordType.Command },
-            //Objetos
-            { "pasta", WordType.Object },
-            { "arquivo", WordType.Object },
-        };
-
+        //Sinonimo chave de cada variação dos comandos
         static Dictionary<string, string> commandSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             //Criar
@@ -54,6 +48,12 @@ namespace Vados
             { "construa", "criar" },
             { "fazer", "criar" },
             { "faça", "criar" },
+            { "inventar", "criar" },
+            { "invente", "criar" },
+            { "dar a luz", "criar" },
+            { "de a luz", "criar" },
+            { "originar", "criar" },
+            { "origine", "criar" },
             //Renomear
             { "renomear", "renomear" },
             { "renomeie", "renomear" },
@@ -65,6 +65,10 @@ namespace Vados
             { "mude o nome", "renomear" },
             { "trocar o nome", "renomear" },
             { "troque o nome", "renomear" },
+            { "modificar o nome", "renomear" },
+            { "modifique o nome", "renomear" },
+            { "substituir o nome", "renomear" },
+            { "substitua o nome", "renomear" },
             //Excluir
             { "excluir", "excluir" },
             { "exclua", "excluir" },
@@ -76,6 +80,18 @@ namespace Vados
             { "remova", "excluir" },
             { "eliminar", "excluir" },
             { "elimine", "excluir" },
+            { "destruir", "excluir" },
+            { "destrua", "excluir" },
+            { "quebrar", "excluir" },
+            { "quebre", "excluir" },
+            { "anular", "excluir" },
+            { "anule", "excluir" },
+            { "desfazer", "excluir" },
+            { "desfaça", "excluir" },
+            { "extinguir", "excluir" },
+            { "extinga", "excluir" },
+            { "obliterar", "excluir" },
+            { "oblitere", "excluir" },
             //Mover
             { "mover", "mover" },
             { "mova", "mover" },
@@ -93,11 +109,52 @@ namespace Vados
             { "transporte", "mover" },
             { "enviar", "mover" },
             { "envie", "mover" },
+            { "movimentar", "mover" },
+            { "movimente", "mover" },
+            { "translocar", "mover" },
+            { "transloque", "mover" },
         };
 
+        //Todas as variações dos comandos
+        public static List<string> allCommands = new List<string>(commandSynonyms.Keys);
+
+
+        //Todas as variações de pasta
+        public static List<string> folderWords = new List<string>()
+        {
+            "pasta", "pastas", "diretorio", "diretorios"
+        };
+
+        //Sinonimos chave de cada sinônimo dos objetos (pasta / arquivo)
+        static Dictionary<string, string> objectSynonyms = new Dictionary<string, string>()
+        {
+            { "pastas", "pasta" },
+            { "pasta", "pasta" },
+            { "diretorios", "pasta" },
+            { "diretorio", "pasta" },
+            { "arquivos", "arquivo" },
+            { "arquivo", "arquivo" },
+            { "documentos", "arquivo" },
+            { "documento", "arquivo" },
+        };
+
+        //Todas as variações de objetos (pasta / arquivo)
+        public static List<string> allObjects = new List<string>(objectSynonyms.Keys);
+
+        //Todos os sinônimos
+        static Dictionary<string, string> currentSynonyms = commandSynonyms.Concat(objectSynonyms).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        static Dictionary<string, string> wordSynonyms = new Dictionary<string, string>(currentSynonyms)
+        {
+            { "todos", "todos" },
+            { "todos os", "todos" },
+            { "metade dos", "metade" },
+        };
+
+
+        //Extensões relacionadas as palavras
         static Dictionary<string, List<string>> wordExtensions = new Dictionary<string, List<string>>()
         {
-            //Criar
             { "texto", new List<string>() { "txt", "doc", "docx", "rtf", "odt", "md" } },
             { "imagem", new List<string>() { "png", "jpg", "jpeg", "bmp", "ico" } },
             { "video", new List<string>() { "mp4", "avi", "mov" } },
@@ -112,46 +169,93 @@ namespace Vados
             { "excel", new List<string>() { "xls", "xlsx" } },
         };
 
-        static List<string> wordGroups = new List<string>()
+        //Todas as palavras que indicam extensões
+        public static List<string> allExtensionsWords = new List<string>(wordExtensions.Keys);
+
+
+        //Formas de começar o comando
+        public static List<string> startWords = new List<string>()
         {
-            "com o nome",
-            "com nome",
-            "de nome",
-            "com o titulo",
-            "com titulo",
-            "de titulo",
-            "mudar o nome",
-            "mude o nome",
-            "trocar o nome",
-            "troque o nome",
-            "alterar o nome",
-            "altere o nome",
+            "quero",
+            "eu quero",
+            "quero que",
+            "eu quero que",
+            "quero que voce",
+            "eu quero que voce",
+            "por favor",
+            "por obsequio",
+            "por gentileza",
+        };
+
+        //Formas de indicar a pasta de criação (comando criar)
+        public static List<string> destinationWords = new List<string>()
+        {
+            "na",
+            "no",
             "dentro da",
-            "power point"
+            "dentro do",
+            "com origem na",
+            "com origem no",
+            "com destino na",
+            "com destino no",
+        };
+
+        //Formas de indicar a pasta de destino (comando mover)
+        public static List<string> insideWords = new List<string>()
+        {
+            "na",
+            "no",
+            "pra",
+            "pro",
+            "para a",
+            "para o",
+            "pra dentro da",
+            "pra dentro do",
+            "para dentro da",
+            "para dentro do",
+            "pra o interior da",
+            "pra o interior do",
+            "para o interior da",
+            "para o interior do",
+        };
+
+        //Formas de nomear o arquivo / pasta
+        public static List<string> namingWords = new List<string>()
+        {
+            "chamado",
+            "chamada",
+            "nomeado",
+            "nomeada",
+            "denominado",
+            "denominada",
+            "intitulado",
+            "intitulada",
+            "de nome",
+            "de titulo",
+            "com nome",
+            "com titulo",
+            "com o nome",
+            "com o titulo",
+        };
+
+        //Formas de indicar a quantidade de arquivos / pastas
+        public static List<string> amountWords = new List<string>()
+        {
+            "todos",
+            "todos os",
+            "metade dos",
         };
 
 
-        public static WordType WordGetType(string word)
+        public static string WordGetSynonym(string word)
         {
-            if (wordTypes.TryGetValue(word, out WordType result))
-            {
-                return result;
-            }
-
-            return WordType.Value;
-        }
-
-
-        public static string CommandGetSynonym(string command)
-        {
-            if (commandSynonyms.TryGetValue(command, out string synonym))
+            if (wordSynonyms.TryGetValue(word, out string synonym))
             {
                 return synonym;
             }
 
             return "";
         }
-
 
         public static List<string> WordGetExtensions(string word)
         {
@@ -166,368 +270,119 @@ namespace Vados
         #endregion
 
 
-        //Retorna a ordem de palavras necessárias para realizar o comando
-        public static List<List<object>> CommandGetWordOrder(string command)
+        public static CommandCriteria CommandGetArguments(string command)
         {
-            //Lista de palavras para indicar o nome do arquivo/pasta
-            List<string> namingConnectors = new List<string>() { "chamada", "chamado", "nomeado", "nomeada", "de nome", "com o nome", "com nome", "de titulo", "com o titulo", "com titulo", "denominado", "denominada", "intitulado", "intitulada", "" };
-            //Indica a pasta de destino
-            List<string> dentro = new List<string>() { "na", "dentro da" };
-            //Palavras específicas
-            List<string> pasta = new List<string>() { "pasta" };
-            List<string> para = new List<string>() { "para" };
-            List<string> de = new List<string>() { "de" };
+            CommandCriteria criteria = new CommandCriteria();
 
-            switch (command)
+            //Definir tipo de comando
+            ActionExtractor actionExtractor = new ActionExtractor(Comandos.startWords, Comandos.allCommands);
+            actionExtractor.Extract(command, criteria);
+
+
+            //Extrair argumentos para cada tipo de comando
+            CommandParser parser = new CommandParser(criteria, new List<CriteriaExtractor>());
+
+            switch (criteria.Action)
             {
                 case "criar":
-                    return new List<List<object>>() {
-                        /* ---- SITUAÇÕES ----
-                        0.0 -> sem extensão, sem pasta de destino
-                        0.1 -> sem extensão, pasta de destino
-                        1.0 -> extensão, sem pasta de destino
-                        1.0 -> extensão, pasta de destino
-                        */
-
-                        new List<object>() { 1.1, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
-                        new List<object>() { 1.0, WordType.Object, de, WordType.Value, namingConnectors, WordType.Value },
-                        new List<object>() { 0.1, WordType.Object, namingConnectors, WordType.Value, dentro, pasta, namingConnectors, WordType.Value },
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
 
                 case "renomear":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, para, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                        });
+                    break;
 
                 case "excluir":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value },
-                    };
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                        });
+                    break;
 
                 case "mover":
-                    return new List<List<object>>()
-                    {
-                        new List<object>() { 0.0, WordType.Object, namingConnectors, WordType.Value, new List<string>() { "para", "dentro da" }, pasta, namingConnectors, WordType.Value },
-                    };
-
-
-                //Lista vazia se não identificar o comando
-                default:
-                    return new List<List<object>>();
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
             }
+
+            var arguments = parser.Parse(command);
+            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Quantidade: {arguments.ObjectAmount} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Destino: {arguments.Destination}");
+            return arguments;
         }
 
 
-        public static void ExecuteCommand(List<string> arguments)
+        public static void ExecuteCommand(CommandCriteria arguments)
         {
-            double situation = Convert.ToDouble(arguments[0]);
-            int mainSituation = (int)(Math.Floor(situation));
-            int subSituation = (int)((situation - mainSituation) * 10);
-            MessageBox.Show(mainSituation.ToString() + "." + subSituation.ToString());
+            string commandType = arguments.Action;
+            string objectType = arguments.ObjectType;
+            string name = arguments.ObjectName;
+            string newName = arguments.ObjectNewName;
+            string destination = arguments.Destination;
+            string amount = arguments.ObjectAmount;
 
-            string obj = arguments[2];
-            string name = arguments[3];
-            List<string> paths;
+            //Definir caminhos
+            List<string> namePath = new List<string>();
+            string destinationPath = "";
 
-            switch (arguments[1])
+            if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
+
+
+            //Identificar quantidade de objetos afetados
+            int GetAmount(int totalAmount, string modifier)
             {
+                switch(modifier)
+                {
+                    case "":
+                        return 1;
+                    case "todos":
+                        return totalAmount;
+                    case "metade":
+                        return (int)Math.Ceiling((decimal)totalAmount / 2);
+                }
+                
+                return 1;
+            }
+
+
+            //Realizar comando
+            switch (commandType)
+            {
+                //Criar
                 case "criar":
-                    if (obj == "pasta") { CriarPasta(name, ""); }
-                    if (obj == "arquivo")
-                    {
-                        string fileName = name;
-                        string destinyFolder = "";
-
-                        //Quando o formato do arquivo está por extenso (ex: "arquivo de texto")
-                        if (mainSituation == 1)
-                        {
-                            fileName = arguments[4];
-
-                            //Definir extensão
-                            string extensionWord = arguments[3];
-                            List<string> extensions = WordGetExtensions(extensionWord);
-                            if (extensions.Count != 0)
-                            {
-                                fileName += "." + WordGetExtensions(extensionWord)[0];
-                            }
-                        }
-
-                        //Pasta de destino
-                        if (subSituation == 1)
-                        {
-                            destinyFolder = arguments.Last();
-                        }
-
-                        MessageBox.Show(destinyFolder);
-                        CriarArquivo(fileName, destinyFolder);
-                    }
+                    if (objectType == "pasta") { CriarPasta(name, destination); }
+                    if (objectType == "arquivo") { CriarArquivo(name, destination); }
                     break;
 
-
+                //Renomear
                 case "renomear":
-                    string oldName = arguments[3];
-                    string newName = arguments[4];
-
-                    if (obj == "pasta") { RenomearPasta(oldName, newName); }
-                    if (obj == "arquivo") { RenomearArquivo(oldName, newName); }
+                    if (objectType == "pasta") { RenomearPasta(name, newName); }
+                    if (objectType == "arquivo") { RenomearArquivo(name, newName); }
                     break;
 
                 case "excluir":
-                    paths = SearchPaths(name, obj == "pasta").ToList();
-
-                    if (obj == "pasta") { ExcluirPasta(paths); }
-                    if (obj == "arquivo") { ExcluirArquivo(paths); }
+                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
+                    if (objectType == "pasta") { ExcluirPasta(namePath); }
+                    if (objectType == "arquivo") { ExcluirArquivo(namePath); }
                     break;
 
                 
                 case "mover":
-                    string destiny = arguments[4];
-                    string destinyPath = SearchPaths(destiny, true).FirstOrDefault();
-                    paths = SearchPaths(name, obj == "pasta").ToList();
-
-                    if (obj == "pasta") { MoverPasta(paths, destiny); }
-                    if (obj == "arquivo") { MoverArquivo(paths, destinyPath); }
+                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
+                    if (objectType == "pasta") { MoverPasta(namePath, destinationPath); }
+                    if (objectType == "arquivo") { MoverArquivo(namePath, destinationPath); }
                     break;
                 
             }
-        }
-
-
-        public static List<string> ValidateCommand(List<string> words)
-        {
-            string command = "";
-            List<string> arguments = new List<string>();
-            List<List<object>> orderList = null;
-            int startIndex = 0;
-
-            //Definir comando
-            for (int i = 0; i < words.Count; i++)
-            {
-                string word = words[i].ToLower();
-                string possibleCommand = CommandGetSynonym(word);
-                WordType type = WordGetType(possibleCommand);
-
-                //Definir comando
-                if (type == WordType.Command)
-                {
-                    command = possibleCommand;
-                    orderList = CommandGetWordOrder(command);
-                    startIndex = i + 1;
-                    break;
-                }
-            }
-
-            //Retornar nulo se não for nenhum comando
-            if (command == "") return null;
-
-
-            //Checar todas as ordens de palavras aceitas pelo comando
-            for (int i = 0; i < orderList.Count; i++)
-            {
-                List<object> typeOrder = orderList[i];
-                int typeIndex = 1;  //Pular primeiro elemento, que indica a situação do comando
-
-                //Adicionar situação e commando nos argumentos
-                arguments.Clear();
-                double commandSituation = (double)(typeOrder[0]);
-                arguments.Add(commandSituation.ToString());
-                arguments.Add(command);
-
-                int j = startIndex;
-
-                //Checar se o comando possui todas as palavras necessárias
-                for (j = startIndex; j < words.Count; j++)
-                {
-                    if (typeIndex >= typeOrder.Count) break;    //Parar se tiver mais palavras que o esperado
-
-                    string word = words[j].ToLower();
-                    var expected = typeOrder[typeIndex];
-
-                    //Se for tipo de palavra
-                    if (expected is WordType)
-                    {
-                        WordType actualType = WordGetType(word);
-
-                        if (actualType == (WordType)expected)
-                        {
-                            //Definir argumentos pro comando
-                            if (actualType == WordType.Object || actualType == WordType.Value)
-                            {
-                                arguments.Add(word);
-                            }
-
-                            typeIndex += 1;
-                            continue;
-                        }
-
-                    }
-
-                    //Se for palavra específica aceita
-                    if (expected is List<string>)
-                    {
-                        List<string> list = (List<string>)expected;
-                        bool containsWord = list.Contains(word);
-
-                        //Seguir para a próxima palavra se a atual estiver na lista
-                        if (containsWord)
-                        {
-                            typeIndex += 1;
-                        }
-
-                        //Checar a mesma palavra mas com o próximo tipo esperado (caso não esteja na lista, que não é obrigatória)
-                        if (!containsWord && list.Contains(""))
-                        {
-                            j -= 1;
-                            typeIndex += 1;
-                        }
-                    }
-                }
-
-
-                //Retornar argumentos se o comando estiver correto
-                if (typeIndex == typeOrder.Count && j == words.Count)
-                {
-                    return arguments;
-                }
-            }
-
-            return null;
-        }
-
-
-        public static List<string> IdentifyWordGroups(List<string> words)
-        {
-            List<string> newWords = new List<string>();
-
-            //Para cada palavra de determinada lista
-            for (int i = 0; i < words.Count(); i++)
-            {
-                string temporaryWord = "";
-                int wordCount = 0;
-
-                for (int j = 0; j < wordGroups.Count(); j++)
-                {
-                    string actualWordGroup = wordGroups[j];
-                    List<string> groupSeparateWords = actualWordGroup.Split(" ").ToList();
-                    wordCount = groupSeparateWords.Count;
-
-                    //Checar se formam um grupo conhecido
-                    for (var k = 0; k < groupSeparateWords.Count; k++)
-                    {
-                        string wordToCheck = words[i + k];
-
-                        //Parar de juntar as palavras se alguma não fizer parte do grupo
-                        if (groupSeparateWords[k] != wordToCheck)
-                        {
-                            temporaryWord = "";
-                            break;
-                        }
-
-                        //Juntar palavras
-                        temporaryWord += wordToCheck;
-
-                        if (k != groupSeparateWords.Count - 1)
-                        {
-                            //Adicionar espaço entre as palavras
-                            temporaryWord += " ";
-                        }
-                    }
-
-                    //Parar de checar outros grupos de palavras se já encontrar um
-                    if (temporaryWord != "")
-                    {
-                        break;
-                    }
-                }
-
-                //Adicionar grupo à nova lista (como uma única palavra)
-                if (temporaryWord != "")
-                {
-                    newWords.Add(temporaryWord);
-                    i += wordCount - 1;
-                }
-                //Adicionar palavra única à nova lista caso não seja um grupo
-                else
-                {
-                    newWords.Add(words[i]);
-                }
-            }
-
-            return newWords;
-        }
-
-
-        public static List<string> SeparateWords(string str)
-        {
-            var words = new List<string>();
-            if (str == "") return words;
-
-            char[] separators = { ' ', ',' };
-            char[] charList = str.ToCharArray();
-            char namer = '\0';
-
-            string currentWord = "";
-
-            for (var i = 0; i < charList.Length; i++)
-            {
-                char c = charList[i];
-                bool breakWord = false;
-
-                //Checar se o caractere é um nomeador   (junta palavras que estão entre eles)
-                if (c == '\"' || c == '\'')
-                {
-                    //Fechar junção
-                    if (c == namer)
-                    {
-                        namer = '\0';
-                        continue;
-                    }
-
-                    //Iniciar junção
-                    namer = c;
-                    continue;
-                }
-
-                //Checar se o caractere é um separador
-                if (namer == '\0')
-                {
-                    for (var j = 0; j < separators.Length; j++)
-                    {
-                        char s = separators[j];
-
-                        if (c == s)
-                        {
-                            breakWord = true;
-                            break;
-                        }
-                    }
-                }
-
-                //Adicionar caractere à palavra
-                if (breakWord == false)
-                {
-                    currentWord += c;
-                    continue;
-                }
-
-                //Ir para a próxima palavra (se o caractere for um separador)
-                if (currentWord != "")  //Ignorar palavras vazias
-                {
-                    words.Add(currentWord);
-                    currentWord = "";
-                }
-            }
-
-            //Adicionar última palavra
-            if (currentWord != "")
-            {
-                words.Add(currentWord);
-            }
-
-            return words;
         }
 
         #endregion
@@ -550,274 +405,64 @@ namespace Vados
         }
 
 
-        public static void AbrirGerenciador(string path)
+        public static void OpenFileExplorer(string path, bool forceOpen)
         {
-            //Comando pra abrir o gerenciador depois de realizar uma função
             path = Path.GetDirectoryName(path);
-            if (Directory.Exists(path))
+
+            //Função para abrir o gerenciador
+            void OpenNewWindow(string path)
             {
-                Process.Start("explorer.exe", path);
+                if (Directory.Exists(path))
+                {
+                    Process.Start("explorer.exe", path);
+                }
             }
+
+            //Abrir nova janela forçadamente
+            if (forceOpen)
+            {
+                OpenNewWindow(path);
+                return;
+            }
+
+
+           //Janelas abertas do explorador de arquivos (+ internet explorer)
+           ShellWindows shellWindows = new ShellWindows();
+
+           foreach(InternetExplorer window in shellWindows)
+           {
+                string filename = Path.GetFileNameWithoutExtension(window.FullName).ToLower();
+
+                //Checar se é mesmo o explorador de arquivos, e não o internet explorer
+                if (filename == "explorer")
+                {
+                    string openPath = new Uri(window.LocationURL).LocalPath;
+
+                    //Checar se está aberto no caminho correto
+                    if (path == openPath)
+                    {
+                        //Abrir janela (focalizar)
+                        IntPtr windowHandle = (IntPtr)window.HWND;
+                        int SW_RESTORE = 9; //Valor da api do windows que significa restaurar a janela (caso minimizada ou em tela cheia)
+
+                        ShowWindow(windowHandle, SW_RESTORE);
+                        SetForegroundWindow(windowHandle);
+
+                        return;
+                    
+                    }
+                }
+           }
+
+
+            //Abrir nova janela se não encontrar nenhuma aberta
+            OpenNewWindow(path);
         }
 
 
-        #region FUNÇÃO TESTE
-
-        //public static HashSet<string> funcaoteste(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = null, int? varcontrole = 1) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
-        //{
-
-        //    // PRA QUE SERVE CADA PARÂMETRO:
-
-        //    // aprocurar: o nome do arquivo ou pasta que você quer procurar
-        //    // comando: se for TRUE, ele procura por pastas, se for FALSE, ele procura por arquivos
-        //    // criteriosize: se for diferente de 0, ele procura por arquivos com tamanho próximo ao valor especificado
-        //    // criterio2: é um segundo critério de busca, se for especificado, ele procura por arquivos que contenham esse critério no nome
-        //    // pastaRoot: é a pasta aonde ele vai procurar, se for nulo, ele procura em todas as pastas do computador
-        //    // varcontrole: é um controle de quantas pastas ou arquivos ele vai procurar, se for nulo, ele procura em todas as pastas ou arquivos
-
-        //    string root = driveverifica(null);
-        //    var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        //    var resultados = new HashSet<string>();
-        //    var ignorar = new List<string> // lista de pastas que serão ignoradas na busca
-        //    {
-        //        "$RECYCLE.BIN",
-        //        "System Volume Information",
-        //        "Recovery",
-        //        "Config.Msi",
-        //        "Windows",
-        //        "Program Files (x86)",
-        //        "Program Files"
-        //    };
-
-        //    var prioridades = new List<string> // lista de pastas que serão priorizadas na busca
-        //    {
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-        //        Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-        //        //Path.Combine(root, @"Users\"+Environment.UserName+@""),
-
-        //        Path.Combine(root),
-        //    };
-
-        //    // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
-        //    if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
-        //    {
-        //        pastaRoot = funcaoteste(pastaRoot, true).FirstOrDefault();
-        //        varcontrole = null;//Directory.GetDirectories(pastaRoot).Length;
-        //        MessageBox.Show(aprocurar);
-        //        prioridades.Add(pastaRoot);
-
-        //    }
-        //    else if (!string.IsNullOrEmpty(pastaRoot) && comando == false)
-        //    {
-        //        MessageBox.Show("antes pasta "+pastaRoot+" aprocurar: "+aprocurar);
-        //        pastaRoot = funcaoteste(pastaRoot, true).FirstOrDefault();
-        //        varcontrole = null;//Directory.GetFiles(pastaRoot).Length;
-        //        MessageBox.Show("de pasta " + pastaRoot + " aprocurar: " + aprocurar);
-        //        prioridades.Add(pastaRoot);
-        //    }
-
-        //    var fila = new Queue<string>();
-        //    foreach (var pasta in prioridades)
-        //    {
-        //        if (Directory.Exists(pasta))
-        //        {
-        //            fila.Enqueue(pasta);
-
-        //        }
-        //    }
-
-        //    while (fila.Count > 0)
-        //    {
-        //        var atual = fila.Dequeue();// remove o primeiro elemento da fila e o retorna
-        //        try
-        //        {
-        //            switch (comando)
-        //            {
-        //                case true:
-
-
-
-        //                    foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
-        //                    {
-        //                        string nomePasta = Path.GetFileName(caminho); // pega o nome da pasta atual a partir do caminho completo
-
-        //                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-        //                            continue;
-
-        //                        if (visitados.Add(caminho)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
-        //                        {
-
-        //                            //fila.Enqueue(caminho);
-        //                            InserirNoInicio(fila, caminho); // insere o caminho atual no inicio da fila
-        //                            FileInfo caminhoinfo = new FileInfo(caminho); // cria um objeto FileInfo a partir do caminho atual para pegar suas informaões
-
-        //                            // adicionam o caminho atual ou o caminho completo a lista de resultados
-
-        //                            if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
-        //                            {
-        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
-        //                                MessageBox.Show(caminho + " situação 3 " + aprocurar);
-        //                                resultados.Add(caminho);
-
-        //                                if (varcontrole != null && varcontrole > 0)
-        //                                {
-        //                                    varcontrole -= 1;
-        //                                }
-
-        //                            }else if (caminho.Contains(aprocurar) && atual.Contains(aprocurar)) // caso o caminho desejado seja o caminho atual, ele o retorna
-        //                            {
-        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
-        //                                MessageBox.Show(atual + " situação 1 " + aprocurar);
-        //                                resultados.Add(atual);
-
-        //                                if (varcontrole != null && varcontrole > 0)
-        //                                {
-        //                                    varcontrole -= 1;
-        //                                }
-
-        //                            }
-        //                            else if (caminho.Contains(aprocurar)) // caso o caminho desejado esteja dentro do caminho atual, ele o retorna
-        //                            {
-        //                                MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
-        //                                MessageBox.Show(caminho + " situação 2 " + aprocurar);
-        //                                resultados.Add(caminho);
-
-        //                                if (varcontrole != null && varcontrole > 0)
-        //                                {
-        //                                    varcontrole -= 1;
-        //                                }
-
-        //                            }
-                                   
-
-
-        //                            if (varcontrole != null && varcontrole <= 0) // se todas as pastas dentro da pastaRoot forem visitadas, elas são retornadas
-        //                            {
-        //                                MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
-
-        //                                return resultados;
-        //                            }
-
-        //                        }
-        //                    }
-
-        //                    break;
-        //                case false:
-
-
-
-        //                    foreach (var arquivo in Directory.GetFiles(atual)) // percorre todos os arquivos dentro da pasta atual
-        //                    {
-
-        //                        FileInfo caminhoinfo = new FileInfo(arquivo); // mesma coisa do bglh de pasta
-        //                        if (visitados.Add(arquivo)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
-        //                        {
-        //                            if (criteriosize != 0) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
-        //                            {
-        //                                if (caminhoinfo.Length >= criteriosize * 0.8 && caminhoinfo.Length <= criteriosize * 1.2)
-        //                                {
-        //                                    MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
-        //                                    resultados.Add(arquivo);
-
-        //                                    if (varcontrole != null && varcontrole > 0)
-        //                                    {
-        //                                        varcontrole -= 1;
-        //                                    }
-
-        //                                }
-        //                            }
-        //                            else
-        //                            {
-        //                                if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta root
-        //                                {
-        //                                    MessageBox.Show($"Arquivo encontrado pr: {arquivo}");
-        //                                    resultados.Add(arquivo);
-
-        //                                    if (varcontrole != null && varcontrole > 0)
-        //                                    {
-        //                                        varcontrole -= 1;
-        //                                    }
-
-
-        //                                }
-        //                                else if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
-        //                                {
-        //                                    MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
-        //                                    resultados.Add(arquivo);
-
-        //                                    if (varcontrole != null && varcontrole > 0)
-        //                                    {
-        //                                        varcontrole -= 1;
-        //                                    }
-
-
-        //                                }
-        //                            }
-        //                            if (varcontrole != null && varcontrole <= 0)
-        //                            {
-        //                                MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
-        //                                return resultados;
-        //                            }
-
-        //                        }
-        //                    }
-
-
-        //                    foreach (var caminho in Directory.GetDirectories(atual)) // percorre todas as pastas dentro da pasta atual
-        //                    {
-        //                        string nomePasta = Path.GetFileName(caminho);
-        //                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
-        //                            continue;
-
-        //                        //fila.Enqueue(caminho);
-
-
-        //                        if (visitados.Add(caminho))
-        //                        {
-        //                            Comandos.InserirNoInicio(fila, caminho);
-        //                        }
-
-        //                    }
-
-        //                    break;
-        //            }
-
-                    
-
-
-        //        }
-
-        //        catch (Exception)
-        //        {
-
-        //        }
-        //    }
-        //    if (resultados != null)
-        //    {
-        //        MessageBox.Show("bolete");
-        //        return resultados;
-        //    }
-        //    MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-        //    return null;
-        //}
-
-
-        #endregion
-
-
-        public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = null, int? varcontrole = 1) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        #region busca 
+          
+        public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = "", int? varcontrole = 1, int[] data = null) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         {
 
             // PRA QUE SERVE CADA PARÂMETRO:
@@ -868,7 +513,7 @@ namespace Vados
             if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
             {
                 pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = null;//Directory.GetDirectories(pastaRoot).Length;
+                varcontrole = Directory.GetDirectories(pastaRoot).Length;
                
                 prioridades.Add(pastaRoot);
 
@@ -877,7 +522,7 @@ namespace Vados
             {
                 
                 pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = null;//Directory.GetFiles(pastaRoot).Length;
+                varcontrole = Directory.GetFiles(pastaRoot).Length;
                
                 prioridades.Add(pastaRoot);
             }
@@ -918,8 +563,36 @@ namespace Vados
                                     FileInfo caminhoinfo = new FileInfo(caminho); // cria um objeto FileInfo a partir do caminho atual para pegar suas informaões
 
                                     // adicionam o caminho atual ou o caminho completo a lista de resultados
+                                    if (data!= null && caminho!=pastaRoot && filtroData(caminho, caminhoinfo, data, pastaRoot))
+                                    {
+                                        MessageBox.Show(caminhoinfo.Directory.Parent.ToString() + ", aaaaaaaaaaaaaa");
 
-                                    if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
+                                        resultados.Add(caminho);
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+                                        
+                                    }
+                                    else if (criteriosize != 0 && caminho!=pastaRoot) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+                                    {
+                                        long arquivoSize = getFolderSize(caminho, criterio: criteriosize);
+                                        //MessageBox.Show(arquivoSize.ToString());
+                                        if (filtroSize(arquivoSize, criteriosize, caminho, pastaRoot))
+                                        {
+                                            MessageBox.Show("deu certo eu acho caminho: " + arquivoSize + " " + criteriosize);
+                                            resultados.Add(caminho);
+
+                                            if (varcontrole != null && varcontrole > 0)
+                                            {
+                                                varcontrole -= 1;
+                                            }
+
+                                        }
+
+
+                                    }
+                                    else if (!string.IsNullOrEmpty(pastaRoot) && caminho.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && caminho.Contains(pastaRoot)) // retorna o caminho atual caso ele contenha o caminho desejado e a pastaroot
                                     {
                                         //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
                                         //MessageBox.Show(caminho + " situação 3 " + aprocurar);
@@ -931,7 +604,7 @@ namespace Vados
                                         }
 
                                     }
-                                    else if (caminho.Contains(aprocurar) && atual.Contains(aprocurar)) // caso o caminho desejado seja o caminho atual, ele o retorna
+                                    else if (caminho.Contains(aprocurar) && !string.IsNullOrEmpty(aprocurar) && atual.Contains(aprocurar)) // caso o caminho desejado seja o caminho atual, ele o retorna
                                     {
                                         //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
                                         //MessageBox.Show(atual + " situação 1 " + aprocurar);
@@ -943,7 +616,7 @@ namespace Vados
                                         }
 
                                     }
-                                    else if (caminho.Contains(aprocurar)) // caso o caminho desejado esteja dentro do caminho atual, ele o retorna
+                                    else if (caminho.Contains(aprocurar) && !string.IsNullOrEmpty(aprocurar)) // caso o caminho desejado esteja dentro do caminho atual, ele o retorna
                                     {
                                         //MessageBox.Show($"Foram encontrados d {visitados.Count} caminhos de pastas.");
                                         //MessageBox.Show(caminho + " situação 2 " + aprocurar);
@@ -977,54 +650,56 @@ namespace Vados
                                 FileInfo caminhoinfo = new FileInfo(arquivo); // mesma coisa do bglh de pasta
                                 if (visitados.Add(arquivo)) // adiciona o caminho atual ao conjunto de visitados se ja nao tiver sido visitado
                                 {
-                                    if (criteriosize != 0) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
+                                    if (criteriosize != 0 && filtroSize(caminhoinfo.Length,criteriosize,arquivo,pastaRoot)) // compara o tamanho do arquivo, ainda tem coisa pra mudar depois
                                     {
-                                        if (caminhoinfo.Length >= criteriosize * 0.8 && caminhoinfo.Length <= criteriosize * 1.2)
+                                        MessageBox.Show("deu erradopracacete eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
+                                        resultados.Add(arquivo);
+
+                                        if (varcontrole != null && varcontrole > 0)
                                         {
-                                            //MessageBox.Show("deu certo eu acho caminho: " + caminhoinfo.Length + " " + criteriosize);
-                                            resultados.Add(arquivo);
+                                            varcontrole -= 1;
+                                        }
+                                        
+                                    }
+                                    else if (data!=null && filtroData(arquivo, caminhoinfo, data, pastaRoot))
+                                    {
+                                        
+                                        resultados.Add(arquivo);
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
+                                        }
+                                        
+                                    }
 
-                                            if (varcontrole != null && varcontrole > 0)
-                                            {
-                                                varcontrole -= 1;
-                                            }
+                                    else if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot, StringComparison.OrdinalIgnoreCase)) // retorna o arquivo desejado que esta dentro da pasta root
+                                    {
+                                        //MessageBox.Show($"Arquivo encontrado pr: {arquivo}");
+                                        resultados.Add(arquivo);
 
+                                        if (varcontrole != null && varcontrole > 0)
+                                        {
+                                            varcontrole -= 1;
                                         }
                                     }
-                                    else
+                                    else if (!string.IsNullOrEmpty(aprocurar) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
                                     {
-                                        if (!string.IsNullOrEmpty(pastaRoot) && arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && arquivo.Contains(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta root
+                                        //MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
+                                        resultados.Add(arquivo);
+
+                                        if (varcontrole != null && varcontrole > 0)
                                         {
-                                            //MessageBox.Show($"Arquivo encontrado pr: {arquivo}");
-                                            resultados.Add(arquivo);
-
-                                            if (varcontrole != null && varcontrole > 0)
-                                            {
-                                                varcontrole -= 1;
-                                            }
-
-
+                                            varcontrole -= 1;
                                         }
-                                        else if (arquivo.Contains(aprocurar, StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(pastaRoot)) // retorna o arquivo desejado que esta dentro da pasta atual
-                                        {
-                                            //MessageBox.Show($"Arquivo encontrado nro: {arquivo}");
-                                            resultados.Add(arquivo);
-
-                                            if (varcontrole != null && varcontrole > 0)
-                                            {
-                                                varcontrole -= 1;
-                                            }
 
 
-                                        }
                                     }
+                                }
                                     if (varcontrole != null && varcontrole <= 0)
                                     {
                                         //MessageBox.Show("A quantidade de pastas encontradas foi: " + resultados.Count);
                                         return resultados;
                                     }
-
-                                }
                             }
 
 
@@ -1057,6 +732,10 @@ namespace Vados
             if (resultados != null)
             {
                 MessageBox.Show("bolete");
+                foreach(var x in resultados)
+                {
+                    MessageBox.Show(x);
+                }
                 return resultados;
             }
             MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
@@ -1084,6 +763,77 @@ namespace Vados
             }
         }
 
+        public static bool filtroData(string arquivo, FileInfo fileinfo, int[] datas, string pastaroot)
+        {
+            int dia = datas[0], mes = datas[1], ano = datas[2];
+
+            if (dia != 0 && mes != 0 && ano != 0 && fileinfo.LastWriteTime.Day == dia && fileinfo.LastWriteTime.Month == mes && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
+            {
+                MessageBox.Show(fileinfo.LastWriteTime.Day + ", "+ fileinfo.LastWriteTime.Month + ", "+ fileinfo.LastWriteTime.Year);
+
+                return true;
+            }
+            else if (dia == 0 )
+            {
+                if (mes != 0 && ano != 0 && fileinfo.LastWriteTime.Month == mes && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
+                {
+                    MessageBox.Show("2");
+                    return true;
+                }
+                else if ( mes == 0 && ano != 0 && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
+                {
+                    MessageBox.Show("3");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public static bool filtroSize(long arquivosize, long criteriosize, string arquivo, string pastaroot)
+        {
+            //MessageBox.Show(arquivosize.ToString());
+
+            if ((arquivosize >= criteriosize * 0.8 && arquivosize <= criteriosize * 1.2))
+            {
+                //MessageBox.Show(criteriosize.ToString() + ", " + arquivosize);
+                return true;
+                
+            }
+            //MessageBox.Show("merda");
+            return false;
+        }
+
+        public static long getFolderSize(string caminho,long criterio=0, long control=0)
+        {
+            long tamanhoTotal = 0;
+
+            try
+            {
+                
+                tamanhoTotal += Directory.GetFiles(caminho).Sum(arquivo => new FileInfo(arquivo).Length);
+
+                control += tamanhoTotal;
+
+                if( control== 1.5 * criterio && criterio!=0 || tamanhoTotal>= 1.5*criterio)
+                {
+                    return control;
+                }
+
+                foreach (var subPasta in Directory.GetDirectories(caminho))
+                {
+                    tamanhoTotal += getFolderSize(subPasta, control:control);
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+            return tamanhoTotal;
+        }
+        #endregion
+          
 
         public static void MoverUnsArquivos(string criterio, string Pastaroot1,string destino, string crit2="")
         {
@@ -1149,9 +899,9 @@ namespace Vados
         {
             try
             {
-                if (path == "") 
+                if (string.IsNullOrEmpty(path)) 
                 {
-                    path = Path.Combine(Global.DefaultFolder , nome);
+                    path = Path.Combine(Global.DefaultFolder, nome);
                 }
                 else
                 {
@@ -1164,7 +914,7 @@ namespace Vados
                 {
                     Directory.CreateDirectory(path);
                     Console.WriteLine("Pasta" + nome + "Criada com sucesso");
-                    AbrirGerenciador(path);
+                    OpenFileExplorer(path, false);
                 }
                 else
                 {
@@ -1186,13 +936,14 @@ namespace Vados
             try
             {
                 //Criar na pasta padrão
-                if (path == "")
+                if (string.IsNullOrEmpty(path))
                 {
                     path = Path.Combine(Global.DefaultFolder, nome);
                 }
                 //Criar na pasta especificada
                 else
                 {
+                    MessageBox.Show("pasta especificada");
                     path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome);
                     //MessageBox.Show(path);
                 }
@@ -1202,7 +953,7 @@ namespace Vados
 
                 using (FileStream fs = File.Create(pathfinal))
                 Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
-                AbrirGerenciador(pathfinal);
+                OpenFileExplorer(pathfinal, false);
             }
             catch (Exception ex)
             {

@@ -91,11 +91,11 @@ namespace Vados
             string novoNome = txtNovoNome.Text;
             if (extension == "pasta")
             {
-                Comandos.RenomearPasta(nome, novoNome);
+                Comandos.RenomearPasta(nome, novoNome, "");
             }
             else
             {
-                Comandos.RenomearArquivo(nome, novoNome);
+                Comandos.RenomearArquivo(nome, novoNome, "");
             }
 
         }
@@ -138,11 +138,12 @@ namespace Vados
 
             string SearchArquivo = txtSearch.Text;
 
+            /*
             MessageBox.Show(Environment.UserName);
             if (cbExtensoes.Text == "pasta")
             {
-                
-                foreach (var item in Comandos.SearchPaths(".txt", false, pastaRoot: "Desktop")) 
+
+                foreach (var item in Comandos.SearchPaths(SearchArquivo, false, varcontrole:null))
                 {
                     listateste.Items.Add(item);
                 }
@@ -157,6 +158,12 @@ namespace Vados
                     listateste.Items.Add(item);
                 }
 
+            }
+            */
+
+            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, varcontrole:null))
+            {
+                listateste.Items.Add(item);
             }
         }
         

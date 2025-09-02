@@ -10,7 +10,11 @@ using System.Windows.Forms;
 using System.Reflection.Metadata;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using SHDocVw;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace Vados
@@ -47,7 +51,7 @@ namespace Vados
             { "construir", "criar" },
             { "construa", "criar" },
             { "fazer", "criar" },
-            { "faça", "criar" },
+            { "faca", "criar" },
             { "inventar", "criar" },
             { "invente", "criar" },
             { "dar a luz", "criar" },
@@ -87,7 +91,7 @@ namespace Vados
             { "anular", "excluir" },
             { "anule", "excluir" },
             { "desfazer", "excluir" },
-            { "desfaça", "excluir" },
+            { "desfaca", "excluir" },
             { "extinguir", "excluir" },
             { "extinga", "excluir" },
             { "obliterar", "excluir" },
@@ -113,6 +117,17 @@ namespace Vados
             { "movimente", "mover" },
             { "translocar", "mover" },
             { "transloque", "mover" },
+            //Duplicar
+            { "duplicar", "duplicar" },
+            { "duplique", "duplicar" },
+            { "copiar", "duplicar" },
+            { "copie", "duplicar" },
+            { "repetir", "duplicar" },
+            { "repita", "duplicar" },
+            { "reproduzir", "duplicar" },
+            { "reproduza", "duplicar" },
+            { "imitar", "duplicar" },
+            { "imite", "duplicar" },
         };
 
         //Todas as variações dos comandos
@@ -219,17 +234,41 @@ namespace Vados
             "para o interior do",
         };
 
+        public static List<string> fromWords = new List<string>()
+        {
+            "da",
+            "do",
+            "pertencente a",
+            "pertencentes a",
+            "que pertence a",
+            "que pertencem a",
+            "que esta dentro da",
+            "que estao dentro da",
+            "que esta no interior da",
+            "que estao no interior da",
+        };
+
+        //Formas de indicar a pasta de posse
+
         //Formas de nomear o arquivo / pasta
         public static List<string> namingWords = new List<string>()
         {
             "chamado",
+            "chamados",
             "chamada",
+            "chamadas",
             "nomeado",
+            "nomeados",
             "nomeada",
+            "nomeadas",
             "denominado",
+            "denominados",
             "denominada",
+            "denominadas",
             "intitulado",
+            "intitulados",
             "intitulada",
+            "intituladas",
             "de nome",
             "de titulo",
             "com nome",
@@ -296,27 +335,42 @@ namespace Vados
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
                             new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new NewNameExtractor(),
+                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
+                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
+
 
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
+                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
+                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords),
+                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
+                        });
+                    break;
+
+
+                case "duplicar":
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
                             new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords),
                             new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
                         });
                     break;
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: {arguments.Action} - Objeto: {arguments.ObjectType} - Quantidade: {arguments.ObjectAmount} - Nome: {arguments.ObjectName} - Novo nome: {arguments.ObjectNewName} - Destino: {arguments.Destination}");
+            MessageBox.Show($"Comando: {arguments.Action}\r\nObjeto: {arguments.ObjectType}\r\nFormato: {arguments.ObjectFormat}\r\nQuantidade: {arguments.ObjectAmount}\r\nNome: {arguments.ObjectName}\r\nNovo nome: {arguments.ObjectNewName}\r\nOrigem: {arguments.Origin}\r\nDestino: {arguments.Destination}");
             return arguments;
         }
 
@@ -327,31 +381,70 @@ namespace Vados
             string objectType = arguments.ObjectType;
             string name = arguments.ObjectName;
             string newName = arguments.ObjectNewName;
+            string format = arguments.ObjectFormat;
+            string origin = arguments.Origin;
             string destination = arguments.Destination;
             string amount = arguments.ObjectAmount;
 
-            //Definir caminhos
-            List<string> namePath = new List<string>();
-            string destinationPath = "";
 
-            if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
-
-
-            //Identificar quantidade de objetos afetados
-            int GetAmount(int totalAmount, string modifier)
+            //Adicionar extensão ao nome
+            if (name != "")
             {
-                switch(modifier)
+                var extension = Comandos.WordGetExtensions(format);
+                if (extension.Count() != 0)
                 {
-                    case "":
-                        return 1;
-                    case "todos":
-                        return totalAmount;
-                    case "metade":
-                        return (int)Math.Ceiling((decimal)totalAmount / 2);
+                    name += "." + extension[0];
                 }
-                
-                return 1;
             }
+
+
+            //Retorna os caminhos encontrados conforme os critérios
+            List<string> GetPaths(string name, string objectType, string amountIndicator, string folder)
+            {
+                //Buscar apenas um arquivo
+                if (amountIndicator == "") {
+                    return SearchPaths(name, objectType == "pasta", pastaRoot: folder, varcontrole: 1).ToList();
+                }
+
+                //Retornar todos os caminhos correspondentes
+                List<string> paths = new List<string>();
+
+                if (name == "")
+                {
+                    //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
+                    foreach(string extension in Comandos.WordGetExtensions(format))
+                    {
+                        List<string> newPaths = SearchPaths("." + extension, objectType == "pasta", pastaRoot: folder, varcontrole: null).ToList();
+                        paths.AddRange(newPaths);
+                    }
+                }
+                else
+                {
+                    //Procura normal usando o nome
+                    paths = SearchPaths(name, objectType == "pasta", pastaRoot: folder, varcontrole: null).ToList();
+                }
+
+                switch (amountIndicator)
+                {
+                    case "todos":
+                        break;
+                    case "metade":
+                        int half = (int)Math.Ceiling((decimal)paths.Count / 2);
+                        paths = paths.GetRange(0, half);
+                        break;
+                }
+
+                return paths;
+            }
+
+
+            //Caminho da pasta de origem e de destino
+            string destinationPath = "";
+            if (!string.IsNullOrEmpty(destination)) destinationPath = SearchPaths(destination, true).FirstOrDefault();
+            string originPath = "";
+            if (!string.IsNullOrEmpty(origin)) originPath = SearchPaths(origin, true).FirstOrDefault();
+
+            List<string> paths = new List<string>();
 
 
             //Realizar comando
@@ -365,24 +458,49 @@ namespace Vados
 
                 //Renomear
                 case "renomear":
-                    if (objectType == "pasta") { RenomearPasta(name, newName); }
-                    if (objectType == "arquivo") { RenomearArquivo(name, newName); }
+                    if (objectType == "pasta") { RenomearPasta(name, newName, origin); }
+                    if (objectType == "arquivo") { RenomearArquivo(name, newName, origin); }
                     break;
 
                 case "excluir":
-                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
-                    if (objectType == "pasta") { ExcluirPasta(namePath); }
-                    if (objectType == "arquivo") { ExcluirArquivo(namePath); }
+                    paths = GetPaths(name, objectType, amount, origin);
+                    if (objectType == "pasta") { ExcluirPasta(paths); }
+                    if (objectType == "arquivo") { ExcluirArquivo(paths); }
                     break;
 
                 
                 case "mover":
-                    if (!string.IsNullOrEmpty(name)) namePath = SearchPaths(name, objectType == "pasta").ToList();
-                    if (objectType == "pasta") { MoverPasta(namePath, destinationPath); }
-                    if (objectType == "arquivo") { MoverArquivo(namePath, destinationPath); }
+                    paths = GetPaths(name, objectType, amount, origin);
+                    if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
+                    if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
                     break;
-                
+
+                case "duplicar":
+                    paths = GetPaths(name, objectType, amount, origin);
+                    if (objectType == "pasta") { DuplicarPasta(paths, destinationPath); }
+                    if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
+                    break;
+
             }
+        }
+
+
+        //Remover acentos das palavras
+        public static string RemoveDiacritics(string text)
+        {
+            var normalizedStr = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedStr.EnumerateRunes())
+            {
+                var unicodeCategory = Rune.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
         #endregion
@@ -460,8 +578,8 @@ namespace Vados
         }
 
 
-        #region busca 
-          
+        #region BUSCA 
+
         public static HashSet<string> SearchPaths(string aprocurar, bool comando, long criteriosize = 0, string criterio2 = null, string pastaRoot = "", int? varcontrole = 1, int[] data = null) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         {
 
@@ -510,22 +628,40 @@ namespace Vados
             };
 
             // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
-            if (!string.IsNullOrEmpty(pastaRoot) && comando == true)
-            {
-                pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = Directory.GetDirectories(pastaRoot).Length;
-               
-                prioridades.Add(pastaRoot);
+            int? maxLength = varcontrole;
 
-            }
-            else if (!string.IsNullOrEmpty(pastaRoot) && comando == false)
-            {
-                
+            if (!string.IsNullOrEmpty(pastaRoot)) {
                 pastaRoot = SearchPaths(pastaRoot, true).FirstOrDefault();
-                varcontrole = Directory.GetFiles(pastaRoot).Length;
-               
-                prioridades.Add(pastaRoot);
+                if (string.IsNullOrEmpty(pastaRoot)) return null;
+                //Buscar apenas na pasta determinada
+                prioridades = new List<string>() { pastaRoot };
+
+                //Quantidade máxima a ser buscada
+                if (comando == true)
+                {
+                    //Pastas
+                    maxLength = Directory.GetDirectories(pastaRoot).Length;
+
+                }
+                else if (comando == false)
+                {
+                    //Arquivos
+                    maxLength = Directory.GetFiles(pastaRoot).Length;
+                }
             }
+
+            //Redefinir quantidade de caminhos a serem buscados
+            if (varcontrole != null)
+            {
+                varcontrole = Math.Min((int)varcontrole, (int)maxLength);
+            }
+            else
+            {
+                varcontrole = maxLength;
+            }
+
+            //MessageBox.Show(varcontrole.ToString());
+
 
             var fila = new Queue<string>();
             foreach (var pasta in prioridades)
@@ -879,7 +1015,7 @@ namespace Vados
         {
 
             string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-            MessageBox.Show(caminhoPadrao);
+            //MessageBox.Show(caminhoPadrao);
             try
             {
                 if (!Directory.Exists(caminhoPadrao))
@@ -935,25 +1071,23 @@ namespace Vados
 
             try
             {
-                //Criar na pasta padrão
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = Path.Combine(Global.DefaultFolder, nome);
-                }
-                //Criar na pasta especificada
-                else
-                {
-                    MessageBox.Show("pasta especificada");
-                    path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome);
-                    //MessageBox.Show(path);
-                }
-
+                //Redefinir nome caso já exista um igual
                 string nomefinal = CriarNome(nome, path);
-                string pathfinal = Path.Combine(Path.GetDirectoryName(path), nomefinal);
+                string destination = Global.DefaultFolder;
 
-                using (FileStream fs = File.Create(pathfinal))
+                //Definir pasta informada como destino
+                if (!string.IsNullOrEmpty(path))
+                {
+                    destination = SearchPaths(path, true).FirstOrDefault();
+                }
+
+                //Caminho a ser criado
+                string newPath = Path.Combine(destination, nomefinal);
+
+                using (FileStream fs = File.Create(newPath))
                 Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
-                OpenFileExplorer(pathfinal, false);
+
+                OpenFileExplorer(newPath, false);
             }
             catch (Exception ex)
             {
@@ -1034,9 +1168,11 @@ namespace Vados
         }
 
 
-        public static void RenomearArquivo(string nome, string novoNome) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        public static void RenomearArquivo(string nome, string novoNome, string pastaOrigem) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
         {
-            string path = SearchPaths(nome, false).FirstOrDefault();
+            string path = SearchPaths(nome, false, pastaRoot:pastaOrigem).FirstOrDefault();
+            if (path == null) return;
+
             string novoPath = Path.Combine(Path.GetDirectoryName(path), novoNome);
 
             if (File.Exists(path))
@@ -1050,11 +1186,11 @@ namespace Vados
             }
         }
 
-        public static void RenomearPasta(string nome, string novoNome) // renomear pasta(mesmo erro de logica do renomear arquivo)
+        public static void RenomearPasta(string nome, string novoNome, string pastaOrigem) // renomear pasta(mesmo erro de logica do renomear arquivo)
         {
 
-            string path = SearchPaths(nome, true).FirstOrDefault();
-            MessageBox.Show(path);
+            string path = SearchPaths(nome, true, pastaRoot:pastaOrigem).FirstOrDefault();
+            //MessageBox.Show(path);
 
             string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
 
@@ -1099,38 +1235,37 @@ namespace Vados
 
         public static void MoverArquivo(List<string> Pathnomes, string destino) 
         {
-            try
+            //nome = SearchPaths(nome, false).FirstOrDefault();
+            // SearchPaths(destino, true) + @"\" + nome + "." + ext;
+            foreach (string nome in Pathnomes)
             {
-                //nome = SearchPaths(nome, false).FirstOrDefault();
-                // SearchPaths(destino, true) + @"\" + nome + "." + ext;
-                foreach (string nome in Pathnomes)
+                try
                 {
                     MessageBox.Show("Nome do arquivo: " + Path.GetFileName(nome));
                     string destinoNovo = Path.Combine(destino,Path.GetFileName(nome));
                     if (File.Exists(destino))
                     {
                         MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        return;
                     }
                     File.Move(nome, destinoNovo);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
+                }
             }
 
             return;
         }
 
 
-        public static void DuplicarPasta(List<string> Pathnome, string destino)
+        public static void DuplicarPasta(List<string> paths, string destino)
         {
             try
             {
                 //nome = SearchPaths(nome, true).FirstOrDefault();
 
-                foreach (string nome in Pathnome)
+                foreach (string nome in paths)
                 {
                     string destinoNovo;
                     if (string.IsNullOrEmpty(destino))
@@ -1144,7 +1279,7 @@ namespace Vados
                     }
 
 
-                    MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
+                    //MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
                     if (Directory.Exists(destinoNovo))
                     {
                         MessageBox.Show("Já existe uma pasta com esse nome no destino.");
@@ -1165,8 +1300,8 @@ namespace Vados
                     {
                         string nomeSubPasta = Path.GetFileName(subPasta);
                         string destinoSubPasta = Path.Combine(destinoNovo, nomeSubPasta);
-                        MessageBox.Show(destinoSubPasta);
-                        MessageBox.Show(nomeSubPasta);
+                        //MessageBox.Show(destinoSubPasta);
+                        //MessageBox.Show(nomeSubPasta);
                         var subpastas = new List<string>();
                         subpastas.Add(subPasta);
                         DuplicarPasta(subpastas, destinoNovo);
@@ -1179,30 +1314,35 @@ namespace Vados
             }
         }
 
-        public static void DuplicarArquivo(List<string> Pathnomes, string destino)
+        public static void DuplicarArquivo(List<string> Pathnomes, string destination)
         {
 
             try
             {
-
-                //nome = SearchPaths(nome, false).FirstOrDefault();
-                //MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
-                //string ext = Path.GetExtension(nome);
-                
+                string newDestination = "";
 
                 foreach (string nome in Pathnomes)
                 {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-
-                    if (File.Exists(destino))
+                    //Definir destino como a mesma pasta caso não seja informado
+                    if (string.IsNullOrEmpty(destination))
                     {
-                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        return;
+                        destination = Path.GetDirectoryName(nome);
                     }
 
-                    File.Move(nome, destino);
+                    string fileName = CriarNome(Path.GetFileName(nome), destination);
+                    newDestination = Path.Combine(destination, fileName);
+
+                    //if (File.Exists(destinoNovo))
+                    //{
+                    //    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    //}
+                    MessageBox.Show("pasta: " + destination);
+                    MessageBox.Show("destino novo: " + newDestination);
+
+                    File.Copy(nome, newDestination, false);
                 }
 
+                OpenFileExplorer(newDestination, false);
             }
             catch (Exception ex)
             {
@@ -1281,24 +1421,21 @@ namespace Vados
         }
 
 
-        public static string CriarNome(string nome, string path)
+        public static string CriarNome(string nome, string destination)
         {
-            int contador = 1;
-            string nomefinal = nome;
+            int i = 1;
+            string newName = nome;
 
-            if (File.Exists(path))
+            MessageBox.Show(Path.Combine(destination, newName));
+
+            while (File.Exists(Path.Combine(destination, newName)))
             {
-                while (File.Exists(path))
-                {
-                    nomefinal = $"{nome}({contador})";
-                    contador++;
-                  
-                    path = Path.Combine(Path.GetDirectoryName(path), nomefinal);
-                }
-
+                newName = $"{nome}({i})";
+                i++;
             }
-            MessageBox.Show("Nome: " + nomefinal);
-            return nomefinal;
+
+            MessageBox.Show("Nome: " + newName);
+            return newName;
         }
 
 

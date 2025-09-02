@@ -13,12 +13,14 @@ namespace Vados
 {
     public class CommandCriteria
     {
-        public string Action;           //Tipo de comando
-        public string ObjectType;       //Tipo de objeto (arquivo / pasta)
-        public string ObjectName;       //Nome do objeto
-        public string ObjectAmount;     //Quantidade de objetos ("todos")
-        public string ObjectNewName;    //Novo nome do objeto (ao renomear)
-        public string Destination;      //Nome da pasta de destino
+        public string Action = "";          //Tipo de comando
+        public string ObjectType = "";      //Tipo de objeto (arquivo / pasta)
+        public string ObjectName = "";      //Nome do objeto
+        public string ObjectAmount = "";    //Quantidade de objetos ("todos")
+        public string ObjectNewName = "";   //Novo nome do objeto (ao renomear)
+        public string ObjectFormat = ""; //Formato do objeto (pode ser várias extensões)
+        public string Origin = "";          //Nome da pasta de origem 
+        public string Destination = "";     //Nome da pasta de destino
     }
 
 
@@ -74,7 +76,7 @@ namespace Vados
             string pattern = $@"^(({patternStarts})\s+)?({patternAction})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair comando
             if (match.Success)
@@ -97,13 +99,17 @@ namespace Vados
         List<string> amount;
         List<string> extensions;
         List<string> nominators;
+        List<string> stopWords;
 
-        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_)
+        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_, List<string> stopWords_ = null)
         {
             amount = amount_;
             objects = objects_;
             extensions = extensions_;
             nominators = nominators_;
+            stopWords = stopWords_;
+
+            if (stopWords == null) stopWords = new List<string>();
         }
 
         public void Extract(string command, CommandCriteria criteria)
@@ -114,10 +120,10 @@ namespace Vados
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?(\s+para\s({patternName}))?";
+            string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)
@@ -126,29 +132,93 @@ namespace Vados
                 string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
                 criteria.ObjectType = obj;
 
-                //Nome do objeto
-                string name = match.Groups[9].Success ? match.Groups[9].Value : 
-                              match.Groups[10].Success ? match.Groups[10].Value :
-                              match.Groups[11].Value;
-                var extension = Comandos.WordGetExtensions(match.Groups[5].Value);
-                if (extension.Count() != 0)
-                {
-                    name += "." + extension[0];
-                }
-
-                criteria.ObjectName = name;
-
-                //Novo nome
-                criteria.ObjectNewName = match.Groups[13].Success ? match.Groups[13].Value :
-                                 match.Groups[14].Success ? match.Groups[14].Value :
-                                 match.Groups[15].Value;
+                //Formato do objeto
+                criteria.ObjectFormat = match.Groups[5].Value;
 
                 //Quantidade
                 criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
+
+                //Nome do objeto
+                string name = match.Groups[9].Success ? match.Groups[9].Value :
+                              match.Groups[10].Success ? match.Groups[10].Value :
+                              match.Groups[11].Value;
+
+                if (stopWords.Contains(name.ToLower())) return; //Checar se o nome não é uma das palavras de parada
+
+                criteria.ObjectName = name;
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             MessageBox.Show("Objeto -> " + objectStr);
+        }
+    }
+
+
+    //Extrai o objeto (arquivo / pasta), seu nome e seu novo nome
+    public class NewNameExtractor : CriteriaExtractor
+    {
+        public NewNameExtractor(){}
+
+        public void Extract(string command, CommandCriteria criteria)
+        {
+            string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
+
+            string pattern = $@"\b(\s+(para|pra)\s({patternName}))";
+
+            //Checar se o padrão está no comando
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+
+            //Extrair argumentos
+            if (match.Success)
+            {
+                //Novo nome
+                criteria.ObjectNewName = match.Groups[3].Success ? match.Groups[3].Value :
+                                 match.Groups[4].Success ? match.Groups[4].Value :
+                                 match.Groups[5].Value;
+            }
+
+            string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Novo nome -> " + newNameStr);
+        }
+    }
+
+
+    //Extrai a pasta de origem
+    public class OriginExtractor : CriteriaExtractor
+    {
+        List<string> fromIndicators;
+        List<string> folders;
+        List<string> nominators;
+
+        public OriginExtractor(List<string> fromIndicators_, List<string> folders_, List<string> nominators_)
+        {
+            fromIndicators = fromIndicators_;
+            folders = folders_;
+            nominators = nominators_;
+        }
+
+        public void Extract(string command, CommandCriteria criteria)
+        {
+            string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
+            string patternFolder = string.Join("|", folders.Select(Regex.Escape));
+            string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
+            string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
+
+            string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
+
+            //Checar se o padrão está no comando
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+
+            //Extrair argumentos
+            if (match.Success)
+            {
+                criteria.Origin = match.Groups[5].Success ? match.Groups[5].Value :
+                                       match.Groups[6].Success ? match.Groups[6].Value :
+                                       match.Groups[7].Value; ;
+            }
+
+            string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Origem -> " + originStr);
         }
     }
 
@@ -177,7 +247,7 @@ namespace Vados
             string pattern = $@"\b({patternInside})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)

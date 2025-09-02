@@ -47,6 +47,8 @@ namespace Vados
         {
             if (textboxActive == true)
             {
+                MessageBox.Show(Comandos.RemoveDiacritics(txtComando.Text));
+
                 //Extrair argumentos do comando
                 var arguments = Comandos.CommandGetArguments(txtComando.Text);
 

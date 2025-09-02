@@ -153,16 +153,10 @@ namespace Vados
             }
             else
             {
-                int[] datas = new int[3] { 11, 12, 2024 };
-
-                foreach(var x in Comandos.SearchPaths("",true, data:datas))
+               foreach(var item in Comandos.SearchPaths("", true, criteriosize:8000))
                 {
-                    listateste.Items.Add(x);
+                    listateste.Items.Add(item);
                 }
-
-                //Task.Run(() => Comandos.MoverUnsArquivos(".txt", "Desktop", "pasta de coisa"));
-
-                
 
             }
             */

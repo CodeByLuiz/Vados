@@ -659,7 +659,7 @@ namespace Vados
                 varcontrole = maxLength;
             }
 
-            MessageBox.Show(varcontrole.ToString());
+            //MessageBox.Show(varcontrole.ToString());
 
 
             var fila = new Queue<string>();
@@ -956,7 +956,7 @@ namespace Vados
         {
 
             string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-            MessageBox.Show(caminhoPadrao);
+            //MessageBox.Show(caminhoPadrao);
             try
             {
                 if (!Directory.Exists(caminhoPadrao))
@@ -1012,25 +1012,23 @@ namespace Vados
 
             try
             {
-                //Criar na pasta padrão
-                if (string.IsNullOrEmpty(path))
-                {
-                    path = Path.Combine(Global.DefaultFolder, nome);
-                }
-                //Criar na pasta especificada
-                else
-                {
-                    MessageBox.Show("pasta especificada");
-                    path = Path.Combine( SearchPaths(path, true).FirstOrDefault(), nome);
-                    //MessageBox.Show(path);
-                }
-
+                //Redefinir nome caso já exista um igual
                 string nomefinal = CriarNome(nome, path);
-                string pathfinal = Path.Combine(Path.GetDirectoryName(path), nomefinal);
+                string destination = Global.DefaultFolder;
 
-                using (FileStream fs = File.Create(pathfinal))
+                //Definir pasta informada como destino
+                if (!string.IsNullOrEmpty(path))
+                {
+                    destination = SearchPaths(path, true).FirstOrDefault();
+                }
+
+                //Caminho a ser criado
+                string newPath = Path.Combine(destination, nomefinal);
+
+                using (FileStream fs = File.Create(newPath))
                 Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
-                OpenFileExplorer(pathfinal, false);
+
+                OpenFileExplorer(newPath, false);
             }
             catch (Exception ex)
             {
@@ -1133,7 +1131,7 @@ namespace Vados
         {
 
             string path = SearchPaths(nome, true, pastaRoot:pastaOrigem).FirstOrDefault();
-            MessageBox.Show(path);
+            //MessageBox.Show(path);
 
             string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
 
@@ -1243,8 +1241,8 @@ namespace Vados
                     {
                         string nomeSubPasta = Path.GetFileName(subPasta);
                         string destinoSubPasta = Path.Combine(destinoNovo, nomeSubPasta);
-                        MessageBox.Show(destinoSubPasta);
-                        MessageBox.Show(nomeSubPasta);
+                        //MessageBox.Show(destinoSubPasta);
+                        //MessageBox.Show(nomeSubPasta);
                         var subpastas = new List<string>();
                         subpastas.Add(subPasta);
                         DuplicarPasta(subpastas, destinoNovo);
@@ -1257,32 +1255,35 @@ namespace Vados
             }
         }
 
-        public static void DuplicarArquivo(List<string> Pathnomes, string destino)
+        public static void DuplicarArquivo(List<string> Pathnomes, string destination)
         {
 
             try
             {
-
-                //nome = SearchPaths(nome, false).FirstOrDefault();
-                //MessageBox.Show(nome + " nome do arquivo que pode estar dando erro");
-                //string ext = Path.GetExtension(nome);
-                
+                string newDestination = "";
 
                 foreach (string nome in Pathnomes)
                 {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    MessageBox.Show(destinoNovo);
-
-                    if (File.Exists(destinoNovo))
+                    //Definir destino como a mesma pasta caso não seja informado
+                    if (string.IsNullOrEmpty(destination))
                     {
-                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        return;
+                        destination = Path.GetDirectoryName(nome);
                     }
 
-                    File.Copy(nome, destinoNovo, false);
+                    string fileName = CriarNome(Path.GetFileName(nome), destination);
+                    newDestination = Path.Combine(destination, fileName);
+
+                    //if (File.Exists(destinoNovo))
+                    //{
+                    //    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
+                    //}
+                    MessageBox.Show("pasta: " + destination);
+                    MessageBox.Show("destino novo: " + newDestination);
+
+                    File.Copy(nome, newDestination, false);
                 }
 
-                OpenFileExplorer(destino, false);
+                OpenFileExplorer(newDestination, false);
             }
             catch (Exception ex)
             {
@@ -1361,24 +1362,21 @@ namespace Vados
         }
 
 
-        public static string CriarNome(string nome, string path)
+        public static string CriarNome(string nome, string destination)
         {
-            int contador = 1;
-            string nomefinal = nome;
+            int i = 1;
+            string newName = nome;
 
-            if (File.Exists(path))
+            MessageBox.Show(Path.Combine(destination, newName));
+
+            while (File.Exists(Path.Combine(destination, newName)))
             {
-                while (File.Exists(path))
-                {
-                    nomefinal = $"{nome}({contador})";
-                    contador++;
-                  
-                    path = Path.Combine(Path.GetDirectoryName(path), nomefinal);
-                }
-
+                newName = $"{nome}({i})";
+                i++;
             }
-            MessageBox.Show("Nome: " + nomefinal);
-            return nomefinal;
+
+            MessageBox.Show("Nome: " + newName);
+            return newName;
         }
 
 

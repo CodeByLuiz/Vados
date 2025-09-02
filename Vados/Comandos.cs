@@ -161,9 +161,27 @@ namespace Vados
 
         static Dictionary<string, string> wordSynonyms = new Dictionary<string, string>(currentSynonyms)
         {
+            //Quantidade
             { "todos", "todos" },
             { "todos os", "todos" },
             { "metade dos", "metade" },
+
+            //Tamanho
+            { "maior que", "maior" },
+            { "maiores que", "maior" },
+            { "superior a", "maior" },
+            { "acima de", "maior" },
+            { "mais alto que", "maior" },
+            { "mais alta que", "maior" },
+            { "mais altos que", "maior" },
+            { "mais altas que", "maior" },
+            { "menor", "menor" },
+            { "inferior a", "menor" },
+            { "abaixo de", "menor" },
+            { "mais baixo que", "menor" },
+            { "mais baixa que", "menor" },
+            { "mais baixos que", "menor" },
+            { "mais baixas que", "menor" },
         };
 
 
@@ -370,7 +388,7 @@ namespace Vados
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: {arguments.Action}\r\nObjeto: {arguments.ObjectType}\r\nFormato: {arguments.ObjectFormat}\r\nQuantidade: {arguments.ObjectAmount}\r\nNome: {arguments.ObjectName}\r\nNovo nome: {arguments.ObjectNewName}\r\nOrigem: {arguments.Origin}\r\nDestino: {arguments.Destination}");
+            MessageBox.Show($"Comando: --{arguments.Action}*\r\nObjeto: --{arguments.ObjectType}*\r\nFormato: --{arguments.ObjectFormat}\r\nQuantidade: --{arguments.ObjectAmount}\r\nNome: --{arguments.ObjectName}\r\nNovo nome: --{arguments.ObjectNewName}\r\nOrigem: --{arguments.Origin}\r\nDestino: --{arguments.Destination}\r\nTamanho: --{arguments.SizeModifier} {arguments.SizeAmount} {arguments.SizeUnit}");
             return arguments;
         }
 

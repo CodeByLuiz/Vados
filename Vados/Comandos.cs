@@ -777,7 +777,7 @@ namespace Vados
         #region BUSCA 
 
         // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
-        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null)
+        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null, List<string> ignorar, List<string> prioridades)
         {
 
             // PRA QUE SERVE CADA PARÂMETRO:
@@ -1130,7 +1130,6 @@ namespace Vados
                 else
                 {
                     path = Path.Combine(SearchPaths(path, true).FirstOrDefault(), nome);
-
                 }
 
 
@@ -1201,7 +1200,6 @@ namespace Vados
                 }
                 else
                 {
-
                     MessageBox.Show("esse arquivo não existe");
                 }
 
@@ -1348,7 +1346,6 @@ namespace Vados
             try
             {
                 //nome = SearchPaths(nome, true).FirstOrDefault();
-
                 foreach (string nome in paths)
                 {
                     string destinoNovo;
@@ -1359,7 +1356,6 @@ namespace Vados
                     else
                     {
                          destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-
                     }
 
 
@@ -1494,7 +1490,7 @@ namespace Vados
 
         public static void AbrirArquivo(string nome)
         {
-           string arquivo = SearchPaths(nome,false).FirstOrDefault();
+            string arquivo = SearchPaths(nome,false).FirstOrDefault();
 
             var psi = new ProcessStartInfo()
             {
@@ -1521,8 +1517,17 @@ namespace Vados
             MessageBox.Show("Nome: " + newName);
             return newName;
         }
-
-
+        
+        public static void ExecutarAplicativo(string nome)
+        {
+         
+           
+            ProcessStartInfo processInfo = new ProcessStartInfo();
+            processInfo.FileName = SearchFolders(nome, false, Global.ignorarExecutaveis, Global.prioridadesExecutaveis);
+            processInfo.UseShellExecute = true;
+            Process.Start(processInfo);
+           
+        }
     }
 
 }

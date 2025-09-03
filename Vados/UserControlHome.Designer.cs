@@ -32,7 +32,6 @@
             pnlBottom = new OptmizedPanel();
             lblText = new Label();
             lblDebug = new Label();
-            btnTrocarPagina = new Button();
             btnManual = new PictureBox();
             btnConfigs = new PictureBox();
             imgLogo = new PictureBox();
@@ -48,7 +47,6 @@
             // 
             pnlBottom.Controls.Add(lblText);
             pnlBottom.Controls.Add(lblDebug);
-            pnlBottom.Controls.Add(btnTrocarPagina);
             pnlBottom.Controls.Add(btnManual);
             pnlBottom.Controls.Add(btnConfigs);
             pnlBottom.Controls.Add(imgLogo);
@@ -68,6 +66,7 @@
             // 
             lblText.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             lblText.AutoSize = true;
+            lblText.BackColor = Color.Transparent;
             lblText.Font = new Font("Segoe UI Semibold", 27F, FontStyle.Bold);
             lblText.Location = new Point(608, 445);
             lblText.Name = "lblText";
@@ -85,47 +84,38 @@
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
             // 
-            // btnTrocarPagina
-            // 
-            btnTrocarPagina.Anchor = AnchorStyles.Top;
-            btnTrocarPagina.Location = new Point(809, 28);
-            btnTrocarPagina.Name = "btnTrocarPagina";
-            btnTrocarPagina.Size = new Size(93, 23);
-            btnTrocarPagina.TabIndex = 1;
-            btnTrocarPagina.Text = "Trocar Página";
-            btnTrocarPagina.UseVisualStyleBackColor = true;
-            btnTrocarPagina.Click += btnTrocarPagina_Click;
-            // 
             // btnManual
             // 
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1530, 25);
+            btnManual.Location = new Point(1505, 25);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(50, 50);
+            btnManual.Size = new Size(69, 50);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
+            btnManual.Click += btnManual_Click;
             // 
             // btnConfigs
             // 
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1605, 25);
+            btnConfigs.Location = new Point(1593, 25);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(50, 50);
+            btnConfigs.Size = new Size(65, 50);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
+            btnConfigs.Click += btnConfigs_Click;
             // 
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(34, 12);
+            imgLogo.Location = new Point(13, 13);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(191, 73);
+            imgLogo.Size = new Size(204, 72);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 5;
             imgLogo.TabStop = false;
@@ -157,6 +147,7 @@
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
+            txtComando.TextChanged += txtComando_TextChanged;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
             // UserControlHome
@@ -182,7 +173,6 @@
         private TextBox textBox1;
         private OptmizedPanel pnlBottom;
         private Label lblDebug;
-        private Button btnTrocarPagina;
         private PictureBox btnManual;
         private PictureBox btnConfigs;
         private PictureBox imgLogo;

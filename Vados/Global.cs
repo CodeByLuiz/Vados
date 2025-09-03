@@ -10,11 +10,70 @@ namespace Vados
     //Variáveis que podem ser acessadas de qualquer lugar
     public class Global
     {
+        public static string DefaultFolder = Comandos.CriarPastaPadrao();
+
+        public static List<string> ignorarPadrao = new List<string>
+            {
+                "$RECYCLE.BIN",
+                "System Volume Information",
+                "Recovery",
+                "Config.Msi",
+                "Program Files (x86)",
+                "Program Files",
+                "Windowns" 
+            };
+
+
+        public static List<string> ignorarExecutaveis = new List<string>
+            {
+                "$RECYCLE.BIN",
+                "System Volume Information",
+                "Recovery",
+                "Config.Msi"
+                
+            };
+
+
+
+       public static string root = @"" + Comandos.driveverifica(null);
+
+        public static List<string> prioridadesPadrao  = new List<string>
+            {
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+
+            };
+        public static List<string> prioridadesExecutaveis = new List<string>
+            {
+                 DefaultFolder ,
+                "Program Files (x86)",
+                "Program Files",
+                @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+               
+
+            };
+
+
+
+
+
         //Inicializar user controls
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
 
-        public static string DefaultFolder = Comandos.CriarPastaPadrao();
+
 
       
         //Desenhar retângulo arredondado
@@ -27,7 +86,7 @@ namespace Vados
             path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
             //Linha cima
             path.AddLine(rect.X + radius, rect.Y, rect.Right - radius, rect.Y);
-            //Canto cima direita
+            //Canto cima direitaz
             path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);
             //Linha direita
             path.AddLine(rect.Right, rect.Y + radius, rect.Right, rect.Bottom - radius);

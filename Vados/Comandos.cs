@@ -1,5 +1,4 @@
-﻿//mover todos os arquivos da pasta psteste que pesam mais que 5 mb para a pasta outrapasta
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,6 +17,7 @@ using System.IO;
 using System.Globalization;
 using static System.Windows.Forms.DataFormats;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 
 namespace Vados
 {
@@ -132,6 +132,19 @@ namespace Vados
             { "reproduza", "duplicar" },
             { "imitar", "duplicar" },
             { "imite", "duplicar" },
+            //Abrir
+            { "abrir", "abrir" },
+            { "abra", "abrir" },
+            { "iniciar", "abrir" },
+            { "inicie", "abrir" },
+            { "inicializar", "abrir" },
+            { "inicialize", "abrir" },
+            { "comecar", "abrir" },
+            { "comece", "abrir" },
+            { "despertar", "abrir" },
+            { "desperte", "abrir" },
+            { "acordar", "abrir" },
+            { "acorde", "abrir" },
         };
 
         //Todas as variações dos comandos
@@ -199,6 +212,7 @@ namespace Vados
         //Modificadores de tamanho
         static Dictionary<string, string> sizeModifierSynonyms = new Dictionary<string, string>()
         {
+            //Maior
             { "maior que", "maior" },
             { "maiores que", "maior" },
             { "superior a", "maior" },
@@ -208,7 +222,9 @@ namespace Vados
             { "mais altos que", "maior" },
             { "mais altas que", "maior" },
             { "mais que", "maior" },
-            { "menor", "menor" },
+            //Menor
+            { "menor que", "menor" },
+            { "menores que", "menor" },
             { "inferior a", "menor" },
             { "abaixo de", "menor" },
             { "mais baixo que", "menor" },
@@ -216,13 +232,23 @@ namespace Vados
             { "mais baixos que", "menor" },
             { "mais baixas que", "menor" },
             { "menos que", "menor" },
+            //Igual
             { "igual a", "igual" },
+            { "iguais a", "igual" },
             { "semelhante a", "igual" },
+            { "semelhantes a", "igual" },
             { "parecido com", "igual" },
-            { "exatamente", "igual" },
+            { "parecidos com", "igual" },
+            { "de", "igual" },
+            { "de exatamente", "igual" },
+            { "com exatamente", "igual" },
+            { "com exatos", "igual" },
             { "similar a", "igual" },
+            { "similares a", "igual" },
             { "proximo a", "igual" },
+            { "proximos a", "igual" },
             { "identico a", "igual" },
+            { "identicos a", "igual" },
         };
 
         public static List<string> allSizeModifierWords = new List<string>(sizeModifierSynonyms.Keys);
@@ -417,7 +443,7 @@ namespace Vados
             CommandCriteria criteria = new CommandCriteria();
 
             //Definir tipo de comando
-            ActionExtractor actionExtractor = new ActionExtractor(Comandos.startWords, Comandos.allCommands);
+            ActionExtractor actionExtractor = new ActionExtractor(startWords, allCommands);
             actionExtractor.Extract(command, criteria);
 
 
@@ -429,25 +455,25 @@ namespace Vados
                 case "criar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
-                            new DestinationExtractor(Comandos.destinationWords, Comandos.folderWords, Comandos.namingWords)
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new DestinationExtractor(destinationWords, folderWords, namingWords)
                         });
                     break;
 
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
                             new NewNameExtractor(),
-                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
+                            new OriginExtractor(fromWords, folderWords, namingWords)
                         });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
-                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords)
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
+                            new OriginExtractor(fromWords, folderWords, namingWords)
                         });
                     break;
 
@@ -455,10 +481,10 @@ namespace Vados
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords, Comandos.fromWords),
-                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords),
-                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords),
-                            new SizeExtractor(Comandos.sizeWords, Comandos.allSizeModifierWords, Comandos.allSizeUnitWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
+                            new OriginExtractor(fromWords, folderWords, namingWords),
+                            new DestinationExtractor(insideWords, folderWords, namingWords),
+                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
                     break;
 
@@ -466,9 +492,17 @@ namespace Vados
                 case "duplicar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(Comandos.amountWords, Comandos.allObjects, Comandos.allExtensionsWords, Comandos.namingWords),
-                            new OriginExtractor(Comandos.fromWords, Comandos.folderWords, Comandos.namingWords),
-                            new DestinationExtractor(Comandos.insideWords, Comandos.folderWords, Comandos.namingWords)
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new OriginExtractor(fromWords, folderWords, namingWords),
+                            new DestinationExtractor(insideWords, folderWords, namingWords)
+                        });
+                    break;
+
+                case "abrir":
+                    parser = new CommandParser(criteria, new List<CriteriaExtractor>()
+                        {
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new OriginExtractor(fromWords, folderWords, namingWords),
                         });
                     break;
             }
@@ -528,6 +562,8 @@ namespace Vados
                         upperBound = long.MaxValue;
                         break;
                 }
+
+                MessageBox.Show("lower: " + lowerBound.ToString() + ", upper: " + upperBound.ToString());
             }
 
             #endregion
@@ -542,7 +578,7 @@ namespace Vados
             //Buscar mais de um caminho correspondente
             List<string> paths = new List<string>();
 
-            if (name == "")
+            if (name == "" && format != "")
             {
                 //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
                 foreach (string extension in Comandos.WordGetExtensions(format))
@@ -740,7 +776,8 @@ namespace Vados
 
         #region BUSCA 
 
-        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] data = null) // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null)
         {
 
             // PRA QUE SERVE CADA PARÂMETRO:
@@ -801,7 +838,6 @@ namespace Vados
                 {
                     //Pastas
                     maxLength = Directory.GetDirectories(rootFolder).Length;
-
                 }
                 else
                 {
@@ -817,7 +853,7 @@ namespace Vados
             }
             else
             {
-                pathAmount = int.MaxValue;
+                pathAmount = int.MaxValue;  //Sem limite
             }
 
 
@@ -863,7 +899,7 @@ namespace Vados
                             FileInfo caminhoinfo = new FileInfo(folderPath);
 
                             //Filtro de data
-                            if (data != null && !DateFilter(folderPath, caminhoinfo, data, rootFolder))
+                            if (dateStart != null && !DateFilter(folderPath, caminhoinfo, dateStart, rootFolder))
                                 continue;
 
                             //Filtro de tamanho
@@ -910,10 +946,11 @@ namespace Vados
                             FileInfo pathInfo = new FileInfo(filePath);
 
                             //Filtro de data
-                            if (data != null && !DateFilter(filePath, pathInfo, data, rootFolder))
+                            if (dateStart != null && !DateFilter(filePath, pathInfo, dateStart, rootFolder))
                                 continue;
 
                             //Filtro de tamanho
+                            MessageBox.Show($"{filePath}\r\n{pathInfo.Length}");
                             if (sizeLowerBound != -1 && sizeUpperBound != -1 && !SizeFilter(pathInfo.Length, sizeLowerBound, sizeUpperBound))
                                 continue;
 
@@ -1009,9 +1046,9 @@ namespace Vados
         }
 
 
-        public static bool SizeFilter(long targetSize, long lowerBound, long upperBound)
+        public static bool SizeFilter(long size, long lowerBound, long upperBound)
         {
-            return (targetSize >= lowerBound) && (targetSize <= upperBound);
+            return (size >= lowerBound) && (size <= upperBound);
         }
 
         public static long FolderGetSize(string caminho,long criterio=0, long control=0)

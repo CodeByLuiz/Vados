@@ -161,7 +161,7 @@ namespace Vados
             }
             */
 
-            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, varcontrole:null))
+            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, pathAmount:null))
             {
                 listateste.Items.Add(item);
             }

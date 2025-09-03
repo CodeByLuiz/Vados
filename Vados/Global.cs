@@ -12,32 +12,31 @@ namespace Vados
     {
         public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
-        public static List<string> ignorarPadrao = new List<string>
-            {
-                "$RECYCLE.BIN",
-                "System Volume Information",
-                "Recovery",
-                "Config.Msi",
-                "Program Files (x86)",
-                "Program Files",
-                "Windowns" 
-            };
+        public static List<string> defaultExceptions = new List<string>
+        {
+            "$RECYCLE.BIN",
+            "System Volume Information",
+            "Recovery",
+            "Config.Msi",
+            "Windows",
+            "Program Files (x86)",
+            "Program Files"
+        };
 
 
-        public static List<string> ignorarExecutaveis = new List<string>
-            {
-                "$RECYCLE.BIN",
-                "System Volume Information",
-                "Recovery",
-                "Config.Msi"
-                
-            };
+        public static List<string> exeExceptions = new List<string>
+        {
+            "$RECYCLE.BIN",
+            "System Volume Information",
+            "Recovery",
+            "Config.Msi"
+        };
 
 
 
        public static string root = @"" + Comandos.driveverifica(null);
 
-        public static List<string> prioridadesPadrao  = new List<string>
+        public static List<string> defaultPriorities = new List<string>
             {
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
@@ -53,16 +52,19 @@ namespace Vados
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+
+                Path.Combine(root),
 
             };
-        public static List<string> prioridadesExecutaveis = new List<string>
+        public static List<string> exePriorities = new List<string>
             {
-                 DefaultFolder ,
-                "Program Files (x86)",
-                "Program Files",
+                DefaultFolder,
                 @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-               
+                @"C:\Program Files",
+                @"C:\Program Files (x86)",
 
+                Path.Combine(root),
             };
 
 

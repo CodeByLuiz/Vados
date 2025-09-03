@@ -171,6 +171,10 @@ namespace Vados
             { "arquivo", "arquivo" },
             { "documentos", "arquivo" },
             { "documento", "arquivo" },
+            { "programa", "programa" },
+            { "aplicativo", "programa" },
+            { "app", "programa" },
+            { "executavel", "programa" },
         };
 
         //Todas as variações de objetos (pasta / arquivo)
@@ -299,7 +303,7 @@ namespace Vados
             { "audio", new List<string>() { "mp3", "wav", "ogg" } },
             { "apresentacao", new List<string>() { "odp", "ppt", "pptx" } },
             { "web", new List<string>() { "htm", "html", "css", "js", "php", "xps", "asp" } },
-            { "executavel", new List<string>() { "exe", "lnk" } },
+            { "executavel", new List<string>() { "exe" } },
             { "atalho", new List<string>() { "lnk" } },
             { "compactado", new List<string>() { "zip", "rar", "7z" } },
             { "power point", new List<string>() { "ppt", "pptx" } },
@@ -563,27 +567,21 @@ namespace Vados
                         break;
                 }
 
-                MessageBox.Show("lower: " + lowerBound.ToString() + ", upper: " + upperBound.ToString());
+                //MessageBox.Show("lower: " + lowerBound.ToString() + ", upper: " + upperBound.ToString());
             }
 
             #endregion
 
-
-            //Buscar apenas um caminho
-            if (amountModifier == "")
-            {
-                return SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: 1, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ToList();
-            }
-
             //Buscar mais de um caminho correspondente
             List<string> paths = new List<string>();
 
-            if (name == "" && format != "")
+            if (format != "")
             {
                 //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
                 foreach (string extension in Comandos.WordGetExtensions(format))
                 {
-                    List<string> newPaths = SearchPaths("." + extension, objectType == "pasta", rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ToList();
+                    //MessageBox.Show("extension: " + extension);
+                    List<string> newPaths = SearchPaths(name + "." + extension, objectType == "pasta", rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ToList();
                     paths.AddRange(newPaths);
                 }
             }
@@ -593,6 +591,8 @@ namespace Vados
                 paths = SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ToList();
             }
 
+            if (paths.Count == 0) return paths;
+
             //Corrigir quantidade de caminhos
             switch (amountModifier)
             {
@@ -601,6 +601,9 @@ namespace Vados
                 case "metade":
                     int half = (int)Math.Ceiling((decimal)paths.Count / 2);
                     paths = paths.GetRange(0, half);
+                    break;
+                case "":
+                    paths = paths.GetRange(0, 1);
                     break;
             }
 
@@ -623,16 +626,12 @@ namespace Vados
             string sizeModifier = arguments.SizeModifier;
 
 
-            //Adicionar extensão ao nome
-            if (name != "")
+            //Definições para arquivo executável (programa)
+            if (objectType == "programa")
             {
-                var extension = Comandos.WordGetExtensions(format);
-                if (extension.Count() != 0)
-                {
-                    name += "." + extension[0];
-                }
+                name.Replace(" ", "");
+                format = "executavel";
             }
-
 
             //Caminho da pasta de origem e de destino
             string destinationPath = "";
@@ -677,6 +676,11 @@ namespace Vados
                     if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
                     break;
 
+                case "abrir":
+                    if (objectType == "pasta") break;
+                    paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    ExecutarCaminho(paths.FirstOrDefault());
+                    break;
             }
         }
 
@@ -777,7 +781,7 @@ namespace Vados
         #region BUSCA 
 
         // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
-        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null, List<string> ignorar, List<string> prioridades)
+        public static HashSet<string> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null, List<string> exceptions = null, List<string> priorities = null)
         {
 
             // PRA QUE SERVE CADA PARÂMETRO:
@@ -792,46 +796,19 @@ namespace Vados
             string root = driveverifica(null);
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var resultados = new HashSet<string>();
-            var ignorar = new List<string> // lista de pastas que serão ignoradas na busca
-            {
-                "$RECYCLE.BIN",
-                "System Volume Information",
-                "Recovery",
-                "Config.Msi",
-                "Windows",
-                "Program Files (x86)",
-                "Program Files"
-            };
 
-            var prioridades = new List<string> // lista de pastas que serão priorizadas na busca
-            {
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+            //Definir prioridades e exceções
+            if (priorities == null) priorities = Global.defaultPriorities;
+            if (exceptions == null) exceptions = Global.defaultExceptions;
 
-                Path.Combine(root),
-            };
-
-            // determina se ele ira usar a quantidade pastas ou arquivos para o controle da função
+            //Determinar a quantidade de caminhos a serem buscados
             int? maxLength = pathAmount;
 
             if (!string.IsNullOrEmpty(rootFolder)) {
                 rootFolder = SearchPaths(rootFolder, true).FirstOrDefault();
                 if (string.IsNullOrEmpty(rootFolder)) return null;
                 //Buscar apenas na pasta determinada
-                prioridades = new List<string>() { rootFolder };
+                priorities = new List<string>() { rootFolder };
 
                 //Quantidade máxima a ser buscada
                 if (isFolder == true)
@@ -859,7 +836,7 @@ namespace Vados
 
             //Adicionar prioridades à fila
             var fila = new Queue<string>();
-            foreach (var pasta in prioridades)
+            foreach (var pasta in priorities)
             {
                 if (Directory.Exists(pasta))
                 {
@@ -888,7 +865,8 @@ namespace Vados
 
 
                             //Checar se a pasta tem o nome correto
-                            if (!string.IsNullOrEmpty(searchName) && !folderPath.Contains(searchName, StringComparison.OrdinalIgnoreCase))
+                            string actualName = Path.GetFileName(folderPath);
+                            if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
                             //Checar se está na pasta especificada
@@ -935,10 +913,12 @@ namespace Vados
 
 
                             //Checar se o arquivo tem o nome correto
-                            if (!string.IsNullOrEmpty(searchName) && !filePath.Contains(searchName, StringComparison.OrdinalIgnoreCase))
+                            string actualName = Path.GetFileName(filePath);
+                            if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
                             //Checar se está na pasta especificada
+                            //MessageBox.Show($"esp: {rootFolder}, caminho: {filePath}");
                             if (!string.IsNullOrEmpty(rootFolder) && !filePath.Contains(rootFolder, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
@@ -950,7 +930,7 @@ namespace Vados
                                 continue;
 
                             //Filtro de tamanho
-                            MessageBox.Show($"{filePath}\r\n{pathInfo.Length}");
+                            //MessageBox.Show($"{filePath}\r\n{pathInfo.Length}");
                             if (sizeLowerBound != -1 && sizeUpperBound != -1 && !SizeFilter(pathInfo.Length, sizeLowerBound, sizeUpperBound))
                                 continue;
 
@@ -970,7 +950,7 @@ namespace Vados
                     {
                         string nomePasta = Path.GetFileName(caminho);
                         //Ignorar pasta se ela for alguma das exceções
-                        if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                        if (exceptions.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                             continue;
 
                         if (visitados.Add(caminho))
@@ -987,11 +967,6 @@ namespace Vados
             }
             if (resultados != null)
             {
-                MessageBox.Show("bolete");
-                foreach(var x in resultados)
-                {
-                    MessageBox.Show(x);
-                }
                 return resultados;
             }
             MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
@@ -1025,7 +1000,7 @@ namespace Vados
 
             if (dia != 0 && mes != 0 && ano != 0 && fileinfo.LastWriteTime.Day == dia && fileinfo.LastWriteTime.Month == mes && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
             {
-                MessageBox.Show(fileinfo.LastWriteTime.Day + ", "+ fileinfo.LastWriteTime.Month + ", "+ fileinfo.LastWriteTime.Year);
+                //MessageBox.Show(fileinfo.LastWriteTime.Day + ", "+ fileinfo.LastWriteTime.Month + ", "+ fileinfo.LastWriteTime.Year);
 
                 return true;
             }
@@ -1033,12 +1008,12 @@ namespace Vados
             {
                 if (mes != 0 && ano != 0 && fileinfo.LastWriteTime.Month == mes && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
                 {
-                    MessageBox.Show("2");
+                    //MessageBox.Show("2");
                     return true;
                 }
                 else if ( mes == 0 && ano != 0 && fileinfo.LastWriteTime.Year == ano && arquivo.Contains(pastaroot))
                 {
-                    MessageBox.Show("3");
+                    //MessageBox.Show("3");
                     return true;
                 }
             }
@@ -1299,7 +1274,7 @@ namespace Vados
                 foreach (string nome in Pathnomes)
                 {
                     string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    MessageBox.Show(destinoNovo);
+                    //MessageBox.Show(destinoNovo);
 
                     if (Directory.Exists(destinoNovo))
                     {
@@ -1416,8 +1391,8 @@ namespace Vados
                     //{
                     //    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
                     //}
-                    MessageBox.Show("pasta: " + destination);
-                    MessageBox.Show("destino novo: " + newDestination);
+                    //MessageBox.Show("pasta: " + destination);
+                    //MessageBox.Show("destino novo: " + newDestination);
 
                     File.Copy(nome, newDestination, false);
                 }
@@ -1506,7 +1481,7 @@ namespace Vados
             int i = 1;
             string newName = nome;
 
-            MessageBox.Show(Path.Combine(destination, newName));
+            //MessageBox.Show(Path.Combine(destination, newName));
 
             while (File.Exists(Path.Combine(destination, newName)))
             {
@@ -1514,19 +1489,24 @@ namespace Vados
                 i++;
             }
 
-            MessageBox.Show("Nome: " + newName);
+            //MessageBox.Show("Nome: " + newName);
             return newName;
         }
         
-        public static void ExecutarAplicativo(string nome)
+        public static void ExecutarCaminho(string caminho)
         {
-         
-           
             ProcessStartInfo processInfo = new ProcessStartInfo();
-            processInfo.FileName = SearchFolders(nome, false, Global.ignorarExecutaveis, Global.prioridadesExecutaveis);
+            MessageBox.Show("caminho: " + caminho);
+
+            if (caminho == null)
+            {
+                MessageBox.Show("Caminho não encontrado");
+                return;
+            }
+
+            processInfo.FileName = caminho;
             processInfo.UseShellExecute = true;
             Process.Start(processInfo);
-           
         }
     }
 

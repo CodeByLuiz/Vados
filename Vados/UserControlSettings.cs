@@ -208,7 +208,7 @@ namespace Vados
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Comandos.ExecutarAplicativo(txtNomeAplicativo.Text);
+            Comandos.ExecutarCaminho(txtNomeAplicativo.Text);
         }
     }
 }

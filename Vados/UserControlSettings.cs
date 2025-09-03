@@ -4,13 +4,17 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace Vados
 {
+
+
     public partial class UserControlSettings : UserControl
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
@@ -18,11 +22,7 @@ namespace Vados
         public UserControlSettings()
         {
             InitializeComponent();
-
-
         }
-
-
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -33,7 +33,7 @@ namespace Vados
         private void btnCriar_Click(object sender, EventArgs e)
         {
 
-            string extension = cbExtensoes.Text;
+            string extension = "";
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
 
@@ -44,7 +44,18 @@ namespace Vados
             }
             else
             {
-                Comandos.CriarArquivo(nome, extension, destino);
+                var nomes = new List<string>()
+            {
+                @"C:\Users\ETEC\Desktop\pasta teste\11111.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
+
+            };
+
+                foreach (string x in nomes)
+                {
+                    Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
+                }
             }
 
 
@@ -55,14 +66,21 @@ namespace Vados
         {
             string extension = cbExtensoes.Text;
             string nome = txtNome.Text;
+            var nomes = new List<string>()
+            {
+                @"C:\Users\ETEC\Desktop\pasta teste\11111.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
+
+            };
 
             if (extension == "pasta")
             {
-                Comandos.ExcluirPasta(nome);
+                //Comandos.ExcluirPasta(nome);
             }
             else
             {
-                Comandos.ExcluirArquivo(nome, extension);
+                Comandos.ExcluirArquivo(nomes);
             }
         }
 
@@ -73,11 +91,11 @@ namespace Vados
             string novoNome = txtNovoNome.Text;
             if (extension == "pasta")
             {
-                Comandos.RenomearPasta(nome, novoNome);
+                Comandos.RenomearPasta(nome, novoNome, "");
             }
             else
             {
-                Comandos.RenomearArquivo(nome, novoNome, extension);
+                Comandos.RenomearArquivo(nome, novoNome, "");
             }
 
         }
@@ -120,25 +138,68 @@ namespace Vados
 
             string SearchArquivo = txtSearch.Text;
 
-            MessageBox.Show(Environment.UserName);
-            if (cbExtensoes.Text == "pasta")
+            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, pathAmount:null))
             {
-
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, true, Global.ignorarPadrao, Global.prioridadesPadrao));
-
-            }
-            else
-            {
-                listateste.Items.Add(Comandos.SearchFolders(SearchArquivo, false, Global.ignorarPadrao, Global.prioridadesPadrao));
-
+                listateste.Items.Add(item);
             }
         }
+        
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
 
         }
 
+
+        private void txtDestinatario_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void btnMover_Click(object sender, EventArgs e)
+        {
+            string extension = "";
+            string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
+            var nomes = new List<string>()
+            {
+                @"C:\Users\ETEC\Desktop\pasta teste\11111.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
+                @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
+
+            };
+
+            if (extension == "pasta")
+            {
+               // Comandos.MoverPasta(nome, destino);
+
+            }
+            else
+            {
+                Comandos.MoverArquivo(nomes, @"C:\Users\ETEC\\Desktop\moveraqui");
+            }
+        }
+        
+
+        private void btnDupe_Click(object sender, EventArgs e)
+        {
+            string extension = cbExtensoes.Text;
+            string nome = txtNome.Text;
+            string destino = txtDestinatario.Text;
+
+            if (extension == "pasta")
+            {
+               // Comandos.DuplicarPasta(nome, destino);
+
+            }
+            else
+            {
+                //Comandos.DuplicarArquivo(nome, destino);
+            }
+        }
+        
+        
         private void btnAbrirArquivo_Click(object sender, EventArgs e)
         {
             string NomeArquivo = txtNome.Text;

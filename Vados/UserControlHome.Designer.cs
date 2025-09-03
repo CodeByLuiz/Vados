@@ -159,6 +159,7 @@
             MinimumSize = new Size(360, 180);
             Name = "UserControlHome";
             Size = new Size(1680, 810);
+            KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();

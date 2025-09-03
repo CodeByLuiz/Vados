@@ -47,6 +47,8 @@
             listateste = new ListBox();
             btnLog = new Button();
             txtSearch = new TextBox();
+            btnMover = new Button();
+            btnDupe = new Button();
             btnAbrirArquivo = new Button();
             txtNomeAplicativo = new TextBox();
             label6 = new Label();
@@ -159,6 +161,7 @@
             txtDestinatario.Name = "txtDestinatario";
             txtDestinatario.Size = new Size(100, 23);
             txtDestinatario.TabIndex = 11;
+            txtDestinatario.TextChanged += txtDestinatario_TextChanged;
             // 
             // btnAdm
             // 
@@ -227,9 +230,29 @@
             txtSearch.TabIndex = 18;
             txtSearch.TextChanged += textBox1_TextChanged;
             // 
+            // btnMover
+            // 
+            btnMover.Location = new Point(53, 242);
+            btnMover.Name = "btnMover";
+            btnMover.Size = new Size(75, 23);
+            btnMover.TabIndex = 19;
+            btnMover.Text = "Mover";
+            btnMover.UseVisualStyleBackColor = true;
+            btnMover.Click += btnMover_Click;
+            // 
+            // btnDupe
+            // 
+            btnDupe.Location = new Point(167, 242);
+            btnDupe.Name = "btnDupe";
+            btnDupe.Size = new Size(75, 23);
+            btnDupe.TabIndex = 20;
+            btnDupe.Text = "Duplicar";
+            btnDupe.UseVisualStyleBackColor = true;
+            btnDupe.Click += btnDupe_Click;
+            // 
             // btnAbrirArquivo
             // 
-            btnAbrirArquivo.Location = new Point(113, 242);
+            btnAbrirArquivo.Location = new Point(99, 301);
             btnAbrirArquivo.Name = "btnAbrirArquivo";
             btnAbrirArquivo.Size = new Size(164, 23);
             btnAbrirArquivo.TabIndex = 19;
@@ -281,6 +304,9 @@
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(txtNomeAplicativo);
+            BackgroundImageLayout = ImageLayout.Stretch;
+            Controls.Add(btnDupe);
+            Controls.Add(btnMover);
             Controls.Add(btnAbrirArquivo);
             Controls.Add(txtSearch);
             Controls.Add(btnLog);
@@ -329,6 +355,8 @@
         private ListBox listateste;
         private Button btnLog;
         private TextBox txtSearch;
+        private Button btnMover;
+        private Button btnDupe;
         private Button btnAbrirArquivo;
         private TextBox txtNomeAplicativo;
         private Label label6;

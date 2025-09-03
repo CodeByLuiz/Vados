@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -49,6 +50,35 @@ namespace Vados
         bool setTextboxWidth = false;
         bool textboxActive = false;
 
+
+        public void PerformCommand(string command)
+        {
+            if (textboxActive == true)
+            {
+                MessageBox.Show(Comandos.RemoveDiacritics(txtComando.Text));
+
+                //Extrair argumentos do comando
+                var arguments = Comandos.CommandGetArguments(txtComando.Text);
+
+                //Executar comando
+                Comandos.ExecuteCommand(arguments);
+            }
+        }
+
+
+        //Realizar comando quando apertar enter
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Enter)
+            {
+                PerformCommand(txtComando.Text);
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+
         public UserControlHome()
         {
             InitializeComponent();
@@ -81,14 +111,13 @@ namespace Vados
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário
-            if (textboxActive == true)
+            if (textboxActive == true && txtComando.Text == "")
             {
                 txtComando.Text = "Escreva um comando...";
                 txtComando.ForeColor = Color.FromArgb(88, 99, 152);
                 txtComando.ForeColor = Colors.blueTernary;
+                textboxActive = false;
             }
-
-            textboxActive = false;
         }
 
 
@@ -367,13 +396,7 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                string comando = txtComando.Text;
-
-                if (textboxActive == true)
-                {
-                    List<string> palavras = Comandos.SepararPalavras(comando);
-                    MessageBox.Show(String.Join(", ", palavras.ToArray()));
-                }
+                PerformCommand(txtComando.Text);
             }
 
             #endregion
@@ -393,6 +416,16 @@ namespace Vados
         private void txtComando_TextChanged(object sender, EventArgs e)
         {
 
+        }
+        
+        private void UserControlHome_KeyDown(object sender, KeyEventArgs e)
+        {
+            MessageBox.Show("enter");
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                PerformCommand(txtComando.Text);
+            }
         }
     }
 }

@@ -299,10 +299,10 @@ namespace Vados
                 criteria.SizeAmount = match.Groups[4].Value;
 
                 //Modificador
-                criteria.SizeModifier = match.Groups[3].Value;
+                criteria.SizeModifier = Comandos.WordGetSynonym(match.Groups[3].Value);
 
                 //Unidade
-                criteria.SizeUnit = match.Groups[5].Value;
+                criteria.SizeUnit = Comandos.WordGetSynonym(match.Groups[5].Value);
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));

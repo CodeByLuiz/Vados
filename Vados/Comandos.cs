@@ -683,8 +683,20 @@ namespace Vados
                         case true:
 
 
+                            var subpasta = await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    return Directory.GetDirectories(atual);
+                                }
+                                catch (UnauthorizedAccessException)
+                                {
+                                    Console.WriteLine($"Acesso negado ao diretório: {atual}");
+                                    return Array.Empty<string>();
+                                }
+                            });
 
-                            foreach (var caminho in (await Task.Run(()=> Directory.GetDirectories(atual)))) // percorre todas as pastas dentro da pasta atual
+                            foreach (var caminho in subpasta) // percorre todas as pastas dentro da pasta atual
                             {
                                 string nomePasta = Path.GetFileName(caminho); // pega o nome da pasta atual a partir do caminho completo
 
@@ -838,8 +850,20 @@ namespace Vados
                                     }
                             }
 
+                            var subpastas = await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    return Directory.GetDirectories(atual);
+                                }
+                                catch (UnauthorizedAccessException)
+                                {
+                                    Console.WriteLine($"Acesso negado ao diretório: {atual}");
+                                    return Array.Empty<string>();
+                                }
+                            });
 
-                            foreach (var caminho in (await Task.Run(()=>Directory.GetDirectories(atual)))) // percorre todas as pastas dentro da pasta atual
+                            foreach (var caminho in subpastas) // percorre todas as pastas dentro da pasta atual
                             {
                                 string nomePasta = Path.GetFileName(caminho);
                                 if (ignorar.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
@@ -859,11 +883,15 @@ namespace Vados
                     }
 
                 }
-
-                catch (Exception)
+                catch (UnauthorizedAccessException)
                 {
-
+                    continue; // Skip inaccessible directories
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro capturado {ex.Message}");
+                }
+                
             }
             if (resultados != null)
             {

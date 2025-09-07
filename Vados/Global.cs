@@ -39,19 +39,19 @@ namespace Vados
         public static List<string> defaultPriorities = new List<string>
             {
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
                 Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
                 //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
                 Path.Combine(root),
@@ -64,7 +64,7 @@ namespace Vados
                 @"C:\Program Files",
                 @"C:\Program Files (x86)",
 
-                Path.Combine(root),
+                //Path.Combine(root),
             };
 
 

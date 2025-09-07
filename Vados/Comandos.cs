@@ -518,8 +518,11 @@ namespace Vados
 
 
         //Retorna os caminhos encontrados conforme os critérios
-        static List<string> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier)
+        static List<string> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
         {
+            if (priorities == null) priorities = Global.defaultPriorities;
+            if (exceptions == null) priorities = Global.defaultExceptions;
+
             #region TAMANHO
 
             //Definir quantidade de bytes conforme a unidade de tamanho
@@ -581,7 +584,8 @@ namespace Vados
                 foreach (string extension in Comandos.WordGetExtensions(format))
                 {
                     //MessageBox.Show("extension: " + extension);
-                    List<string> newPaths = SearchPaths(name + "." + extension, objectType == "pasta", rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ToList();
+                    List<string> newPaths = SearchPaths(name + "." + extension, objectType == "pasta",
+                                                        rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions, priorities: priorities).ToList();
                     paths.AddRange(newPaths);
                 }
             }
@@ -663,7 +667,7 @@ namespace Vados
                     if (objectType == "arquivo") { ExcluirArquivo(paths); }
                     break;
 
-                
+
                 case "mover":
                     paths = GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
                     if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
@@ -678,7 +682,18 @@ namespace Vados
 
                 case "abrir":
                     if (objectType == "pasta") break;
-                    paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+
+                    //Procurar caminhos mais eficientemente
+                    if (objectType == "arquivo")
+                    {
+                        paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    } 
+                    else
+                    {
+                        //Prioridades e excessões para procurar programas
+                        paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
+                    }
+
                     ExecutarCaminho(paths.FirstOrDefault());
                     break;
             }
@@ -911,14 +926,12 @@ namespace Vados
                             if (!visitados.Add(filePath)) 
                                continue;
 
-
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
                             //Checar se está na pasta especificada
-                            //MessageBox.Show($"esp: {rootFolder}, caminho: {filePath}");
                             if (!string.IsNullOrEmpty(rootFolder) && !filePath.Contains(rootFolder, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
@@ -930,7 +943,6 @@ namespace Vados
                                 continue;
 
                             //Filtro de tamanho
-                            //MessageBox.Show($"{filePath}\r\n{pathInfo.Length}");
                             if (sizeLowerBound != -1 && sizeUpperBound != -1 && !SizeFilter(pathInfo.Length, sizeLowerBound, sizeUpperBound))
                                 continue;
 
@@ -949,6 +961,7 @@ namespace Vados
                     foreach (var caminho in Directory.GetDirectories(atual))
                     {
                         string nomePasta = Path.GetFileName(caminho);
+
                         //Ignorar pasta se ela for alguma das exceções
                         if (exceptions.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
                             continue;

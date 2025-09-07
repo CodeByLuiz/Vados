@@ -26,6 +26,7 @@ namespace Vados
 
 
         //Variáveis do botão do microfone
+        float circleSizeMax = 325;
         float circleSizeDefault = 325;
         float circleSize = 325;
         float circleSizeTarget = 325;
@@ -33,6 +34,7 @@ namespace Vados
         float circleY = 0;
         bool circleHovering = false;
         bool lastCircleHovering = false;
+        float circleSizeRatio = 1;
         
 
         //Variáveis da textbox
@@ -91,7 +93,6 @@ namespace Vados
 
             micIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png"));
             txtComando.Select(0, 0);
-
         }
 
        
@@ -311,32 +312,33 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            #region ajustar label
-            int middleX = this.Width  / 2;
-            int middleY = 85 + (lblText.Top - 85) / 2;
-
-
-
-            circleX = middleX - circleSize / 2;
-            circleY = middleY - circleSize / 2;
+            #region AJUSTAR LABEL
 
             int labelX = this.Width / 2 - lblText.Width / 2;
-            int labelY = (int)(circleY + circleSize + lblText.Height);
-
-            labelY = Math.Clamp(lblText.Location.Y, 0, txtComando.Location.Y - 5);
+            int labelY = txtComando.Top - lblText.Height - 40;
 
             lblText.Location = new Point(labelX, labelY);
+
             #endregion
 
 
-            #region Ajustar botao mic
-            circleSizeDefault = Math.Min(this.Height * 0.4f, 325);
+            #region AJUSTAR BOTÃO DO MICROFONE
+
+            //Corrigir tamanho
+            int minY = 85;
+            int maxY = lblText.Top;
+            float newSize = (maxY - minY) * 0.8f;
+            circleSizeDefault = Math.Min(newSize, circleSizeMax);
+            circleSize = circleSizeDefault;
             circleSizeTarget = circleSizeDefault;
+
+            //Reposicionar círculo no centro
+            int middleX = this.Width / 2;
+            int middleY = minY + (lblText.Top - minY) / 2;
+
+            circleX = middleX - circleSize / 2;
+            circleY = middleY - circleSize / 2;
             
-
-
-
-
             #endregion
 
             #region AJUSTAR TEXTBOX
@@ -372,8 +374,6 @@ namespace Vados
 
             #endregion
           
-
-
 
             pnlBottom.Invalidate();
         }

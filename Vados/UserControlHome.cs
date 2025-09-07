@@ -18,12 +18,7 @@ namespace Vados
         public event EventHandler<LoadPageEventArgs> loadPage;
 
         System.Windows.Forms.Timer timer;
-
-
-      
-
         private Image micIcon;
-
 
         //Variáveis do botão do microfone
         float circleSizeMax = 325;
@@ -65,6 +60,18 @@ namespace Vados
                 //Executar comando
                 Comandos.ExecuteCommand(arguments);
             }
+
+
+            //Escurecer tela
+            var parentForm = this.FindForm() as Form1;
+            if (parentForm != null)
+            {
+                parentForm.ToggleOverlay(true);
+            }
+
+            //Mostrar mensagem de confirmação
+            var message = new FormMessage();
+            message.Show();
         }
 
 

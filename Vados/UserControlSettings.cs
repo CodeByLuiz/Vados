@@ -38,25 +38,24 @@ namespace Vados
             string destino = txtDestinatario.Text;
 
 
-            if (extension == "pasta")
-            {
+            
                 Comandos.CriarPasta(nome, destino);
-            }
-            else
-            {
-                var nomes = new List<string>()
-            {
-                @"C:\Users\ETEC\Desktop\pasta teste\11111.txt",
-                @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
-                @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
+           
+            //else
+            //{
+            //    var nomes = new List<string>()
+            //{
+            //    @"C:\Users\ETEC\Desktop\pasta teste\11111.txt",
+            //    @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
+            //    @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
 
-            };
+            //};
 
-                foreach (string x in nomes)
-                {
-                    Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
-                }
-            }
+            //    foreach (string x in nomes)
+            //    {
+            //        Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
+            //    }
+            //}
 
 
 
@@ -133,12 +132,11 @@ namespace Vados
 
         }
 
-        private void btnLog_Click(object sender, EventArgs e)
+        private async void btnLog_Click(object sender, EventArgs e)
         {
-
             string SearchArquivo = txtSearch.Text;
-
-            foreach (var item in Comandos.SearchPaths(SearchArquivo, false, pathAmount:null))
+            
+            foreach (var item in (await Comandos.SearchPaths(SearchArquivo, false, pathAmount:null)))
             {
                 listateste.Items.Add(item);
             }

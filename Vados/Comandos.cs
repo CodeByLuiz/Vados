@@ -573,6 +573,10 @@ namespace Vados
 
             #endregion
 
+
+            int? amountNumber = null;
+            if (amountModifier == "") amountNumber = 1;
+
             //Buscar mais de um caminho correspondente
             List<string> paths = new List<string>();
 
@@ -582,15 +586,15 @@ namespace Vados
                 foreach (string extension in Comandos.WordGetExtensions(format))
                 {
                     //MessageBox.Show("extension: " + extension);
-                    List<string> newPaths = (await (SearchPaths(name + "." + extension, objectType == "pasta",
-                                                        rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions, priorities: priorities)).ToList();
+                    List<string> newPaths = (await SearchPaths(name + "." + extension, objectType == "pasta",
+                                                        rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions, priorities: priorities)).ToList();
                     paths.AddRange(newPaths);
                 }
             }
             else
             {
                 //Procura normal usando o nome
-                paths = (await (SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: null, sizeLowerBound: lowerBound, sizeUpperBound: upperBound)).ToList();
+                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound)).ToList();
             }
 
             if (paths.Count == 0) return paths;
@@ -609,6 +613,7 @@ namespace Vados
                     break;
             }
 
+            MessageBox.Show("Terminou busca");
             return paths;
         }
 
@@ -684,12 +689,12 @@ namespace Vados
                     //Procurar caminhos mais eficientemente
                     if (objectType == "arquivo")
                     {
-                        paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
                     } 
                     else
                     {
                         //Prioridades e excessões para procurar programas
-                        paths = GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
                     }
 
                     ExecutarCaminho(paths.FirstOrDefault());
@@ -827,12 +832,12 @@ namespace Vados
                 if (isFolder == true)
                 {
                     //Pastas
-                    maxLength = await Task.Run(()=>Directory.GetDirectories(rootFolder).Length);
+                    maxLength = await Task.Run(()=> Directory.GetDirectories(rootFolder).Length);
                 }
                 else
                 {
                     //Arquivos
-                    maxLength = await Task.Run(() =>Directory.GetFiles(rootFolder).Length);
+                    maxLength = await Task.Run(() => Directory.GetFiles(rootFolder).Length);
                 }
             }
 
@@ -845,6 +850,8 @@ namespace Vados
             {
                 pathAmount = int.MaxValue;  //Sem limite
             }
+
+            //MessageBox.Show("Máximo: " + pathAmount);
 
 
             //Adicionar prioridades à fila
@@ -906,7 +913,7 @@ namespace Vados
                             //Filtro de tamanho
                             if (sizeLowerBound != -1 && sizeUpperBound != -1)
                             {
-                                long folderSize = FolderGetSize(folderPath, criterio: sizeLowerBound);
+                                long folderSize = await FolderGetSize(folderPath, criterio: sizeLowerBound);
 
                                 if (!SizeFilter(folderSize, sizeLowerBound, sizeUpperBound))
                                     continue;
@@ -926,15 +933,34 @@ namespace Vados
                     //Arquivos
                     else
                     {
+                        var files = await Task.Run(() =>
+                        {
+                            try
+                            {
+                                return Directory.GetFiles(atual);
+                            }
+                            catch (UnauthorizedAccessException)
+                            {
+                                Console.WriteLine($"Acesso negado ao diretório: {atual}");
+                                return Array.Empty<string>();
+                            }
+                        });
+
+                        //MessageBox.Show("Pasta: " + atual + "\r\nArquivos: " + string.Join("|", files.Select(Regex.Escape)));
+
                         //Percorrer todos os arquivos da pasta atual
-                        foreach (var filePath in (await Task.Run(()=> Directory.GetFiles(atual))))
+                        foreach (var filePath in files)
                         {
                             //Parar se o arquivo já tiver sido visitado
                             if (!visitados.Add(filePath)) 
                                continue;
 
+                            Console.WriteLine(filePath);
+
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
+
+                            //MessageBox.Show("Nome: " + actualName + "\r\nEsperado: " + searchName);
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
@@ -1078,6 +1104,36 @@ namespace Vados
 
             return tamanhoTotal;
         }
+
+        public static async Task<long> FolderGetSize(string caminho, long criterio = 0, long control = 0)
+        {
+            long tamanhoTotal = 0;
+
+            try
+            {
+
+                tamanhoTotal += await Task.Run(() => Directory.GetFiles(caminho).Sum(arquivo => new FileInfo(arquivo).Length));
+
+                control += tamanhoTotal;
+
+                if (control == 1.5 * criterio && criterio != 0 || tamanhoTotal >= 1.5 * criterio)
+                {
+                    return control;
+                }
+
+                foreach (var subPasta in await Task.Run(() => Directory.GetDirectories(caminho)))
+                {
+                    tamanhoTotal += (await FolderGetSize(subPasta, control: control));
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return tamanhoTotal;
+        }
+
         #endregion
 
 

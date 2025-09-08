@@ -201,7 +201,7 @@ namespace Vados
         private void btnAbrirArquivo_Click(object sender, EventArgs e)
         {
             string NomeArquivo = txtNome.Text;
-            Comandos.AbrirArquivo(NomeArquivo);
+            //Comandos.AbrirArquivo(NomeArquivo);
         }
 
         private void button2_Click(object sender, EventArgs e)

@@ -117,5 +117,38 @@ namespace Vados
             return true;
         }
 
+
+        //Definir tamanho da textbox de acordo com o conteúdo
+        public static void TextBoxFitContent(RichTextBox textBox, int extraPadding = 2)
+        {
+            if (textBox == null) return;
+
+            // Use a Graphics object to measure the text accurately
+            using (Graphics g = textBox.CreateGraphics())
+            {
+                if (textBox.Multiline)
+                {
+                    string[] lines = textBox.Text.Split('\n');
+                    int maxWidth = 0;
+                    int totalHeight = 0;
+
+                    foreach (string line in lines)
+                    {
+                        SizeF size = g.MeasureString(line, textBox.Font);
+                        maxWidth = Math.Max(maxWidth, (int)Math.Ceiling(size.Width));
+                        totalHeight += (int)Math.Ceiling(size.Height);
+                    }
+
+                    textBox.Width = maxWidth + extraPadding + textBox.Padding.Horizontal;
+                    textBox.Height = totalHeight + extraPadding + textBox.Padding.Vertical;
+                }
+                else
+                {
+                    SizeF size = g.MeasureString(textBox.Text, textBox.Font);
+                    textBox.Width = (int)Math.Ceiling(size.Width) + extraPadding + textBox.Padding.Horizontal;
+                    textBox.Height = (int)Math.Ceiling(size.Height) + extraPadding + textBox.Padding.Vertical;
+                }
+            }
+        }
     }
 }

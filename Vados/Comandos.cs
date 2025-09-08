@@ -469,7 +469,8 @@ namespace Vados
                         {
                             new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
                             new NewNameExtractor(),
-                            new OriginExtractor(fromWords, folderWords, namingWords)
+                            new OriginExtractor(fromWords, folderWords, namingWords),
+                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
                     break;
 
@@ -477,7 +478,8 @@ namespace Vados
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
                             new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
-                            new OriginExtractor(fromWords, folderWords, namingWords)
+                            new OriginExtractor(fromWords, folderWords, namingWords),
+                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
                     break;
 
@@ -498,7 +500,8 @@ namespace Vados
                         {
                             new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
                             new OriginExtractor(fromWords, folderWords, namingWords),
-                            new DestinationExtractor(insideWords, folderWords, namingWords)
+                            new DestinationExtractor(insideWords, folderWords, namingWords),
+                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
                     break;
 

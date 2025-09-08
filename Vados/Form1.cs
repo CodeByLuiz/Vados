@@ -34,8 +34,15 @@ namespace Vados
 
         public void ToggleOverlay(bool visible)
         {
-            overlayForm.Show();
-            overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+            if (visible)
+            {
+                overlayForm.Show();
+                overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+            }
+            else
+            {
+                overlayForm.Hide();
+            }
         }
 
       

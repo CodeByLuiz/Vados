@@ -50,15 +50,13 @@ namespace Vados
 
         public void PerformCommand(string command)
         {
+            //Extrair argumentos do comando
+            var arguments = Comandos.CommandGetArguments(txtComando.Text);
+            
             if (textboxActive == true)
             {
-                //MessageBox.Show(Comandos.RemoveDiacritics(txtComando.Text));
-
-                //Extrair argumentos do comando
-                var arguments = Comandos.CommandGetArguments(txtComando.Text);
-
-                //Executar comando
-                Comandos.ExecuteCommand(arguments);
+                ////Executar comando
+                //Comandos.ExecuteCommand(arguments);
             }
 
 
@@ -70,7 +68,7 @@ namespace Vados
             }
 
             //Mostrar mensagem de confirmação
-            var message = new FormMessage();
+            var message = new FormMessage(arguments, this.FindForm());
             message.Show();
         }
 

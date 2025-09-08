@@ -4,6 +4,8 @@ namespace Vados
 {
     public partial class Form1 : Form
     {
+        Form overlayForm = new Form();
+
         private bool isFullscreen = false;
         private FormWindowState lastWindowState;
         private FormBorderStyle lastBorderStyle;
@@ -14,7 +16,29 @@ namespace Vados
         {
             InitializeComponent();
             KeyPreview = true;
+
+            //Otimizar pintura
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint, true);
+
+            //Criar form transparente para escurecer a tela quando preciso
+            overlayForm.FormBorderStyle = FormBorderStyle.None;
+            overlayForm.BackColor = Color.Black;
+            overlayForm.Opacity = 0.25;
+            overlayForm.ShowInTaskbar = false;
+            overlayForm.StartPosition = FormStartPosition.Manual;
         }
+
+        public void ToggleOverlay(bool visible)
+        {
+            overlayForm.Show();
+            overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+        }
+
+      
 
         //Função para trocar user control
         public void LoadUserControl(UserControl userControl)
@@ -71,6 +95,11 @@ namespace Vados
 
                 isFullscreen = false;
             }
+        }
+
+        private void panelContainer_Paint(object sender, PaintEventArgs e)
+        {
+           
         }
     }
 }

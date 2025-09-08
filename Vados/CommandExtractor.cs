@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Vados
 {
@@ -16,11 +17,14 @@ namespace Vados
         public string Action = "";          //Tipo de comando
         public string ObjectType = "";      //Tipo de objeto (arquivo / pasta)
         public string ObjectName = "";      //Nome do objeto
-        public string ObjectAmount = "";    //Quantidade de objetos ("todos")
+        public string ObjectAmount = "";    //Quantidade de objetos (todos, metade)
         public string ObjectNewName = "";   //Novo nome do objeto (ao renomear)
-        public string ObjectFormat = ""; //Formato do objeto (pode ser várias extensões)
+        public string ObjectFormat = "";    //Formato do objeto (pode ser várias extensões)
         public string Origin = "";          //Nome da pasta de origem 
         public string Destination = "";     //Nome da pasta de destino
+        public string SizeAmount = "";      //Tamanho (número)
+        public string SizeModifier = "";    //Modificador do tamanho (maior, menor)
+        public string SizeUnit = "";        //Unidade de tamanho (giga, mega)
     }
 
 
@@ -87,7 +91,7 @@ namespace Vados
             }
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Comando -> " + actionStr);
+            //MessageBox.Show("Comando -> " + actionStr);
         }
     }
 
@@ -149,7 +153,7 @@ namespace Vados
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Objeto -> " + objectStr);
+            //MessageBox.Show("Objeto -> " + objectStr);
         }
     }
 
@@ -163,7 +167,7 @@ namespace Vados
         {
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b(\s+(para|pra)\s({patternName}))";
+            string pattern = $@"\b(\s+(para|pra)\s+({patternName}))";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -178,7 +182,7 @@ namespace Vados
             }
 
             string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Novo nome -> " + newNameStr);
+            //MessageBox.Show("Novo nome -> " + newNameStr);
         }
     }
 
@@ -204,7 +208,7 @@ namespace Vados
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s({patternName})";
+            string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s+({patternName})";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -218,7 +222,7 @@ namespace Vados
             }
 
             string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Origem -> " + originStr);
+            //MessageBox.Show("Origem -> " + originStr);
         }
     }
 
@@ -258,7 +262,51 @@ namespace Vados
             }
 
             string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Destino -> " + destinationStr);
+            //MessageBox.Show("Destino -> " + destinationStr);
+        }
+    }
+
+
+    //Extrai o tamanho do arquivo / pasta
+    public class SizeExtractor : CriteriaExtractor
+    {
+        List<string> sizeIndicators;
+        List<string> sizeModifiers;
+        List<string> sizeUnits;
+
+        public SizeExtractor(List<string> sizeIndicators_, List<string> sizeModifiers_, List<string> sizeUnits_)
+        {
+            sizeIndicators = sizeIndicators_;
+            sizeModifiers = sizeModifiers_;
+            sizeUnits = sizeUnits_;
+        }
+
+        public void Extract(string command, CommandCriteria criteria)
+        {
+            string patternIndicator = string.Join("|", sizeIndicators.Select(Regex.Escape));
+            string patternModifier = string.Join("|", sizeModifiers.Select(Regex.Escape));
+            string patternUnit = string.Join("|", sizeUnits.Select(Regex.Escape));
+
+            string pattern = $@"\b({patternIndicator})?(\s+({patternModifier}))?\s+(\d+)\s+({patternUnit})";
+
+            //Checar se o padrão está no comando
+            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+
+            //Extrair argumentos
+            if (match.Success)
+            {
+                //Tamanho
+                criteria.SizeAmount = match.Groups[4].Value;
+
+                //Modificador
+                criteria.SizeModifier = Comandos.WordGetSynonym(match.Groups[3].Value);
+
+                //Unidade
+                criteria.SizeUnit = Comandos.WordGetSynonym(match.Groups[5].Value);
+            }
+
+            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            //MessageBox.Show("Tamanho -> " + objectStr);
         }
     }
 }

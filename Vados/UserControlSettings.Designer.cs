@@ -50,6 +50,10 @@
             btnMover = new Button();
             btnDupe = new Button();
             btnAbrirArquivo = new Button();
+            txtNomeAplicativo = new TextBox();
+            label6 = new Label();
+            label7 = new Label();
+            button2 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -256,10 +260,50 @@
             btnAbrirArquivo.UseVisualStyleBackColor = true;
             btnAbrirArquivo.Click += btnAbrirArquivo_Click;
             // 
+            // txtNomeAplicativo
+            // 
+            txtNomeAplicativo.Location = new Point(167, 375);
+            txtNomeAplicativo.Name = "txtNomeAplicativo";
+            txtNomeAplicativo.Size = new Size(144, 23);
+            txtNomeAplicativo.TabIndex = 20;
+            txtNomeAplicativo.Text = "...";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Location = new Point(85, 378);
+            label6.Name = "label6";
+            label6.Size = new Size(43, 15);
+            label6.TabIndex = 21;
+            label6.Text = "Nome:";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(206, 357);
+            label7.Name = "label7";
+            label7.Size = new Size(58, 15);
+            label7.TabIndex = 22;
+            label7.Text = "aplicativo";
+            // 
+            // button2
+            // 
+            button2.Location = new Point(167, 404);
+            button2.Name = "button2";
+            button2.Size = new Size(136, 32);
+            button2.TabIndex = 23;
+            button2.Text = "executar";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
             // UserControlSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(button2);
+            Controls.Add(label7);
+            Controls.Add(label6);
+            Controls.Add(txtNomeAplicativo);
             BackgroundImageLayout = ImageLayout.Stretch;
             Controls.Add(btnDupe);
             Controls.Add(btnMover);
@@ -314,5 +358,9 @@
         private Button btnMover;
         private Button btnDupe;
         private Button btnAbrirArquivo;
+        private TextBox txtNomeAplicativo;
+        private Label label6;
+        private Label label7;
+        private Button button2;
     }
 }

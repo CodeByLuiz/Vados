@@ -50,16 +50,6 @@ namespace Vados
 
         public void PerformCommand(string command)
         {
-            //Extrair argumentos do comando
-            var arguments = Comandos.CommandGetArguments(txtComando.Text);
-            
-            if (textboxActive == true)
-            {
-                ////Executar comando
-                //Comandos.ExecuteCommand(arguments);
-            }
-
-
             //Escurecer tela
             var parentForm = this.FindForm() as Form1;
             if (parentForm != null)
@@ -67,8 +57,12 @@ namespace Vados
                 parentForm.ToggleOverlay(true);
             }
 
+            //Extrair argumentos do comando
+            var arguments = Comandos.CommandGetArguments(txtComando.Text);
+
             //Mostrar mensagem de confirmação
-            var message = new FormMessage(arguments, this.FindForm());
+            var message = new FormMessage(arguments);
+            message.Owner = this.FindForm();
             message.Show();
         }
 

@@ -16,12 +16,11 @@ namespace Vados
     public partial class FormMessage : Form
     {
         CommandCriteria criteria;
-        Form parentForm;
 
 
         private void ExitMessage()
         {
-            Form1 form = (Form1)parentForm;
+            Form1 form = (Form1)this.Owner;
             form.ToggleOverlay(false);
             this.Hide();
         }
@@ -217,11 +216,10 @@ namespace Vados
         #endregion
 
 
-        public FormMessage(CommandCriteria criteria_, Form parentForm_)
+        public FormMessage(CommandCriteria criteria_)
         {
             InitializeComponent();
             criteria = criteria_;
-            parentForm = parentForm_;
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -260,6 +258,12 @@ namespace Vados
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            ExitMessage();
+        }
+
+        private void btnConfirm_Click(object sender, EventArgs e)
+        {
+            Comandos.ExecuteCommand(criteria);
             ExitMessage();
         }
     }

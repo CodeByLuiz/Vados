@@ -29,6 +29,7 @@ namespace Vados
             overlayForm.BackColor = Color.Black;
             overlayForm.Opacity = 0.25;
             overlayForm.ShowInTaskbar = false;
+            overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
         }
 
@@ -45,7 +46,7 @@ namespace Vados
             }
         }
 
-      
+
 
         //Função para trocar user control
         public void LoadUserControl(UserControl userControl)
@@ -104,9 +105,11 @@ namespace Vados
             }
         }
 
-        private void panelContainer_Paint(object sender, PaintEventArgs e)
+        private void Form1_Resize(object sender, EventArgs e)
         {
-           
+            //Corrigir tamanho da tela preta
+            overlayForm.Bounds = this.Bounds;
+            overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
         }
     }
 }

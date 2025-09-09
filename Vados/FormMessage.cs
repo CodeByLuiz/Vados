@@ -8,6 +8,8 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Vados
 {
@@ -17,7 +19,17 @@ namespace Vados
         Form parentForm;
 
 
-        private static string GetConfirmationMessage(CommandCriteria criteria)
+        private void ExitMessage()
+        {
+            Form1 form = (Form1)parentForm;
+            form.ToggleOverlay(false);
+            this.Hide();
+        }
+
+
+        #region DEFINIR MENSAGEM
+
+        private static void SetConfirmationMessage(RichTextBox textBox, CommandCriteria criteria)
         {
             string commandType = criteria.Action;
             string objectType = criteria.ObjectType;
@@ -31,7 +43,8 @@ namespace Vados
             string sizeUnit = criteria.SizeUnit;
             string sizeModifier = criteria.SizeModifier;
 
-            string finalMessage = "Você deseja";
+            MessageBox.Show("old width: " + textBox.Width.ToString());
+            textBox.Text = "Você deseja";
 
 
             //Comando
@@ -39,7 +52,7 @@ namespace Vados
 
             if (commandType != "")
             {
-                finalMessage += " " + commandType;
+                AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, FontStyle.Bold);
 
                 //Conector após comando
                 switch (commandType)
@@ -79,14 +92,14 @@ namespace Vados
             {
                 string objectStr = objectType;
                 if (amount != "") objectStr += "s";
-                finalMessage += commandConnector + objectType;
+                AppendPlainText(textBox, commandConnector + objectType);
             }
 
 
             //Formato
             if (format != "")
             {
-                finalMessage += " de " + format;
+                AppendPlainText(textBox, " de " + format);
             }
 
 
@@ -97,7 +110,8 @@ namespace Vados
                 if (objectType == "pasta") connector = " chamada";
                 if (amount != "") connector += "s";
 
-                finalMessage += connector + " \"" + name + "\"";
+                AppendPlainText(textBox, connector + " ");
+                AppendFormattedText(textBox, name, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
@@ -123,7 +137,7 @@ namespace Vados
                         break;
                 }
 
-                finalMessage += modifier + size + " " + sizeUnit;
+                AppendPlainText(textBox, modifier + size + " " + sizeUnit);
             }
 
 
@@ -133,7 +147,8 @@ namespace Vados
                 string insideIndicator = " presente na pasta ";
                 if (amount != "") insideIndicator = " presentes na pasta ";
 
-                finalMessage += insideIndicator + '\"' + origin + "\"";
+                AppendPlainText(textBox, insideIndicator);
+                AppendFormattedText(textBox, origin, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
@@ -154,20 +169,52 @@ namespace Vados
                 }
 
 
-                finalMessage += destinationIndicator + '\"' + destination + "\"";
+                AppendPlainText(textBox, destinationIndicator);
+                AppendFormattedText(textBox, destination, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
             //Novo nome
             if (newName != "")
             {
-                finalMessage += " para \"" + newName + "\"";
+                AppendPlainText(textBox, " para ");
+                AppendFormattedText(textBox, newName, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
-            finalMessage += "?";
-            return finalMessage;
+            AppendPlainText(textBox, "?");
         }
+
+        public static void AppendPlainText(RichTextBox textBox, string text)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Resetar formatação
+            textBox.SelectionColor = textBox.ForeColor;
+            textBox.SelectionFont = textBox.Font;
+
+            //Adicionar texto
+            textBox.AppendText(text);
+        }
+
+
+        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Formatar texto
+            textBox.SelectionColor = color;
+            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
+
+            //Adicionar texto
+            textBox.AppendText(text);
+        }
+
+        #endregion
 
 
         public FormMessage(CommandCriteria criteria_, Form parentForm_)
@@ -188,15 +235,14 @@ namespace Vados
         //Configurar mensagem
         private void FormMessage_Load(object sender, EventArgs e)
         {
-            txtMessage.Text = GetConfirmationMessage(this.criteria);
-            Global.TextBoxFitContent(txtMessage);
+            SetConfirmationMessage(txtMessage, this.criteria);
+            Global.TextBoxFitHeight(txtMessage);
+            MessageBox.Show("new width: " + txtMessage.Width.ToString());
 
             //Ajustar tamanho do form para caber a mensagem
             int messageMarginBottom = 20;
             int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
             int actualDistance = btnConfirm.Top - txtMessage.Bottom;
-
-            MessageBox.Show("min: " + minDistance + " actual: " + actualDistance);
 
             this.Height += minDistance - actualDistance;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -214,9 +260,7 @@ namespace Vados
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            Form1 form = (Form1)parentForm;
-            form.ToggleOverlay(false);
-            this.Hide();
+            ExitMessage();
         }
     }
 }

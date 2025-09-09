@@ -40,7 +40,7 @@
             lblTitle.FlatStyle = FlatStyle.System;
             lblTitle.Font = new Font("Segoe UI", 16.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblTitle.ForeColor = Color.FromArgb(48, 61, 99);
-            lblTitle.Location = new Point(16, 16);
+            lblTitle.Location = new Point(26, 16);
             lblTitle.Margin = new Padding(0);
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new Size(280, 38);
@@ -52,10 +52,11 @@
             txtMessage.BackColor = Color.FromArgb(231, 231, 231);
             txtMessage.BorderStyle = BorderStyle.None;
             txtMessage.Font = new Font("Segoe UI", 11F);
-            txtMessage.Location = new Point(16, 67);
+            txtMessage.Location = new Point(26, 67);
+            txtMessage.Margin = new Padding(0);
             txtMessage.Name = "txtMessage";
             txtMessage.ReadOnly = true;
-            txtMessage.Size = new Size(480, 30);
+            txtMessage.Size = new Size(460, 30);
             txtMessage.TabIndex = 1;
             txtMessage.Text = "Você deseja criar um arquivo chamado \"teste\"?";
             txtMessage.TextChanged += txtMessage_TextChanged;

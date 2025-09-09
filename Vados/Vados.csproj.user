@@ -13,6 +13,9 @@
     <Compile Update="UserControlHome.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="UserControlManual.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="UserControlSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>

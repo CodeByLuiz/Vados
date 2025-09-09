@@ -404,7 +404,7 @@ namespace Vados
 
         private void btnManual_Click(object sender, EventArgs e)
         {
-
+            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
         }
 
         private void btnConfigs_Click(object sender, EventArgs e)

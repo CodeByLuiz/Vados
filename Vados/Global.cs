@@ -74,6 +74,7 @@ namespace Vados
         //Inicializar user controls
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
+        public static UserControlManual userControlManual = new UserControlManual();
 
 
 

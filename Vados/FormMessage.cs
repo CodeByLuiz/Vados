@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +19,23 @@ namespace Vados
     {
         CommandCriteria criteria;
 
+        //Bordas arredondadas
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        private static extern IntPtr CreateRoundRectRgn
+        (
+            int nLeftRect,
+            int nTopRect,
+            int nRightRect,
+            int nBottomRect,
+            int nWidthEllipse,
+            int nHeightEllipse
+        );
+
 
         private void ExitMessage()
         {
             Form1 form = (Form1)this.Owner;
+            form.Focus();
             form.ToggleOverlay(false);
             this.Hide();
         }
@@ -184,6 +199,7 @@ namespace Vados
             AppendPlainText(textBox, "?");
         }
 
+
         public static void AppendPlainText(RichTextBox textBox, string text)
         {
             //Iniciar seleção no fim da string
@@ -197,7 +213,6 @@ namespace Vados
             //Adicionar texto
             textBox.AppendText(text);
         }
-
 
         public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
         {
@@ -246,25 +261,31 @@ namespace Vados
             this.StartPosition = FormStartPosition.CenterScreen;
         }
 
-        private void txtMessage_TextChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void txtMessage_Enter(object sender, EventArgs e)
         {
             this.ActiveControl = null;
         }
 
+
         private void btnCancel_Click(object sender, EventArgs e)
         {
             ExitMessage();
         }
 
+
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             Comandos.ExecuteCommand(criteria);
             ExitMessage();
+        }
+
+
+        private void FormMessage_Resize(object sender, EventArgs e)
+        {
+            //Definir arredondamento da janela
+            int roundValue = (int)(0.2 * Height);
+            Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
         }
     }
 }

@@ -30,8 +30,8 @@
         {
             lblTitle = new Label();
             txtMessage = new RichTextBox();
-            btnConfirm = new Button();
-            btnCancel = new Button();
+            btnConfirm = new RoundedButton();
+            btnCancel = new RoundedButton();
             SuspendLayout();
             // 
             // lblTitle
@@ -59,13 +59,11 @@
             txtMessage.Size = new Size(402, 22);
             txtMessage.TabIndex = 1;
             txtMessage.Text = "Você deseja criar um arquivo chamado \"teste\"?";
-            txtMessage.TextChanged += txtMessage_TextChanged;
             txtMessage.Enter += txtMessage_Enter;
             // 
             // btnConfirm
             // 
             btnConfirm.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnConfirm.BackColor = Color.FromArgb(82, 99, 152);
             btnConfirm.Cursor = Cursors.Hand;
             btnConfirm.FlatAppearance.BorderSize = 0;
             btnConfirm.FlatStyle = FlatStyle.Flat;
@@ -114,6 +112,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Atenção!";
             Load += FormMessage_Load;
+            Resize += FormMessage_Resize;
             ResumeLayout(false);
             PerformLayout();
         }

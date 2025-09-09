@@ -10,6 +10,9 @@
     <Compile Update="OptmizedPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="RoundedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="UserControlHome.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -242,6 +242,11 @@ namespace Vados
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.UserPaint |
                      ControlStyles.AllPaintingInWmPaint, true);
+
+
+            //Definir variáveis dos botões
+            btnConfirm.BehindColor = BackColor;
+            btnCancel.BehindColor = BackColor;
         }
 
 

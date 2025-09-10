@@ -12,6 +12,9 @@ namespace Vados
     {
         public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
+
+        #region PRIORIDADES E EXCEÇÕES
+
         public static List<string> defaultExceptions = new List<string>
         {
             "$RECYCLE.BIN",
@@ -34,48 +37,45 @@ namespace Vados
 
 
 
-       public static string root = @"" + Comandos.driveverifica(null);
+        public static string root = @"" + Comandos.driveverifica(null);
 
         public static List<string> defaultPriorities = new List<string>
-            {
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+        {
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+            //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-                Path.Combine(root),
+            Path.Combine(root),
+        };
 
-            };
         public static List<string> exePriorities = new List<string>
-            {
-                DefaultFolder,
-                @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                @"C:\Program Files",
-                @"C:\Program Files (x86)",
+        {
+            DefaultFolder,
+            @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+            @"C:\Program Files",
+            @"C:\Program Files (x86)",
 
-                //Path.Combine(root),
-            };
+            //Path.Combine(root),
+        };
 
-
-
+        #endregion
 
 
         //Inicializar user controls
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
-
-
 
       
         //Desenhar retângulo arredondado
@@ -131,6 +131,33 @@ namespace Vados
                 SizeF size = g.MeasureString(textBox.Text, textBox.Font, width);
                 textBox.Height = (int)Math.Ceiling(size.Height) + extraPadding + textBox.Padding.Vertical;
             }
+        }
+
+
+        //Mudar brilho de uma cor em porcentagem
+        public static Color ChangeColorBrightness(Color color, float correctionFactor)
+        {
+            float red = color.R;
+            float green = color.G;
+            float blue = color.B;
+
+            if (correctionFactor < 0)
+            {
+                //Escurecer
+                correctionFactor = 1 + correctionFactor;
+                red *= correctionFactor;
+                green *= correctionFactor;
+                blue *= correctionFactor;
+            }
+            else
+            {
+                //Clarear
+                red = red + (255 - red) * correctionFactor;
+                green = green + (255 - green) * correctionFactor;
+                blue = blue + (255 - blue) * correctionFactor;
+            }
+
+            return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
         }
     }
 }

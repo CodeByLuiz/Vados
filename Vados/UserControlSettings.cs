@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.ApplicationServices;
+using NAudio.Wave;
 
 namespace Vados
 {
@@ -19,10 +20,22 @@ namespace Vados
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
 
+        private ReconhecimentoVoz reconhecedor;
+        private bool estaPausado = false;
+
         public UserControlSettings()
         {
             InitializeComponent();
+
+
         }
+        private void UserControlSettings_Load(object sender, EventArgs e)
+        {
+            PopularDispositivosAudio();
+        }
+
+
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -38,9 +51,9 @@ namespace Vados
             string destino = txtDestinatario.Text;
 
 
-            
-                Comandos.CriarPasta(nome, destino);
-           
+
+            Comandos.CriarPasta(nome, destino);
+
             //else
             //{
             //    var nomes = new List<string>()
@@ -99,10 +112,7 @@ namespace Vados
 
         }
 
-        private void UserControlSettings_Load(object sender, EventArgs e)
-        {
-
-        }
+        
 
         private void btnAdm_Click(object sender, EventArgs e)
         {
@@ -135,13 +145,13 @@ namespace Vados
         private async void btnLog_Click(object sender, EventArgs e)
         {
             string SearchArquivo = txtSearch.Text;
-            
-            foreach (var item in (await Comandos.SearchPaths(SearchArquivo, false, pathAmount:null)))
+
+            foreach (var item in (await Comandos.SearchPaths(SearchArquivo, false, pathAmount: null)))
             {
                 listateste.Items.Add(item);
             }
         }
-        
+
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
@@ -170,7 +180,7 @@ namespace Vados
 
             if (extension == "pasta")
             {
-               // Comandos.MoverPasta(nome, destino);
+                // Comandos.MoverPasta(nome, destino);
 
             }
             else
@@ -178,7 +188,7 @@ namespace Vados
                 Comandos.MoverArquivo(nomes, @"C:\Users\ETEC\\Desktop\moveraqui");
             }
         }
-        
+
 
         private void btnDupe_Click(object sender, EventArgs e)
         {
@@ -188,7 +198,7 @@ namespace Vados
 
             if (extension == "pasta")
             {
-               // Comandos.DuplicarPasta(nome, destino);
+                // Comandos.DuplicarPasta(nome, destino);
 
             }
             else
@@ -196,8 +206,8 @@ namespace Vados
                 //Comandos.DuplicarArquivo(nome, destino);
             }
         }
-        
-        
+
+
         private void btnAbrirArquivo_Click(object sender, EventArgs e)
         {
             string NomeArquivo = txtNome.Text;
@@ -207,6 +217,88 @@ namespace Vados
         private void button2_Click(object sender, EventArgs e)
         {
             Comandos.ExecutarCaminho(txtNomeAplicativo.Text);
+        }
+
+        #region RECONHECIMENTO DE VOZ
+
+        private void ResultadoFinalRecebido(string texto)
+        {
+            Invoke(new Action(() =>
+            {
+                txtTranscriçãoTest.AppendText(texto + " ");
+            }));
+        }
+
+        private void ResultadoParcialRecebido(string parcial)
+        {
+            // Você pode ignorar isso ou mostrar preview em algum label
+            Console.WriteLine($"Parcial: {parcial}");
+        }
+
+        private async void btnStartRecTest_Click(object sender, EventArgs e)
+        {
+
+            if (reconhecedor == null) { 
+
+               string x = (await Comandos.SearchPaths("vosk-model-small-pt-0.3",true)).FirstOrDefault();
+
+                reconhecedor = new ReconhecimentoVoz(x);
+                reconhecedor.OnFinalResult += ResultadoFinalRecebido;
+                reconhecedor.OnPartialResult += ResultadoParcialRecebido;
+            }
+
+            reconhecedor.Start();
+            estaPausado = false;
+            btnPauseTest.Text = "Pausar";
+        }
+
+        private void btnPauseTest_Click(object sender, EventArgs e)
+        {
+            int selectedDeviceIndex = 0;
+            if (cbMicrofones.SelectedIndex >= 0)
+                selectedDeviceIndex = deviceIds[cbMicrofones.SelectedIndex];
+
+            reconhecedor = new ReconhecimentoVoz(@"caminho\do\modelo", selectedDeviceIndex);
+            reconhecedor.OnFinalResult += ResultadoFinalRecebido;
+            reconhecedor.OnPartialResult += ResultadoParcialRecebido;
+
+            reconhecedor.Start();
+            estaPausado = false;
+            btnPauseTest.Text = "Pausar";
+        }
+
+        private void btnStopRecTest_Click(object sender, EventArgs e)
+        {
+            reconhecedor.Stop();
+            estaPausado = false;
+            btnPauseTest.Text = "Pausar";
+        }
+
+        private List<int> deviceIds = new List<int>();
+
+        private void PopularDispositivosAudio()
+        {
+            cbMicrofones.Items.Clear();
+            deviceIds.Clear();
+
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                var cap = WaveIn.GetCapabilities(i);
+                deviceIds.Add(i);
+                cbMicrofones.Items.Add(cap.ProductName);
+            }
+
+            if (cbMicrofones.Items.Count > 0)
+                cbMicrofones.SelectedIndex = 0; // seleciona o primeiro por padrão
+            else
+                MessageBox.Show("Nenhum microfone detectado.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        #endregion
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            reconhecedor?.Dispose();
         }
     }
 }

@@ -54,6 +54,12 @@
             label6 = new Label();
             label7 = new Label();
             button2 = new Button();
+            btnStartRecTest = new Button();
+            btnStopRecTest = new Button();
+            btnPauseTest = new Button();
+            txtTranscriçãoTest = new TextBox();
+            cbMicrofones = new ComboBox();
+            label8 = new Label();
             SuspendLayout();
             // 
             // button1
@@ -296,15 +302,76 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // btnStartRecTest
+            // 
+            btnStartRecTest.Location = new Point(549, 496);
+            btnStartRecTest.Name = "btnStartRecTest";
+            btnStartRecTest.Size = new Size(75, 23);
+            btnStartRecTest.TabIndex = 24;
+            btnStartRecTest.Text = "iniciar";
+            btnStartRecTest.UseVisualStyleBackColor = true;
+            btnStartRecTest.Click += btnStartRecTest_Click;
+            // 
+            // btnStopRecTest
+            // 
+            btnStopRecTest.Location = new Point(644, 496);
+            btnStopRecTest.Name = "btnStopRecTest";
+            btnStopRecTest.Size = new Size(75, 23);
+            btnStopRecTest.TabIndex = 25;
+            btnStopRecTest.Text = "Parar";
+            btnStopRecTest.UseVisualStyleBackColor = true;
+            btnStopRecTest.Click += btnStopRecTest_Click;
+            // 
+            // btnPauseTest
+            // 
+            btnPauseTest.Location = new Point(736, 496);
+            btnPauseTest.Name = "btnPauseTest";
+            btnPauseTest.Size = new Size(75, 23);
+            btnPauseTest.TabIndex = 26;
+            btnPauseTest.Text = "Pausar / Despausar";
+            btnPauseTest.UseVisualStyleBackColor = true;
+            btnPauseTest.Click += btnPauseTest_Click;
+            // 
+            // txtTranscriçãoTest
+            // 
+            txtTranscriçãoTest.Location = new Point(481, 556);
+            txtTranscriçãoTest.Multiline = true;
+            txtTranscriçãoTest.Name = "txtTranscriçãoTest";
+            txtTranscriçãoTest.Size = new Size(478, 135);
+            txtTranscriçãoTest.TabIndex = 27;
+            // 
+            // cbMicrofones
+            // 
+            cbMicrofones.FormattingEnabled = true;
+            cbMicrofones.Location = new Point(965, 556);
+            cbMicrofones.Name = "cbMicrofones";
+            cbMicrofones.Size = new Size(121, 23);
+            cbMicrofones.TabIndex = 28;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(965, 529);
+            label8.Name = "label8";
+            label8.Size = new Size(129, 15);
+            label8.TabIndex = 29;
+            label8.Text = "Dispositivos de Entrada";
+            // 
             // UserControlSettings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackgroundImageLayout = ImageLayout.Stretch;
+            Controls.Add(label8);
+            Controls.Add(cbMicrofones);
+            Controls.Add(txtTranscriçãoTest);
+            Controls.Add(btnPauseTest);
+            Controls.Add(btnStopRecTest);
+            Controls.Add(btnStartRecTest);
             Controls.Add(button2);
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(txtNomeAplicativo);
-            BackgroundImageLayout = ImageLayout.Stretch;
             Controls.Add(btnDupe);
             Controls.Add(btnMover);
             Controls.Add(btnAbrirArquivo);
@@ -328,7 +395,7 @@
             Controls.Add(btnCriar);
             Controls.Add(button1);
             Name = "UserControlSettings";
-            Size = new Size(1097, 530);
+            Size = new Size(1097, 772);
             Load += UserControlSettings_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -362,5 +429,11 @@
         private Label label6;
         private Label label7;
         private Button button2;
+        private Button btnStartRecTest;
+        private Button btnStopRecTest;
+        private Button btnPauseTest;
+        private TextBox txtTranscriçãoTest;
+        private ComboBox cbMicrofones;
+        private Label label8;
     }
 }

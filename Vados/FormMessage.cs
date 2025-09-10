@@ -57,7 +57,6 @@ namespace Vados
             string sizeUnit = criteria.SizeUnit;
             string sizeModifier = criteria.SizeModifier;
 
-            MessageBox.Show("old width: " + textBox.Width.ToString());
             textBox.Text = "Você deseja";
 
 
@@ -246,16 +245,22 @@ namespace Vados
 
             //Definir variáveis dos botões
             btnConfirm.BehindColor = BackColor;
+            btnConfirm.HoverLightenFactor = 0.2f;
+            btnConfirm.PressDarkenFactor = -0.15f;
+
             btnCancel.BehindColor = BackColor;
+            btnCancel.HoverLightenFactor = 0.7f;
+            btnCancel.PressDarkenFactor = -0.15f;
         }
 
 
         //Configurar mensagem
         private void FormMessage_Load(object sender, EventArgs e)
         {
+            Form1 parentForm = (Form1)Owner;
+            parentForm.CorrectMessageForm();
             SetConfirmationMessage(txtMessage, this.criteria);
             Global.TextBoxFitHeight(txtMessage);
-            MessageBox.Show("new width: " + txtMessage.Width.ToString());
 
             //Ajustar tamanho do form para caber a mensagem
             int messageMarginBottom = 20;
@@ -291,6 +296,11 @@ namespace Vados
             //Definir arredondamento da janela
             int roundValue = (int)(0.2 * Height);
             Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            ExitMessage();
         }
     }
 }

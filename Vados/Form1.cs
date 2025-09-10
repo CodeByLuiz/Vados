@@ -35,11 +35,13 @@ namespace Vados
 
         public void ToggleOverlay(bool visible)
         {
+            //Ativar tela escura
             if (visible)
             {
                 overlayForm.Show();
                 overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
             }
+            //Desativar
             else
             {
                 overlayForm.Hide();
@@ -47,8 +49,31 @@ namespace Vados
         }
 
 
+        public void CorrectMessageForm()
+        {
+            FormMessage messageForm = null;
 
-        //Função para trocar user control
+            //Encontrar form
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormMessage)
+                {
+                    messageForm = (FormMessage)openForm;
+                    break;
+                }
+            }
+
+            if (messageForm == null) return;    //Parar se não encontrar form
+
+
+            //Corrigir posição
+            int newX = Width / 2 - messageForm.Width / 2;
+            int newY = Height / 2 - messageForm.Height / 2;
+            messageForm.Location =  PointToScreen(new Point(newX, newY));
+        }
+
+
+        //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
         {
             panelContainer.Controls.Clear();
@@ -108,8 +133,18 @@ namespace Vados
         private void Form1_Resize(object sender, EventArgs e)
         {
             //Corrigir tamanho da tela preta
-            overlayForm.Bounds = this.Bounds;
-            overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+            overlayForm.Bounds = RectangleToScreen(this.ClientRectangle);
+
+            CorrectMessageForm();
+        }
+
+        private void Form1_Move(object sender, EventArgs e)
+        {
+            //Corrigir posição da tela preta
+            Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
+            overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
+
+            CorrectMessageForm();
         }
     }
 }

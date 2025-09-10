@@ -11,8 +11,8 @@ namespace Vados
     {
         public float BorderRadius = 8;
         public Color BehindColor;
-        public float HoverLightenFactor = 0.6f;
-        public float PressDarkenFactor = -0.35f;
+        public float HoverLightenFactor = 0.5f;
+        public float PressDarkenFactor = -0.5f;
         bool isHovered = false;
         bool isPressed = false;
 
@@ -69,8 +69,8 @@ namespace Vados
 
             //Cor do fundo
             Color backColor = BackColor;
-            if (isPressed) backColor = Global.ChangeColorBrightness(backColor, PressDarkenFactor);    //Escurecer
-            if (isHovered) backColor = Global.ChangeColorBrightness(backColor, HoverLightenFactor);   //Clarear
+            if (isHovered) backColor = Global.ChangeColorBrightness(BackColor, HoverLightenFactor);   //Clarear
+            if (isPressed) backColor = Global.ChangeColorBrightness(BackColor, PressDarkenFactor);    //Escurecer
 
 
             //Desenhar borda arredondada

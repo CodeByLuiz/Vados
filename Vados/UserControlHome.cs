@@ -51,7 +51,7 @@ namespace Vados
         public void PerformCommand(string command)
         {
             //Escurecer tela
-            var parentForm = this.FindForm() as Form1;
+            var parentForm = FindForm() as Form1;
             if (parentForm != null)
             {
                 parentForm.ToggleOverlay(true);
@@ -62,7 +62,7 @@ namespace Vados
 
             //Mostrar mensagem de confirmação
             var message = new FormMessage(arguments);
-            message.Owner = this.FindForm();
+            message.Owner = parentForm;
             message.Show();
         }
 

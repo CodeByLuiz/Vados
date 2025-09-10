@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Vados
     {
         private Button selectedButton = null;
         private Panel panelNav;
+        private FlowLayoutPanel flow;
 
         public UserControlManual()
         {
@@ -105,14 +107,16 @@ namespace Vados
             panelNav = new Panel
             {
                 Dock = DockStyle.Left,
-                Width = 220,
+                Width = 260,
                 BackColor = Color.FromArgb(48, 61, 99),
                 AutoScroll = true
+
             };
             this.Controls.Add(panelNav);
 
+
             //panel que organiza os bagulho dentro do panel nav
-            FlowLayoutPanel flow = new FlowLayoutPanel
+            flow = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
@@ -121,23 +125,35 @@ namespace Vados
             };
             panelNav.Controls.Add(flow);
 
+            PictureBox pictureLogo = new PictureBox
+            {
+                Image = Image.FromFile("Images/LogoBranco.png"),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Width = 134,
+                Height = 134,
+                Margin = new Padding(0, 10, 0, 10),
+                Anchor = AnchorStyles.None
+            };
+            flow.Controls.Add(pictureLogo);
+
             // Título
             Label lblTitle = new Label
             {
                 Text = "Comandos",
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                Font = new Font("Darker Grotesque", 22, FontStyle.Bold),
                 Height = 50,
                 Width = flow.Width,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Margin = new Padding(0, 10, 0, 10)
             };
+            lblTitle.Paint += DrawTitleLines;
             flow.Controls.Add(lblTitle);
 
             // Categorias
-            AddSection(flow, "Pastas ", new[] { "Criar uma pasta", "Abrir uma pasta" });
-            AddSection(flow, "Arquivos ", new[] { "Criar um arquivo", "Abrir um arquivo" });
-            AddSection(flow, "Sistema ", new[] { "Mudar Data", "Mudar Idioma" });
+            AddSection(flow, "Pastas ", new[] { "Criar uma pasta", "Abrir uma pasta","Abrir pasta padrão","Renomear uma pasta","Excluir uma pasta","Mover uma pasta","Duplicar uma pasta" });
+            AddSection(flow, "Arquivos ", new[] { "Criar um arquivo", "Abrir um arquivo","Renomear um arquivo","Excluir um arquivo","Mover um arquivo","Duplicar um arquivo","Operar múltiplos arquivos " });
+            AddSection(flow, "Sistema ", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
         }
 
 
@@ -148,8 +164,8 @@ namespace Vados
             {
                 Text = sectionTitle,
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Height = 25,
+                Font = new Font("Darker Grotesque", 19, FontStyle.Bold),
+                Height = 30,
                 Width = flow.Width - 20,
                 Margin = new Padding(10, 10, 10, 5)
             };
@@ -160,28 +176,58 @@ namespace Vados
                 RoundedButton btn = new RoundedButton
                 {
                     Text = cmd,
-                    Height = 25,
-                    Width = flow.Width - 20,
+                    Height = 30,
+                    Width = flow.Width -20,
                     TextAlign = ContentAlignment.MiddleLeft,
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 9),
-                    Padding = new Padding(15, 0, 0, 0),
-                    Margin = new Padding(10, 3, 10, 3) 
+                    Font = new Font("Darker Grotesque", 18,FontStyle.Regular),
+                    Padding = new Padding(15, 0, 15, 0),
+                    Margin = new Padding(15, 3, 15, 3) 
                 };
                 btn.FlatAppearance.BorderSize = 0;
                 btn.Click += NavButton_Click;
                 flow.Controls.Add(btn);
             }
         }
+        private void DrawTitleLines(object sender, PaintEventArgs e)
+        {
+            Label lbl = sender as Label;
+            if (lbl == null) return;
 
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
+            
+            using (Pen pen = new Pen(Color.FromArgb(200, 219, 236), 2)) 
+            {
+             
+                SizeF textSize = e.Graphics.MeasureString(lbl.Text, lbl.Font);
+
+                int textWidth = (int)textSize.Width;
+                int textHeight = (int)textSize.Height;
+
+                int centerY = lbl.Height / 2; 
+                int lineY = centerY; 
+
+                int padding = 5;
+                int lineLength = (lbl.Width - textWidth) / 2 - padding;
+
+                if (lineLength > 0)
+                {
+                    // Linha à esquerda
+                    e.Graphics.DrawLine(pen, 20, lineY, lineLength, lineY);
+
+                    // Linha à direita
+                    e.Graphics.DrawLine(pen, lbl.Width - lineLength, lineY, lbl.Width - 20, lineY);
+                }
+            }
+        }
 
         private void NavButton_Click(object sender, EventArgs e)
         {
 
-            foreach (var btn in panelNav.Controls.OfType<Button>())
+            foreach (var btn in flow.Controls.OfType<Button>())
             {
                 btn.Font = new Font(btn.Font, FontStyle.Regular);
             }// tira a merda do negrito dos outros botoes pra colocar depois apenas no selecionado
@@ -192,7 +238,7 @@ namespace Vados
 
             selectedButton = sender as Button;
             selectedButton.BackColor = Color.FromArgb(82, 99, 152);
-            selectedButton.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            selectedButton.Font = new Font("Darker Grotesque", 18, FontStyle.Bold);
         }
 
     }

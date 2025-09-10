@@ -34,7 +34,9 @@
             btnConfirm = new RoundedButton();
             btnCancel = new RoundedButton();
             btnClose = new PictureBox();
+            imgTitleIcon = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)btnClose).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)imgTitleIcon).BeginInit();
             SuspendLayout();
             // 
             // lblTitle
@@ -112,12 +114,23 @@
             btnClose.TabStop = false;
             btnClose.Click += btnClose_Click;
             // 
+            // imgTitleIcon
+            // 
+            imgTitleIcon.Image = (Image)resources.GetObject("imgTitleIcon.Image");
+            imgTitleIcon.Location = new Point(238, 25);
+            imgTitleIcon.Name = "imgTitleIcon";
+            imgTitleIcon.Size = new Size(24, 24);
+            imgTitleIcon.SizeMode = PictureBoxSizeMode.Zoom;
+            imgTitleIcon.TabIndex = 5;
+            imgTitleIcon.TabStop = false;
+            // 
             // FormMessage
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(231, 231, 231);
             ClientSize = new Size(400, 160);
+            Controls.Add(imgTitleIcon);
             Controls.Add(btnClose);
             Controls.Add(btnCancel);
             Controls.Add(btnConfirm);
@@ -132,6 +145,7 @@
             Load += FormMessage_Load;
             Resize += FormMessage_Resize;
             ((System.ComponentModel.ISupportInitialize)btnClose).EndInit();
+            ((System.ComponentModel.ISupportInitialize)imgTitleIcon).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -143,5 +157,6 @@
         private RoundedButton btnConfirm;
         private RoundedButton btnCancel;
         private PictureBox btnClose;
+        private PictureBox imgTitleIcon;
     }
 }

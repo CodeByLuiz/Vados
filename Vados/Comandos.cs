@@ -18,6 +18,10 @@ using System.Globalization;
 using static System.Windows.Forms.DataFormats;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using Vosk;
+using Microsoft.VisualBasic;
+using NAudio.Wave;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Vados
 {
@@ -1136,6 +1140,13 @@ namespace Vados
 
             return tamanhoTotal;
         }
+
+        #endregion
+
+
+        #region RECONHECIMENTO DE VOZ
+
+       // ainda to vendo alguma forma legal de fazer isso aqui dar certo :(
 
         #endregion
 

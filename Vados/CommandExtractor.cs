@@ -45,9 +45,11 @@ namespace Vados
             //Extrair cada argumento do comando
             for (int i = 0; i < extractors.Count; i++)
             {
-                CriteriaExtractor extractor = extractors[i];
+                var extractor = extractors[i];
+                bool success = extractor.Extract(command, criteria);
 
-                extractor.Extract(command, criteria);
+                //Descartar comando se não houver algum critério obrigatório
+                if (extractor.required && !success) return null;
             }
 
             return criteria;
@@ -55,9 +57,10 @@ namespace Vados
     }
 
 
-    public interface CriteriaExtractor
+    public class CriteriaExtractor
     {
-        void Extract(string command, CommandCriteria criteria);
+        public virtual bool Extract(string command, CommandCriteria criteria) { return true; }
+        public bool required = false;
     }
 
 
@@ -73,7 +76,7 @@ namespace Vados
             actions = actions_;
         }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
             string patternStarts = string.Join("|", starts.Select(Regex.Escape));
             string patternAction = string.Join("|", actions.Select(Regex.Escape));
@@ -92,6 +95,7 @@ namespace Vados
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Comando -> " + actionStr);
+            return match.Success;
         }
     }
 
@@ -105,19 +109,21 @@ namespace Vados
         List<string> nominators;
         List<string> stopWords;
 
-        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_, List<string> stopWords_ = null)
+        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_, List<string> stopWords_ = null, bool required_ = false)
         {
             amount = amount_;
             objects = objects_;
             extensions = extensions_;
             nominators = nominators_;
             stopWords = stopWords_;
+            required = required_;
 
             if (stopWords == null) stopWords = new List<string>();
         }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
+            MessageBox.Show("objeto");
             string patternObject = string.Join("|", objects.Select(Regex.Escape));
             string patternAmount = string.Join("|", amount.Select(Regex.Escape));
             string patternExtension = string.Join("|", extensions.Select(Regex.Escape));
@@ -128,6 +134,7 @@ namespace Vados
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+            MessageBox.Show(match.ToString());
 
             //Extrair argumentos
             if (match.Success)
@@ -147,13 +154,14 @@ namespace Vados
                               match.Groups[10].Success ? match.Groups[10].Value :
                               match.Groups[11].Value;
 
-                if (stopWords.Contains(name.ToLower())) return; //Checar se o nome não é uma das palavras de parada
+                if (stopWords.Contains(name.ToLower())) return true; //Checar se o nome não é uma das palavras de parada
 
                 criteria.ObjectName = name;
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Objeto -> " + objectStr);
+            return match.Success;
         }
     }
 
@@ -161,9 +169,12 @@ namespace Vados
     //Extrai o objeto (arquivo / pasta), seu nome e seu novo nome
     public class NewNameExtractor : CriteriaExtractor
     {
-        public NewNameExtractor(){}
+        public NewNameExtractor(bool required_ = false)
+        {
+            required = required_;
+        }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
@@ -183,6 +194,7 @@ namespace Vados
 
             string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Novo nome -> " + newNameStr);
+            return match.Success;
         }
     }
 
@@ -194,14 +206,15 @@ namespace Vados
         List<string> folders;
         List<string> nominators;
 
-        public OriginExtractor(List<string> fromIndicators_, List<string> folders_, List<string> nominators_)
+        public OriginExtractor(List<string> fromIndicators_, List<string> folders_, List<string> nominators_, bool required_ = false)
         {
             fromIndicators = fromIndicators_;
             folders = folders_;
             nominators = nominators_;
+            required = required_;
         }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
             string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
@@ -223,6 +236,7 @@ namespace Vados
 
             string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Origem -> " + originStr);
+            return match.Success;
         }
     }
 
@@ -234,14 +248,15 @@ namespace Vados
         List<string> folders;
         List<string> nominators;
 
-        public DestinationExtractor(List<string> insideIndicators_, List<string> folders_, List<string> nominators_)
+        public DestinationExtractor(List<string> insideIndicators_, List<string> folders_, List<string> nominators_, bool required_ = false)
         {
             insideIndicators = insideIndicators_;
             folders = folders_;
             nominators = nominators_;
+            required = required_;
         }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
             string patternInside = string.Join("|", insideIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
@@ -263,6 +278,7 @@ namespace Vados
 
             string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Destino -> " + destinationStr);
+            return match.Success;
         }
     }
 
@@ -274,14 +290,15 @@ namespace Vados
         List<string> sizeModifiers;
         List<string> sizeUnits;
 
-        public SizeExtractor(List<string> sizeIndicators_, List<string> sizeModifiers_, List<string> sizeUnits_)
+        public SizeExtractor(List<string> sizeIndicators_, List<string> sizeModifiers_, List<string> sizeUnits_, bool required_ = false)
         {
             sizeIndicators = sizeIndicators_;
             sizeModifiers = sizeModifiers_;
             sizeUnits = sizeUnits_;
+            required = required_;
         }
 
-        public void Extract(string command, CommandCriteria criteria)
+        public override bool Extract(string command, CommandCriteria criteria)
         {
             string patternIndicator = string.Join("|", sizeIndicators.Select(Regex.Escape));
             string patternModifier = string.Join("|", sizeModifiers.Select(Regex.Escape));
@@ -307,6 +324,7 @@ namespace Vados
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Tamanho -> " + objectStr);
+            return match.Success;
         }
     }
 }

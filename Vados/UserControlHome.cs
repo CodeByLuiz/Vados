@@ -61,7 +61,8 @@ namespace Vados
             var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
             //Mostrar mensagem de confirmação
-            var message = new FormMessage(arguments);
+            bool isErrorMessage = arguments == null;
+            var message = new FormMessage(arguments, isErrorMessage);
             message.Owner = parentForm;
             message.Show();
         }
@@ -339,6 +340,7 @@ namespace Vados
             circleY = middleY - circleSize / 2;
             
             #endregion
+
 
             #region AJUSTAR TEXTBOX
 

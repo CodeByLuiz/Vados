@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Vados
     public partial class FormMessage : Form
     {
         CommandCriteria criteria;
+        bool isErrorMessage = false;
 
         //Bordas arredondadas
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
@@ -230,10 +232,11 @@ namespace Vados
         #endregion
 
 
-        public FormMessage(CommandCriteria criteria_)
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_)
         {
             InitializeComponent();
             criteria = criteria_;
+            isErrorMessage = isErrorMessage_;
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -241,16 +244,6 @@ namespace Vados
             SetStyle(ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.UserPaint |
                      ControlStyles.AllPaintingInWmPaint, true);
-
-
-            //Definir variáveis dos botões
-            btnConfirm.BehindColor = BackColor;
-            btnConfirm.HoverLightenFactor = 0.2f;
-            btnConfirm.PressDarkenFactor = -0.15f;
-
-            btnCancel.BehindColor = BackColor;
-            btnCancel.HoverLightenFactor = 0.7f;
-            btnCancel.PressDarkenFactor = -0.15f;
         }
 
 
@@ -259,7 +252,6 @@ namespace Vados
         {
             Form1 parentForm = (Form1)Owner;
             parentForm.CorrectMessageForm();
-            SetConfirmationMessage(txtMessage, this.criteria);
             Global.TextBoxFitHeight(txtMessage);
 
             //Ajustar tamanho do form para caber a mensagem
@@ -269,6 +261,48 @@ namespace Vados
 
             this.Height += minDistance - actualDistance;
             this.StartPosition = FormStartPosition.CenterScreen;
+
+
+            Global.LabelFitWidth(lblTitle);
+            int iconDist = imgTitleIcon.Left - lblTitle.Right;
+
+            //Mensagem de erro
+            if (isErrorMessage)
+            {
+                //Definir título
+                lblTitle.Text = "Erro de comando";
+                lblTitle.ForeColor = Colors.redErrorDark;
+                Global.LabelFitWidth(lblTitle);
+
+                //Definir ícone
+                imgTitleIcon.Left = lblTitle.Right + iconDist;
+                imgTitleIcon.Image = System.Drawing.Image.FromFile(Path.Combine(System.Windows.Forms.Application.StartupPath, @"Images\Icons\warningIcon.png"));
+
+                //Definir botões
+                btnConfirm.Text = "Editar";
+                btnConfirm.BackColor = Colors.redErrorLight;
+
+                btnCancel.Text = "Descartar";
+                btnCancel.FlatAppearance.BorderColor = Colors.redErrorLight;
+
+                //Mensagem
+                txtMessage.Text = "Comando não identficado";
+            }
+            //Mensagem de confirmação
+            else
+            {
+                SetConfirmationMessage(txtMessage, this.criteria);
+            }
+
+
+            //Definir variáveis dos botões
+            btnConfirm.BehindColor = BackColor;
+            btnConfirm.HoverLightenFactor = 0.2f;
+            btnConfirm.PressDarkenFactor = -0.1f;
+
+            btnCancel.BehindColor = BackColor;
+            btnCancel.HoverLightenFactor = 0.7f;
+            btnCancel.PressDarkenFactor = -0.1f;
         }
 
 

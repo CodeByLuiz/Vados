@@ -459,7 +459,7 @@ namespace Vados
                 case "criar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, null, true),
                             new DestinationExtractor(destinationWords, folderWords, namingWords)
                         });
                     break;
@@ -467,7 +467,7 @@ namespace Vados
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, null, true),
                             new NewNameExtractor(),
                             new OriginExtractor(fromWords, folderWords, namingWords),
                             new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
@@ -477,7 +477,7 @@ namespace Vados
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords, true),
                             new OriginExtractor(fromWords, folderWords, namingWords),
                             new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
@@ -487,9 +487,9 @@ namespace Vados
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords, true),
                             new OriginExtractor(fromWords, folderWords, namingWords),
-                            new DestinationExtractor(insideWords, folderWords, namingWords),
+                            new DestinationExtractor(insideWords, folderWords, namingWords, true),
                             new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         });
                     break;
@@ -498,7 +498,7 @@ namespace Vados
                 case "duplicar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, null, true),
                             new OriginExtractor(fromWords, folderWords, namingWords),
                             new DestinationExtractor(insideWords, folderWords, namingWords),
                             new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
@@ -508,14 +508,18 @@ namespace Vados
                 case "abrir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                         {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
+                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, null, true),
                             new OriginExtractor(fromWords, folderWords, namingWords),
                         });
                     break;
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: --{arguments.Action}*\r\nObjeto: --{arguments.ObjectType}*\r\nFormato: --{arguments.ObjectFormat}\r\nQuantidade: --{arguments.ObjectAmount}\r\nNome: --{arguments.ObjectName}\r\nNovo nome: --{arguments.ObjectNewName}\r\nOrigem: --{arguments.Origin}\r\nDestino: --{arguments.Destination}\r\nTamanho: --{arguments.SizeModifier} {arguments.SizeAmount} {arguments.SizeUnit}");
+            if (arguments != null)
+            {
+                MessageBox.Show($"Comando: --{arguments.Action}*\r\nObjeto: --{arguments.ObjectType}*\r\nFormato: --{arguments.ObjectFormat}\r\nQuantidade: --{arguments.ObjectAmount}\r\nNome: --{arguments.ObjectName}\r\nNovo nome: --{arguments.ObjectNewName}\r\nOrigem: --{arguments.Origin}\r\nDestino: --{arguments.Destination}\r\nTamanho: --{arguments.SizeModifier} {arguments.SizeAmount} {arguments.SizeUnit}");
+            }
+
             return arguments;
         }
 

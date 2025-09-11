@@ -134,6 +134,16 @@ namespace Vados
         }
 
 
+        public static void LabelFitWidth(Label label, int extraPadding = 2)
+        {
+            if (label == null) return;
+
+            Graphics g = label.CreateGraphics();
+            SizeF size = g.MeasureString(label.Text, label.Font, label.Width);
+            label.Width = (int)Math.Ceiling(size.Width) + extraPadding + label.Padding.Horizontal;
+        }
+
+
         //Mudar brilho de uma cor em porcentagem
         public static Color ChangeColorBrightness(Color color, float correctionFactor)
         {

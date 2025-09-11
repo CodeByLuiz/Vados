@@ -1,21 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Vados
 {
     internal class BancoDeDados
     {
+
+        private static readonly string UUIDComando = "computador_id.txt";
         public class HistoryEntry
         {
-            public required DateTime data { get; set; }
-            public required int id { get; set; }   
-            public required string comando { get; set; }
-            public required List<string> pastas { get; set; }
+            [Key] public int Id { get; set; }
+            public Guid ComputadorId { get; set; }  
+            public DateTime Data { get; set; }
+             
+            public string Comando { get; set; }
 
+            public string PastasJson { get; set; }  // Armazenado no BD pq o sqlite n aceita lista normal :(
+            [NotMapped]
+            public List<string> Pastas
+            {
+                get => JsonSerializer.Deserialize<List<string>>(PastasJson ?? "[]")!;
+                set => PastasJson = JsonSerializer.Serialize(value);
+            }
+            public HistoryEntry()
+            {
+                Data = DateTime.Now;
+                ComputadorId = ObterComputadorId();
+            }
         }
 
         public class DbConnection : DbContext
@@ -27,6 +45,67 @@ namespace Vados
                 optionsBuilder.UseSqlite("Data Source=historico.db");
             }
 
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<HistoryEntry>()
+                    .HasKey(h => h.Id);
+
+                modelBuilder.Entity<HistoryEntry>()
+                    .Property(h => h.Id)
+                    .ValueGeneratedOnAdd();
+
+                modelBuilder.Entity<HistoryEntry>()
+                    .Property(h => h.ComputadorId)
+                    .HasConversion(
+                        v => v.ToString(),
+                        v => Guid.Parse(v)
+                    );
+            }
+
+        }
+        private static Guid ObterComputadorId()
+        {
+            if (File.Exists(UUIDComando))
+            {
+                var guidString = File.ReadAllText(UUIDComando);
+                if (Guid.TryParse(guidString, out Guid guid))
+                    return guid;
+            }
+
+            // Se não existe ou é inválido, cria novo e salva
+            var novoGuid = Guid.NewGuid();
+            File.WriteAllText(UUIDComando, novoGuid.ToString());
+            return novoGuid;
+        }
+
+        public static void AdicionarEntrada(DateTime data, string comando, List<string> pastas)
+        {
+            using (var db = new DbConnection())
+            {
+                db.Database.EnsureCreated();
+
+                
+
+                var novaEntrada = new HistoryEntry
+                {
+                    //Data = data,
+                    Comando = comando,
+                    Pastas = pastas,
+                    
+                };
+
+                db.Historico.Add(novaEntrada);
+                db.SaveChanges();
+
+                Console.WriteLine($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
+
+
+
+                //BancoDeDados.AdicionarEntrada(
+                //comando: "mkdir novaPasta",
+                //pastas: new List<string> { "C:\\Projetos", "D:\\Backup" }
+                // negocio pra colocar dentro do treco de executar comandos
+            }
         }
 
     }

@@ -57,6 +57,36 @@ namespace Vados
     }
 
 
+    public class Pattern
+    {
+        public List<string> Values;
+        public bool Required;
+
+        public Pattern(List<string> values, bool required = false)
+        {
+            Values = values ?? new List<string>();
+            Required = required;
+
+
+        }
+
+        //Transforma a lista em um padrão aceito pelo regex, adicionando o ? caso não seja obrigatória
+        public string ToPattern()
+        {
+            if (Values.Count == 0) return string.Empty;
+
+            string joined = string.Join("|", Values.Select(Regex.Escape));
+            return $"({joined})";
+        }
+
+        public string ToRequired()
+        {
+            if (Required) return string.Empty;
+            return "?";
+        }
+    }
+
+
     public class CriteriaExtractor
     {
         public virtual bool Extract(string command, CommandCriteria criteria) { return true; }
@@ -103,34 +133,37 @@ namespace Vados
     //Extrai o objeto (arquivo / pasta), seu nome e seu novo nome
     public class ObjectExtractor : CriteriaExtractor
     {
-        List<string> objects;
-        List<string> amount;
-        List<string> extensions;
-        List<string> nominators;
-        List<string> stopWords;
+        Pattern objects;
+        Pattern amount;
+        Pattern extensions;
+        Pattern nominators;
+        Pattern stopWords;
 
-        public ObjectExtractor(List<string> amount_, List<string> objects_, List<string> extensions_, List<string> nominators_, List<string> stopWords_ = null, bool required_ = false)
+        public ObjectExtractor((List<string> v, bool r) amount_, (List<string> v, bool r)  objects_, (List<string> v, bool r)  extensions_, (List<string> v, bool r)  nominators_, List<string> stopWords_ = null, bool required_ = false)
         {
-            amount = amount_;
-            objects = objects_;
-            extensions = extensions_;
-            nominators = nominators_;
-            stopWords = stopWords_;
+            //amount_ = (lista, é obrigatório)
+            amount = new Pattern(amount_.v, amount_.r);
+            objects = new Pattern(objects_.v, objects_.r);
+            extensions = new Pattern(extensions_.v, extensions_.r);
+            nominators = new Pattern(nominators_.v, nominators_.r);
             required = required_;
 
-            if (stopWords == null) stopWords = new List<string>();
+            if (stopWords == null) stopWords = new Pattern(new List<string>(), false);
+            else stopWords = new Pattern(stopWords_, false);
         }
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
             MessageBox.Show("objeto");
-            string patternObject = string.Join("|", objects.Select(Regex.Escape));
-            string patternAmount = string.Join("|", amount.Select(Regex.Escape));
-            string patternExtension = string.Join("|", extensions.Select(Regex.Escape));
-            string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
+            string patternObject = string.Join("|", objects.v.Select(Regex.Escape));
+            string patternAmount = string.Join("|", amount.v.Select(Regex.Escape));
+            string patternExtension = string.Join("|", extensions.v.Select(Regex.Escape));
+            string patternNominator = string.Join("|", nominators.v.Select(Regex.Escape));
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b(({patternAmount})\s+)?({patternObject})(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?";
+            string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
+                             $@"{objects.ToPattern()}{objects.ToRequired()}" +
+                             $@"(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);

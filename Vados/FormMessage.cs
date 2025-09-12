@@ -20,6 +20,7 @@ namespace Vados
     {
         CommandCriteria criteria;
         bool isErrorMessage = false;
+        public UserControl userControl;
 
         //Bordas arredondadas
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
@@ -40,6 +41,13 @@ namespace Vados
             form.Focus();
             form.ToggleOverlay(false);
             this.Hide();
+        }
+
+
+        private void ClearCommand(bool focus = false)
+        {
+            UserControlHome page = (UserControlHome)userControl;
+            page.ClearCommand(focus);
         }
 
 
@@ -201,6 +209,72 @@ namespace Vados
         }
 
 
+        private static void SetErrorMessage(RichTextBox textBox, CommandCriteria criteria)
+        {
+            //Comando não identificado
+            if (string.IsNullOrEmpty(criteria.Action))
+            {
+                textBox.Text = "Comando não identificado.";
+                return;
+            }
+
+
+            //Objeto não identificado
+            if (string.IsNullOrEmpty(criteria.ObjectType))
+            {
+                string objects = "(arquivo / pasta)";
+                if (criteria.Action == "abrir") objects = "(arquivo / aplicativo / atalho)";
+                textBox.Text = $"Especifique o que você quer {criteria.Action} {objects}.";
+                return;
+            }
+
+
+            //Formato não identificado
+            if (!string.IsNullOrEmpty(criteria.ObjectFormat))
+            {
+                if (!Comandos.allExtensionsWords.Contains(criteria.ObjectFormat))
+                    textBox.Text = "Formato de arquivo não identificado.";
+            }
+
+
+            //Erro em um dos critérios
+            string criteriaMessage = "";
+
+            switch(criteria.Action)
+            {
+                case "criar":
+                    //Nome não especificado
+                    if (string.IsNullOrEmpty(criteria.ObjectName))
+                    {
+                        string objToBeCreated = "do arquivo a ser criado";
+                        if (criteria.ObjectType == "pasta") objToBeCreated = "da pasta a ser criada";
+                        criteriaMessage = "Especifique o nome " + objToBeCreated + ".";
+                    }
+
+                    break;
+
+
+                case "mover":
+                    //Pasta de destino não identificada
+                    if (string.IsNullOrEmpty(criteria.Destination))
+                    {
+                        string objToBeCreated = "do arquivo a ser movido";
+                        if (criteria.ObjectType == "pasta") objToBeCreated = "da pasta a ser movida";
+                        criteriaMessage = "Especifique a pasta de destino " + objToBeCreated + ".";
+                    }
+
+                    break;
+
+
+                //Mensagem padrão para o erro de comando
+                default:
+                    criteriaMessage = "Especifique os critérios necessários para o comando.";
+                    break;
+            }
+
+            textBox.Text = criteriaMessage;
+        }
+
         public static void AppendPlainText(RichTextBox textBox, string text)
         {
             //Iniciar seleção no fim da string
@@ -251,20 +325,6 @@ namespace Vados
         private void FormMessage_Load(object sender, EventArgs e)
         {
             Form1 parentForm = (Form1)Owner;
-            parentForm.CorrectMessageForm();
-            Global.TextBoxFitHeight(txtMessage);
-
-            //Ajustar tamanho do form para caber a mensagem
-            int messageMarginBottom = 20;
-            int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
-            int actualDistance = btnConfirm.Top - txtMessage.Bottom;
-
-            this.Height += minDistance - actualDistance;
-            this.StartPosition = FormStartPosition.CenterScreen;
-
-
-            Global.LabelFitWidth(lblTitle);
-            int iconDist = imgTitleIcon.Left - lblTitle.Right;
 
             //Mensagem de erro
             if (isErrorMessage)
@@ -275,7 +335,6 @@ namespace Vados
                 Global.LabelFitWidth(lblTitle);
 
                 //Definir ícone
-                imgTitleIcon.Left = lblTitle.Right + iconDist;
                 imgTitleIcon.Image = System.Drawing.Image.FromFile(Path.Combine(System.Windows.Forms.Application.StartupPath, @"Images\Icons\warningIcon.png"));
 
                 //Definir botões
@@ -286,13 +345,28 @@ namespace Vados
                 btnCancel.FlatAppearance.BorderColor = Colors.redErrorLight;
 
                 //Mensagem
-                txtMessage.Text = "Comando não identficado";
+                SetErrorMessage(txtMessage, criteria);
             }
             //Mensagem de confirmação
             else
             {
-                SetConfirmationMessage(txtMessage, this.criteria);
+                SetConfirmationMessage(txtMessage, criteria);
             }
+
+
+            //Ajustar tamanho do form para caber a mensagem
+            Global.TextBoxFitHeight(txtMessage);
+            int messageMarginBottom = 20;
+            int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
+            int actualDistance = btnConfirm.Top - txtMessage.Bottom;
+
+            this.Height += minDistance - actualDistance;
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            //Corrigir posição do ícone ao lado do título
+            Global.LabelFitWidth(lblTitle);
+            int iconDist = imgTitleIcon.Left - lblTitle.Right;
+            imgTitleIcon.Left = lblTitle.Right + iconDist;
 
 
             //Definir variáveis dos botões
@@ -303,6 +377,10 @@ namespace Vados
             btnCancel.BehindColor = BackColor;
             btnCancel.HoverLightenFactor = 0.7f;
             btnCancel.PressDarkenFactor = -0.1f;
+
+
+            //Corrigir posição da mensagem na tela
+            parentForm.CorrectMessageForm();
         }
 
 
@@ -315,6 +393,12 @@ namespace Vados
         private void btnCancel_Click(object sender, EventArgs e)
         {
             ExitMessage();
+
+            //Limpar textbox (descartar)
+            if (isErrorMessage == false)
+            {
+                ClearCommand(true);
+            }
         }
 
 
@@ -322,6 +406,12 @@ namespace Vados
         {
             Comandos.ExecuteCommand(criteria);
             ExitMessage();
+
+            //Limpar textbox (confirmar)
+            if (isErrorMessage == false)
+            {
+                ClearCommand(true);
+            }
         }
 
 

@@ -57,11 +57,11 @@
             txtMessage.BackColor = Color.FromArgb(231, 231, 231);
             txtMessage.BorderStyle = BorderStyle.None;
             txtMessage.Font = new Font("Segoe UI", 11F);
-            txtMessage.Location = new Point(23, 60);
+            txtMessage.Location = new Point(24, 60);
             txtMessage.Margin = new Padding(0);
             txtMessage.Name = "txtMessage";
             txtMessage.ReadOnly = true;
-            txtMessage.Size = new Size(402, 22);
+            txtMessage.Size = new Size(352, 22);
             txtMessage.TabIndex = 1;
             txtMessage.Text = "Você deseja criar um arquivo chamado \"teste\"?";
             txtMessage.Enter += txtMessage_Enter;
@@ -74,10 +74,10 @@
             btnConfirm.FlatAppearance.BorderSize = 0;
             btnConfirm.FlatStyle = FlatStyle.Flat;
             btnConfirm.ForeColor = Color.White;
-            btnConfirm.Location = new Point(56, 108);
+            btnConfirm.Location = new Point(56, 101);
             btnConfirm.Margin = new Padding(0);
             btnConfirm.Name = "btnConfirm";
-            btnConfirm.Size = new Size(104, 26);
+            btnConfirm.Size = new Size(104, 33);
             btnConfirm.TabIndex = 2;
             btnConfirm.Text = "Sim";
             btnConfirm.UseVisualStyleBackColor = false;
@@ -92,10 +92,10 @@
             btnCancel.FlatAppearance.BorderSize = 3;
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.ForeColor = Color.Black;
-            btnCancel.Location = new Point(242, 108);
+            btnCancel.Location = new Point(242, 101);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(104, 26);
+            btnCancel.Size = new Size(104, 33);
             btnCancel.TabIndex = 3;
             btnCancel.Text = "Não";
             btnCancel.UseVisualStyleBackColor = false;
@@ -117,7 +117,7 @@
             // imgTitleIcon
             // 
             imgTitleIcon.Image = (Image)resources.GetObject("imgTitleIcon.Image");
-            imgTitleIcon.Location = new Point(238, 25);
+            imgTitleIcon.Location = new Point(240, 25);
             imgTitleIcon.Name = "imgTitleIcon";
             imgTitleIcon.Size = new Size(24, 24);
             imgTitleIcon.SizeMode = PictureBoxSizeMode.Zoom;

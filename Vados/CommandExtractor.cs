@@ -40,7 +40,7 @@ namespace Vados
             extractors = extractors_;
         }
 
-        public CommandCriteria Parse(string command)
+        public (CommandCriteria criteria, bool success) Parse(string command)
         {
             //Extrair cada argumento do comando
             for (int i = 0; i < extractors.Count; i++)
@@ -48,11 +48,11 @@ namespace Vados
                 var extractor = extractors[i];
                 bool success = extractor.Extract(command, criteria);
 
-                //Descartar comando se não houver algum critério obrigatório
-                if (extractor.required && !success) return null;
+                //Retornar falso se algum critério obrigatório estiver faltando
+                if (extractor.required && !success) return (criteria, false);
             }
 
-            return criteria;
+            return (criteria, true);
         }
     }
 
@@ -79,6 +79,7 @@ namespace Vados
             return $"({joined})";
         }
 
+        //Adiciona um ? no final do padrão caso não seja obrigatório
         public string ToRequired()
         {
             if (Required) return string.Empty;
@@ -108,6 +109,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
+            command = command.ToLower();
             string patternStarts = string.Join("|", starts.Select(Regex.Escape));
             string patternAction = string.Join("|", actions.Select(Regex.Escape));
             string pattern = $@"^(({patternStarts})\s+)?({patternAction})";
@@ -137,9 +139,10 @@ namespace Vados
         Pattern amount;
         Pattern extensions;
         Pattern nominators;
-        Pattern stopWords;
+        bool nameIsRequired = false;
+        List<string> stopWords;
 
-        public ObjectExtractor((List<string> v, bool r) amount_, (List<string> v, bool r)  objects_, (List<string> v, bool r)  extensions_, (List<string> v, bool r)  nominators_, List<string> stopWords_ = null, bool required_ = false)
+        public ObjectExtractor((List<string> v, bool r) amount_, (List<string> v, bool r)  objects_, (List<string> v, bool r)  extensions_, (List<string> v, bool r)  nominators_, bool nameIsRequired_, List<string> stopWords_ = null, bool required_ = false)
         {
             //amount_ = (lista, é obrigatório)
             amount = new Pattern(amount_.v, amount_.r);
@@ -147,50 +150,55 @@ namespace Vados
             extensions = new Pattern(extensions_.v, extensions_.r);
             nominators = new Pattern(nominators_.v, nominators_.r);
             required = required_;
+            nameIsRequired = nameIsRequired_;
 
-            if (stopWords == null) stopWords = new Pattern(new List<string>(), false);
-            else stopWords = new Pattern(stopWords_, false);
+            if (stopWords == null) stopWords = new List<string>();
         }
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            MessageBox.Show("objeto");
-            string patternObject = string.Join("|", objects.v.Select(Regex.Escape));
-            string patternAmount = string.Join("|", amount.v.Select(Regex.Escape));
-            string patternExtension = string.Join("|", extensions.v.Select(Regex.Escape));
-            string patternNominator = string.Join("|", nominators.v.Select(Regex.Escape));
+            command = command.ToLower();
+            //string patternObject = string.Join("|", objects.v.Select(Regex.Escape));
+            //string patternAmount = string.Join("|", amount.v.Select(Regex.Escape));
+            //string patternExtension = string.Join("|", extensions.v.Select(Regex.Escape));
+            //string patternNominator = string.Join("|", nominators.v.Select(Regex.Escape));
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
             string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
                              $@"{objects.ToPattern()}{objects.ToRequired()}" +
-                             $@"(\s+de\s+({patternExtension}))?((\s+({patternNominator}))?\s+({patternName}))?";
+                             $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
+                             $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()}" +
+                             $@"\s+({patternName}))?";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
-            MessageBox.Show(match.ToString());
 
-            //Extrair argumentos
-            if (match.Success)
+
+            //Tipo de objeto
+            string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
+            criteria.ObjectType = obj;
+
+            //Formato do objeto
+            criteria.ObjectFormat = match.Groups[5].Value;
+
+            //Quantidade
+            criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
+
+            //Nome do objeto
+            string objName = match.Groups[9].Success ? match.Groups[9].Value :
+                            match.Groups[10].Success ? match.Groups[10].Value :
+                            match.Groups[11].Value;
+
+            if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
+
+            //Checar se o nome não é uma das palavras de parada
+            if (stopWords.Contains(objName.ToLower()))
             {
-                //Tipo de objeto
-                string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
-                criteria.ObjectType = obj;
-
-                //Formato do objeto
-                criteria.ObjectFormat = match.Groups[5].Value;
-
-                //Quantidade
-                criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
-
-                //Nome do objeto
-                string name = match.Groups[9].Success ? match.Groups[9].Value :
-                              match.Groups[10].Success ? match.Groups[10].Value :
-                              match.Groups[11].Value;
-
-                if (stopWords.Contains(name.ToLower())) return true; //Checar se o nome não é uma das palavras de parada
-
-                criteria.ObjectName = name;
+                if (nameIsRequired) return false;
+                return true;
             }
+
+            criteria.ObjectName = objName;
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Objeto -> " + objectStr);
@@ -209,8 +217,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
+            command = command.ToLower();
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
-
             string pattern = $@"\b(\s+(para|pra)\s+({patternName}))";
 
             //Checar se o padrão está no comando
@@ -249,6 +257,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
+            command = command.ToLower();
             string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -291,6 +300,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
+            command = command.ToLower();
             string patternInside = string.Join("|", insideIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -333,6 +343,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
+            command = command.ToLower();
             string patternIndicator = string.Join("|", sizeIndicators.Select(Regex.Escape));
             string patternModifier = string.Join("|", sizeModifiers.Select(Regex.Escape));
             string patternUnit = string.Join("|", sizeUnits.Select(Regex.Escape));

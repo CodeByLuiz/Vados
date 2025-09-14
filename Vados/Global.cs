@@ -12,9 +12,6 @@ namespace Vados
     {
         public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
-        //Armazena texto formatado para a próxima mensagem de erro
-        public static RichTextBox nextErrorMessage = new RichTextBox();
-
 
         #region PRIORIDADES E EXCEÇÕES
 
@@ -202,6 +199,34 @@ namespace Vados
 
             //Adicionar texto
             textBox.AppendText(text);
+        }
+
+        //Muda apenas a fonte de um rtf (texto formatado)
+        public static string RtfChangeFont(string rtf, Font newFont)
+        {
+            using (var rtb = new RichTextBox())
+            {
+                rtb.Rtf = rtf;
+
+                //Mudar fonte de cada caractere
+                for (int i = 0; i < rtb.TextLength; i++)
+                {
+                    rtb.Select(i, 1);
+                    var currentFont = rtb.SelectionFont;
+
+                    if (currentFont != null)
+                    {
+                        rtb.SelectionFont = new Font(
+                            newFont.FontFamily,
+                            newFont.Size,
+                            currentFont.Style   //Manter negrito, itálico, etc
+                        );
+                    }
+                }
+
+                rtb.Select(0, 0);
+                return rtb.Rtf;
+            }
         }
     }
 }

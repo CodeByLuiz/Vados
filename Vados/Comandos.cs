@@ -538,23 +538,10 @@ namespace Vados
 
 
         //Retorna os caminhos encontrados conforme os critérios
-        static async Task<List<string>> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
+        static async Task<(List<string>, string)> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
         {
             if (priorities == null) priorities = Global.defaultPriorities;
             if (exceptions == null) priorities = Global.defaultExceptions;
-
-
-            //---------ERRO: pasta de origem não existe---------
-            string rootFolderPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
-
-            if (string.IsNullOrEmpty(rootFolderPath))
-            {
-                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de origem chamada ");
-                Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
-                Global.AppendPlainText(Global.nextErrorMessage, ".");
-                return new List<string>();
-            }
-            //----------------------------------------
 
 
             #region TAMANHO
@@ -635,18 +622,21 @@ namespace Vados
             //---------ERRO: arquivo / pasta não encontrada---------
             if (paths.Count == 0)
             {
-                string objectIndication = $"nenhum {objectType} chamado ";
-                if (objectType == "pasta") objectIndication = "nenhuma pasta chamada ";
-
-                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar " + objectIndication);
-                Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
-                if (origin != "")
+                using (var rtb = new RichTextBox())
                 {
-                    Global.AppendPlainText(Global.nextErrorMessage, " dentro da pasta ");
-                    Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
+                    string objectIndication = $"nenhum {objectType} chamado ";
+                    if (objectType == "pasta") objectIndication = "nenhuma pasta chamada ";
+
+                    Global.AppendPlainText(rtb, "Não foi possível encontrar " + objectIndication);
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    if (origin != "")
+                    {
+                        Global.AppendPlainText(rtb, " dentro da pasta ");
+                        Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    }
+                    Global.AppendPlainText(rtb, ".");
+                    return (paths, rtb.Rtf);
                 }
-                Global.AppendPlainText(Global.nextErrorMessage, ".");
-                return paths;
             }
             //----------------------------------------
 
@@ -666,7 +656,7 @@ namespace Vados
                     break;
             }
 
-            return paths;
+            return (paths, "");
         }
 
 
@@ -695,14 +685,16 @@ namespace Vados
 
 
             #region---------ERRO: nome inválido (nome, origem ou destino)---------
-            Global.nextErrorMessage.Clear();
 
             //Nome do arquivo inválido
             if (objectType != "pasta" && !IsValidFileName(name))
             {
-                Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
-                Global.AppendPlainText(Global.nextErrorMessage, " é um nome de " + objectType + " inválido.");
-                return Global.nextErrorMessage.Rtf;
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, " é um nome de " + objectType + " inválido.");
+                    return rtb.Rtf;
+                }
             }
 
 
@@ -710,33 +702,76 @@ namespace Vados
             char[] invalidPathChars = Path.GetInvalidPathChars();
 
             if (objectType == "pasta") {
-                if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
-                    Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
-                else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
-                    Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
-                else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
-                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
-
-                if (Global.nextErrorMessage.Text != "")
+                using (var rtb = new RichTextBox())
                 {
-                    Global.AppendPlainText(Global.nextErrorMessage, " é um nome de pasta inválido.");
-                    return Global.nextErrorMessage.Rtf;
+                    if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
+                        Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
+                        Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
+                        Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+
+                    if (rtb.Text != "")
+                    {
+                        Global.AppendPlainText(rtb, " é um nome de pasta inválido.");
+                        return rtb.Rtf;
+                    }
                 }
             }
+            
             #endregion----------------------------------------
 
 
-            //Caminho da pasta de origem e de destino
-            string destinationPath = "";
-            if (!string.IsNullOrEmpty(destination)) destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
-
+            //Caminho da pasta de origem
             string originPath = "";
-            if (!string.IsNullOrEmpty(origin)) originPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
 
-            List<string> paths = new List<string>();
+            if (!string.IsNullOrEmpty(origin))
+            {
+                originPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
+
+                #region---------ERRO: pasta de origem não existe---------
+
+                if (string.IsNullOrEmpty(originPath))
+                {
+                    using (var rtb = new RichTextBox())
+                    {
+                        Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de origem chamada ");
+                        Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
+                    }
+                }
+
+                #endregion----------------------------------------
+            }
+
+            //Caminho da pasta de destino
+            string destinationPath = "";
+
+            if (!string.IsNullOrEmpty(destination))
+            {
+                destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
+
+                #region---------ERRO: pasta de destino não existe---------
+
+                if (string.IsNullOrEmpty(destinationPath))
+                {
+                    using (var rtb = new RichTextBox())
+                    {
+                        Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de destino chamada ");
+                        Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
+                    }
+                }
+
+                #endregion----------------------------------------
+            }
 
 
             //Realizar comando
+            (List<string> list, string errorMessage) paths = (new List<string>(), "");
+
             switch (commandType)
             {
                 //Criar
@@ -757,10 +792,10 @@ namespace Vados
                 case "excluir":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
                     //Erro na busca
-                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+                    if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { ExcluirPasta(paths); }
-                    if (objectType == "arquivo") { ExcluirArquivo(paths); }
+                    if (objectType == "pasta") { return await ExcluirPasta(paths.list); }
+                    if (objectType == "arquivo") { return await ExcluirArquivo(paths.list); }
                     break;
 
 
@@ -768,10 +803,10 @@ namespace Vados
                 case "mover":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
                     //Erro na busca
-                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+                    if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
-                    if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
+                    if (objectType == "pasta") { MoverPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { MoverArquivo(paths.list, destinationPath); }
                     break;
 
 
@@ -779,10 +814,10 @@ namespace Vados
                 case "duplicar":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
                     //Erro na busca
-                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+                    if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { DuplicarPasta(paths, destinationPath); }
-                    if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
+                    if (objectType == "pasta") { DuplicarPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { DuplicarArquivo(paths.list, destinationPath); }
                     break;
 
 
@@ -797,11 +832,11 @@ namespace Vados
                     } 
                     else
                     {
-                        //Prioridades e excessões para procurar programas
+                        //Prioridades e excessões para procurar aplicativos
                         paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
                     }
 
-                    ExecutarCaminho(paths.FirstOrDefault());
+                    ExecutarCaminho(paths.list.FirstOrDefault());
                     break;
             }
 
@@ -1312,38 +1347,21 @@ namespace Vados
         }
 
 
-        public static async Task<string> CriarPasta(string nome, string destination)     //Retorna uma possível mensagem de erro
+        public static async Task<string> CriarPasta(string name, string destinationPath)
         {
             try
             {
-                string path;
-
-                //Definir pasta padrão como pasta de destino
-                if (string.IsNullOrEmpty(destination)) 
+                //Definir pasta padrão como pasta de destino caso não seja especificada
+                if (string.IsNullOrEmpty(destinationPath)) 
                 {
-                    path = Path.Combine(Global.DefaultFolder, nome);
-                }
-                //Procurar pasta de destino
-                else
-                {
-                    HashSet<string> destinationPath = (await SearchPaths(destination, true, pathAmount: 1));
-
-                    //---------ERRO: pasta de destino não encontrada---------
-                    if (destinationPath.Count == 0)
-                    {
-                        Global.nextErrorMessage.Clear();
-                        Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de destino chamada ");
-                        Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
-                        Global.AppendPlainText(Global.nextErrorMessage, ".");
-                        return Global.nextErrorMessage.Rtf;
-                    }
-                    //----------------------------------------
-
-
-                    //Definir caminho caso a pasta seja encontrada
-                    path = Path.Combine(destinationPath.FirstOrDefault(), nome);
+                    destinationPath = Global.DefaultFolder;
                 }
 
+                //Redefinir nome caso já exista um igual
+                string finalName = CriarNome(name, destinationPath);
+
+
+                string path = Path.Combine(destinationPath, finalName);
 
                 if (!File.Exists(path))
                 {
@@ -1354,11 +1372,13 @@ namespace Vados
                 //---------ERRO: arquivo com mesmo nome---------
                 else
                 {
-                    Global.nextErrorMessage.Clear();
-                    Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar uma pasta chamada ");
-                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
-                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe um arquivo com esse nome.");
-                    return Global.nextErrorMessage.Rtf;
+                    using (var rtb = new RichTextBox())
+                    {
+                        Global.AppendPlainText(rtb, "Não foi possível criar uma pasta chamada ");
+                        Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ", pois já existe um arquivo com esse nome.");
+                        return rtb.Rtf;
+                    }
                 }
                 //----------------------------------------
 
@@ -1368,58 +1388,50 @@ namespace Vados
             //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                Global.nextErrorMessage.Clear();
-                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar a pasta.\n");
-                Global.AppendFormattedText(Global.nextErrorMessage, destination, Color.Gray, FontStyle.Regular);
-                return Global.nextErrorMessage.Rtf;
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível criar a pasta.\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
             }
             //----------------------------------------
         }
 
 
-        public static async Task<string> CriarArquivo(string nome, string destination) //Retorna uma possível mensagem de erro
+        public static async Task<string> CriarArquivo(string name, string destinationPath)
         {
-            //Redefinir nome caso já exista um igual
-            string nomeFinal = CriarNome(nome, destination);
-            string destinationPath = Global.DefaultFolder;
 
             try
             {
-
-                //Definir pasta informada como destino
-                if (!string.IsNullOrEmpty(destination))
+                //Definir pasta padrão como pasta de destino caso não seja especificada
+                if (string.IsNullOrEmpty(destinationPath))
                 {
-                    destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
-
-                    //---------ERRO: pasta de destino não encontrada---------
-                    if (string.IsNullOrEmpty(destinationPath))
-                    {
-                        Global.nextErrorMessage.Clear();
-                        Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de destino chamada ");
-                        Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
-                        Global.AppendPlainText(Global.nextErrorMessage, ".");
-                        return Global.nextErrorMessage.Rtf;
-                    }
-                    //----------------------------------------
+                    destinationPath = Global.DefaultFolder;
                 }
 
+                //Redefinir nome caso já exista um igual
+                string finalName = CriarNome(name, destinationPath);
 
-                string newPath = Path.Combine(destinationPath, nomeFinal);
 
-                if (!Directory.Exists(newPath))
+                string path = Path.Combine(destinationPath, finalName);
+
+                if (!Directory.Exists(path))
                 {
                     //Criar arquivo
-                    using (FileStream fs = File.Create(newPath))
-                    OpenFileExplorer(newPath, false);
+                    using (FileStream fs = File.Create(path))
+                    OpenFileExplorer(path, false);
                 }
                 //---------ERRO: pasta com mesmo nome---------
                 else
                 {
-                    Global.nextErrorMessage.Clear();
-                    Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar um arquivo chamado ");
-                    Global.AppendFormattedText(Global.nextErrorMessage, nomeFinal, Colors.greenHighlight, FontStyle.Bold);
-                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe uma pasta com esse nome.");
-                    return Global.nextErrorMessage.Rtf;
+                    using (var rtb = new RichTextBox())
+                    {
+                        Global.AppendPlainText(rtb, "Não foi possível criar um arquivo chamado ");
+                        Global.AppendFormattedText(rtb, finalName, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ", pois já existe uma pasta com esse nome.");
+                        return rtb.Rtf;
+                    }
                 }
                 //----------------------------------------
 
@@ -1429,58 +1441,56 @@ namespace Vados
             //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                Global.nextErrorMessage.Clear();
-                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar o arquivo.\n");
-                Global.AppendFormattedText(Global.nextErrorMessage, ex.Message, Color.Gray, FontStyle.Regular);
-                return Global.nextErrorMessage.Rtf;
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível criar o arquivo.\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
             }
             //----------------------------------------
         }
 
 
-        public static void ExcluirArquivo(List<string> paths) //exclui arquivo
+        public static async Task<string> ExcluirArquivo(List<string> paths) //exclui arquivo
         {
+            try { 
+                foreach (string path in paths) {
 
-
-           try { 
-
-            //string path = SearchPaths(nome, false).FirstOrDefault();
-
-            foreach (string path in paths) {
-
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                    //Console.WriteLine("Arquivo" + nome + "Excluido com sucesso");
-                }
-                else
-                {
-                    MessageBox.Show("esse arquivo não existe");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                    else
+                    {
+                        MessageBox.Show("esse arquivo não existe");
+                    }
                 }
 
+                return "";
             }
-           }
-           catch (Exception ex){
-                MessageBox.Show("Não foi possivel excluir estes arquivos: "+ex.Message);
-           }
-            
 
-
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
         }
 
-        public static void ExcluirPasta(List<string> paths) // exclui pasta
+        public static async Task<string> ExcluirPasta(List<string> paths) // exclui pasta
         {
-            //string path = SearchPaths(nome, true).FirstOrDefault();
-
             try
             {
-
                 foreach (string path in paths)
                 {
-
                     if (Directory.Exists(path))
                     {
-
                         foreach (string arquivo in Directory.GetFiles(path))
                         {
                             File.Delete(arquivo);
@@ -1493,19 +1503,27 @@ namespace Vados
 
                         }
                         Directory.Delete(path);
-                        //Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
                     }
                     else
                     {
                         MessageBox.Show("essa pasta não existe");
-
                     }
                 }
-            }
-            catch (Exception ex) {
-                MessageBox.Show("Não foi possivel excluir estas pastas: " + ex.Message);
+
+                return "";
             }
 
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
         }
 
 
@@ -1705,7 +1723,6 @@ namespace Vados
             {
                 MessageBox.Show("O programa precisa de permissões de administrador para funcionar corretamente.", "Permissão negada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
         }
 
 

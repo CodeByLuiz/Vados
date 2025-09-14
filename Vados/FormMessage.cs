@@ -286,7 +286,8 @@ namespace Vados
             isErrorMessage = isErrorMessage_;
 
             //Definir mensagem
-            txtMessage.Rtf = messageRtf;
+            var messageFont = new System.Drawing.Font("Segoe UI", 11f);
+            txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -404,6 +405,7 @@ namespace Vados
                     {
                         //Realizar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
+                        MessageBox.Show("erro: " + errorMessage);
 
                         //Mostrar mensagem de erro
                         if (errorMessage != "")

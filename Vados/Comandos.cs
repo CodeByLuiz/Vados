@@ -18,6 +18,7 @@ using System.Globalization;
 using static System.Windows.Forms.DataFormats;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Xml.Linq;
 
 namespace Vados
 {
@@ -39,6 +40,15 @@ namespace Vados
         #region TEXTO PARA COMANDO
 
         #region DICIONÁRIOS / LISTAS
+
+        //Nomes inválidos para arquivos / pastas
+        public static string[] reservedNames =
+        {
+            "CON", "PRN", "AUX", "NUL",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+        };
+
 
         #region COMANDOS
 
@@ -688,9 +698,7 @@ namespace Vados
             Global.nextErrorMessage.Clear();
 
             //Nome do arquivo inválido
-            char[] invalidFileChars = Path.GetInvalidFileNameChars();
-
-            if (objectType != "pasta" && name.IndexOfAny(invalidFileChars) >= 0)
+            if (objectType != "pasta" && !IsValidFileName(name))
             {
                 Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
                 Global.AppendPlainText(Global.nextErrorMessage, " é um nome de " + objectType + " inválido.");
@@ -702,11 +710,11 @@ namespace Vados
             char[] invalidPathChars = Path.GetInvalidPathChars();
 
             if (objectType == "pasta") {
-                if (name.IndexOfAny(invalidPathChars) >= 0)                 //Pasta indicada
+                if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
                     Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
-                else if (origin.IndexOfAny(invalidPathChars) >= 0)          //Pasta de origem
+                else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
                     Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
-                else if (destination.IndexOfAny(invalidPathChars) >= 0)     //Pasta de destino
+                else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
                     Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
 
                 if (Global.nextErrorMessage.Text != "")
@@ -817,6 +825,40 @@ namespace Vados
             }
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+
+        //Checar se o nome do arquivo é valido
+        public static bool IsValidFileName(string fileName)
+        {
+            //Nome não pode ser vazio ou apenas espaços
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+
+            //Caracteres inválidos
+            if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                return false;
+
+            //Sem espaço ou ponto no final do nome
+            if (fileName.EndsWith(" ") || fileName.EndsWith("."))
+                return false;
+
+            //Nomes reservados para dispositivos
+            if (Array.Exists(reservedNames, r => string.Equals(r, fileName, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            return true;
+        }
+
+        //Checar se o nome da pasta é valido
+        public static bool IsValidFolderName(string name)
+        {
+            if (!IsValidFileName(name)) return false;
+
+            //Pastas não podem ter nome "." ou ".."
+            if (name == "." || name == "..")
+                return false;
+
+            return true;
         }
 
         #endregion

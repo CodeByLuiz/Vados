@@ -173,10 +173,10 @@ namespace Vados
             { "arquivo", "arquivo" },
             { "documentos", "arquivo" },
             { "documento", "arquivo" },
-            { "programa", "programa" },
-            { "aplicativo", "programa" },
-            { "app", "programa" },
-            { "executavel", "programa" },
+            { "aplicativo", "aplicativo" },
+            { "programa", "aplicativo" },
+            { "app", "aplicativo" },
+            { "executavel", "aplicativo" },
         };
 
         //Todas as variações de objetos (pasta / arquivo)
@@ -533,6 +533,20 @@ namespace Vados
             if (priorities == null) priorities = Global.defaultPriorities;
             if (exceptions == null) priorities = Global.defaultExceptions;
 
+
+            //---------ERRO: pasta de origem não existe---------
+            string rootFolderPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(rootFolderPath))
+            {
+                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de origem chamada ");
+                Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(Global.nextErrorMessage, ".");
+                return new List<string>();
+            }
+            //----------------------------------------
+
+
             #region TAMANHO
 
             //Definir quantidade de bytes conforme a unidade de tamanho
@@ -607,7 +621,26 @@ namespace Vados
                 paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound)).ToList();
             }
 
-            if (paths.Count == 0) return paths;
+
+            //---------ERRO: arquivo / pasta não encontrada---------
+            if (paths.Count == 0)
+            {
+                string objectIndication = $"nenhum {objectType} chamado ";
+                if (objectType == "pasta") objectIndication = "nenhuma pasta chamada ";
+
+                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar " + objectIndication);
+                Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
+                if (origin != "")
+                {
+                    Global.AppendPlainText(Global.nextErrorMessage, " dentro da pasta ");
+                    Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
+                }
+                Global.AppendPlainText(Global.nextErrorMessage, ".");
+                return paths;
+            }
+            //----------------------------------------
+
+
 
             //Corrigir quantidade de caminhos
             switch (amountModifier)
@@ -644,11 +677,46 @@ namespace Vados
 
 
             //Definições para arquivo executável (programa)
-            if (objectType == "programa")
+            if (objectType == "aplicativo")
             {
                 name.Replace(" ", "");
                 format = "executavel";
             }
+
+
+            #region---------ERRO: nome inválido (nome, origem ou destino)---------
+            Global.nextErrorMessage.Clear();
+
+            //Nome do arquivo inválido
+            char[] invalidFileChars = Path.GetInvalidFileNameChars();
+
+            if (objectType != "pasta" && name.IndexOfAny(invalidFileChars) >= 0)
+            {
+                Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(Global.nextErrorMessage, " é um nome de " + objectType + " inválido.");
+                return Global.nextErrorMessage.Rtf;
+            }
+
+
+            //Nome da pasta (objeto, origem ou destino) inválido
+            char[] invalidPathChars = Path.GetInvalidPathChars();
+
+            if (objectType == "pasta") {
+                if (name.IndexOfAny(invalidPathChars) >= 0)                 //Pasta indicada
+                    Global.AppendFormattedText(Global.nextErrorMessage, name, Colors.greenHighlight, FontStyle.Bold);
+                else if (origin.IndexOfAny(invalidPathChars) >= 0)          //Pasta de origem
+                    Global.AppendFormattedText(Global.nextErrorMessage, origin, Colors.greenHighlight, FontStyle.Bold);
+                else if (destination.IndexOfAny(invalidPathChars) >= 0)     //Pasta de destino
+                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
+
+                if (Global.nextErrorMessage.Text != "")
+                {
+                    Global.AppendPlainText(Global.nextErrorMessage, " é um nome de pasta inválido.");
+                    return Global.nextErrorMessage.Rtf;
+                }
+            }
+            #endregion----------------------------------------
+
 
             //Caminho da pasta de origem e de destino
             string destinationPath = "";
@@ -669,31 +737,48 @@ namespace Vados
                     if (objectType == "arquivo") { return await CriarArquivo(name, destination); }
                     break;
 
+
                 //Renomear
                 case "renomear":
                     if (objectType == "pasta") { RenomearPasta(name, newName, origin); }
                     if (objectType == "arquivo") { RenomearArquivo(name, newName, origin); }
                     break;
 
+
+                //Excluir
                 case "excluir":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    //Erro na busca
+                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+
                     if (objectType == "pasta") { ExcluirPasta(paths); }
                     if (objectType == "arquivo") { ExcluirArquivo(paths); }
                     break;
 
 
+                //Mover
                 case "mover":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    //Erro na busca
+                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+
                     if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
                     if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
                     break;
 
+
+                //Duplicar
                 case "duplicar":
                     paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    //Erro na busca
+                    if (Global.nextErrorMessage.Text != "") return Global.nextErrorMessage.Rtf;
+
                     if (objectType == "pasta") { DuplicarPasta(paths, destinationPath); }
                     if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
                     break;
 
+
+                //Abrir
                 case "abrir":
                     if (objectType == "pasta") break;
 
@@ -823,7 +908,6 @@ namespace Vados
             // rootFolder: é a pasta aonde ele vai procurar, se for nulo, ele procura em todas as pastas do computador
             // pathAmount: é um controle de quantas pastas ou arquivos ele vai procurar, se for nulo, ele procura em todas as pastas ou arquivos
 
-            string root = driveverifica(null);
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var resultados = new HashSet<string>();
 
@@ -835,8 +919,11 @@ namespace Vados
             int? maxLength = pathAmount;
 
             if (!string.IsNullOrEmpty(rootFolder)) {
+                //Procurar pasta de origem
                 rootFolder = (await SearchPaths(rootFolder, true)).FirstOrDefault();
-                if (string.IsNullOrEmpty(rootFolder)) return null;
+                if (string.IsNullOrEmpty(rootFolder))   //Retornar lista vazia se não encontrar a pasta de origem
+                    return resultados;
+
                 //Buscar apenas na pasta determinada
                 priorities = new List<string>() { rootFolder };
 
@@ -1210,6 +1297,7 @@ namespace Vados
                     }
                     //----------------------------------------
 
+
                     //Definir caminho caso a pasta seja encontrada
                     path = Path.Combine(destinationPath.FirstOrDefault(), nome);
                 }
@@ -1249,11 +1337,12 @@ namespace Vados
 
         public static async Task<string> CriarArquivo(string nome, string destination) //Retorna uma possível mensagem de erro
         {
+            //Redefinir nome caso já exista um igual
+            string nomeFinal = CriarNome(nome, destination);
+            string destinationPath = Global.DefaultFolder;
+
             try
             {
-                //Redefinir nome caso já exista um igual
-                string nomefinal = CriarNome(nome, destination);
-                string destinationPath = Global.DefaultFolder;
 
                 //Definir pasta informada como destino
                 if (!string.IsNullOrEmpty(destination))
@@ -1273,7 +1362,7 @@ namespace Vados
                 }
 
 
-                string newPath = Path.Combine(destinationPath, nomefinal);
+                string newPath = Path.Combine(destinationPath, nomeFinal);
 
                 if (!Directory.Exists(newPath))
                 {
@@ -1286,8 +1375,8 @@ namespace Vados
                 {
                     Global.nextErrorMessage.Clear();
                     Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar um arquivo chamado ");
-                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
-                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe uam pasta com esse nome.");
+                    Global.AppendFormattedText(Global.nextErrorMessage, nomeFinal, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe uma pasta com esse nome.");
                     return Global.nextErrorMessage.Rtf;
                 }
                 //----------------------------------------
@@ -1300,7 +1389,7 @@ namespace Vados
             {
                 Global.nextErrorMessage.Clear();
                 Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar o arquivo.\n");
-                Global.AppendFormattedText(Global.nextErrorMessage, destination, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(Global.nextErrorMessage, ex.Message, Color.Gray, FontStyle.Regular);
                 return Global.nextErrorMessage.Rtf;
             }
             //----------------------------------------
@@ -1613,8 +1702,6 @@ namespace Vados
         {
             int i = 1;
             string newName = nome;
-
-            //MessageBox.Show(Path.Combine(destination, newName));
 
             while (File.Exists(Path.Combine(destination, newName)))
             {

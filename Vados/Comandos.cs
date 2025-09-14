@@ -23,6 +23,8 @@ namespace Vados
 {
     internal class Comandos
     {
+        Task<bool> commandSuccess;
+
         #region FUNÇÕES DO WINDOWS
 
         [DllImport("user32.dll")]
@@ -621,24 +623,24 @@ namespace Vados
                     break;
             }
 
-            MessageBox.Show("Terminou busca");
             return paths;
         }
 
 
-        public static async void ExecuteCommand(CommandCriteria arguments)
+        public static async Task<string> ExecuteCommand(CommandCriteria arguments)    //Retorna uma possível mensagem de erro
         {
-            string commandType = arguments.Action;
-            string objectType = arguments.ObjectType;
-            string name = arguments.ObjectName;
-            string newName = arguments.ObjectNewName;
-            string format = arguments.ObjectFormat;
-            string origin = arguments.Origin;
-            string destination = arguments.Destination;
-            string amount = arguments.ObjectAmount;
-            string size = arguments.SizeAmount;
-            string sizeUnit = arguments.SizeUnit;
-            string sizeModifier = arguments.SizeModifier;
+            string
+            commandType = arguments.Action,
+            objectType = arguments.ObjectType,
+            name = arguments.ObjectName,
+            newName = arguments.ObjectNewName,
+            format = arguments.ObjectFormat,
+            origin = arguments.Origin,
+            destination = arguments.Destination,
+            amount = arguments.ObjectAmount,
+            size = arguments.SizeAmount,
+            sizeUnit = arguments.SizeUnit,
+            sizeModifier = arguments.SizeModifier;
 
 
             //Definições para arquivo executável (programa)
@@ -650,9 +652,10 @@ namespace Vados
 
             //Caminho da pasta de origem e de destino
             string destinationPath = "";
-            if (!string.IsNullOrEmpty(destination)) destinationPath = (await SearchPaths(destination, true)).FirstOrDefault();
+            if (!string.IsNullOrEmpty(destination)) destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
+
             string originPath = "";
-            if (!string.IsNullOrEmpty(origin)) originPath = (await SearchPaths(origin, true)).FirstOrDefault();
+            if (!string.IsNullOrEmpty(origin)) originPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
 
             List<string> paths = new List<string>();
 
@@ -662,8 +665,8 @@ namespace Vados
             {
                 //Criar
                 case "criar":
-                    if (objectType == "pasta") { CriarPasta(name, destination); }
-                    if (objectType == "arquivo") { CriarArquivo(name, destination); }
+                    if (objectType == "pasta") { return await CriarPasta(name, destination); }
+                    if (objectType == "arquivo") { return await CriarArquivo(name, destination); }
                     break;
 
                 //Renomear
@@ -708,6 +711,8 @@ namespace Vados
                     ExecutarCaminho(paths.FirstOrDefault());
                     break;
             }
+
+            return "";
         }
 
 
@@ -806,10 +811,9 @@ namespace Vados
 
         #region BUSCA 
 
-        // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        //Busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         public static async Task<HashSet<string>> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null, List<string> exceptions = null, List<string> priorities = null)
         {
-
             // PRA QUE SERVE CADA PARÂMETRO:
 
             // searchName: o nome do arquivo ou pasta que você quer procurar
@@ -859,8 +863,6 @@ namespace Vados
                 pathAmount = int.MaxValue;  //Sem limite
             }
 
-            //MessageBox.Show("Máximo: " + pathAmount);
-
 
             //Adicionar prioridades à fila
             var fila = new Queue<string>();
@@ -893,14 +895,12 @@ namespace Vados
                                 Console.WriteLine($"Acesso negado ao diretório: {atual}");
                                 return Array.Empty<string>();
                             }
-                        });
-                      
+                        }).ConfigureAwait(false);
+
                         //Percorrer todas as pastas dentro da pasta atual
                         foreach (var folderPath in subpasta)
                         {
-                            //Não continuar se o arquivo já tiver sido visitado
-                            if (!visitados.Add(folderPath))
-                                continue;
+                            Console.WriteLine(folderPath);
 
                             //Checar se a pasta tem o nome correto
                             string actualName = Path.GetFileName(folderPath);
@@ -910,7 +910,7 @@ namespace Vados
                             //Checar se está na pasta especificada
                             if (!string.IsNullOrEmpty(rootFolder) && !folderPath.Contains(rootFolder))
                                 continue;
-                          
+
 
                             FileInfo caminhoinfo = new FileInfo(folderPath);
 
@@ -934,7 +934,9 @@ namespace Vados
 
                         //Retornar resultados ao chegar na quantidade necessária
                         if (pathAmount <= 0)
+                        {
                             return resultados;
+                        }
                     }
                   
 
@@ -1004,7 +1006,7 @@ namespace Vados
                         string nomePasta = Path.GetFileName(caminho);
 
                         //Ignorar pasta se ela for alguma das exceções
-                        if (exceptions.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                        if (exceptions.Any(expt => nomePasta.Equals(expt, StringComparison.OrdinalIgnoreCase)))
                             continue;
 
                         if (visitados.Add(caminho))
@@ -1013,22 +1015,21 @@ namespace Vados
                         }
                     }
                 }
+                //Pular pastas inacessíveis
                 catch (UnauthorizedAccessException)
                 {
-                    continue; // Skip inaccessible directories
+                    continue;
                 }
+
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erro capturado {ex.Message}");
+                    Console.WriteLine($"Erro: {ex.Message}");
                 }
                 
             }
-            if (resultados != null)
-            {
-                return resultados;
-            }
-            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-            return null;
+
+            
+            return resultados;
         }
 
 
@@ -1182,67 +1183,127 @@ namespace Vados
         }
 
 
-        public static async void CriarPasta(string nome, string path) // cria pasta
+        public static async Task<string> CriarPasta(string nome, string destination)     //Retorna uma possível mensagem de erro
         {
             try
             {
-                if (string.IsNullOrEmpty(path)) 
+                string path;
+
+                //Definir pasta padrão como pasta de destino
+                if (string.IsNullOrEmpty(destination)) 
                 {
                     path = Path.Combine(Global.DefaultFolder, nome);
                 }
+                //Procurar pasta de destino
                 else
                 {
-                    path = Path.Combine((await SearchPaths(path, true)).FirstOrDefault(), nome);
+                    HashSet<string> destinationPath = (await SearchPaths(destination, true, pathAmount: 1));
+
+                    //---------ERRO: pasta de destino não encontrada---------
+                    if (destinationPath.Count == 0)
+                    {
+                        Global.nextErrorMessage.Clear();
+                        Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de destino chamada ");
+                        Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(Global.nextErrorMessage, ".");
+                        return Global.nextErrorMessage.Rtf;
+                    }
+                    //----------------------------------------
+
+                    //Definir caminho caso a pasta seja encontrada
+                    path = Path.Combine(destinationPath.FirstOrDefault(), nome);
                 }
 
 
                 if (!File.Exists(path))
                 {
+                    //Criar a pasta
                     Directory.CreateDirectory(path);
-                    Console.WriteLine("Pasta" + nome + "Criada com sucesso");
                     OpenFileExplorer(path, false);
                 }
+                //---------ERRO: arquivo com mesmo nome---------
                 else
                 {
-                    MessageBox.Show("Erro, há um arquivo com o mesmo nome da sua pasta");
+                    Global.nextErrorMessage.Clear();
+                    Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar uma pasta chamada ");
+                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe um arquivo com esse nome.");
+                    return Global.nextErrorMessage.Rtf;
                 }
+                //----------------------------------------
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao criar pasta: " + ex.Message);
-
-
-
+                Global.nextErrorMessage.Clear();
+                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar a pasta.\n");
+                Global.AppendFormattedText(Global.nextErrorMessage, destination, Color.Gray, FontStyle.Regular);
+                return Global.nextErrorMessage.Rtf;
             }
+            //----------------------------------------
         }
 
-        public static async void CriarArquivo(string nome, string path) // cria arquivo
-        {
 
+        public static async Task<string> CriarArquivo(string nome, string destination) //Retorna uma possível mensagem de erro
+        {
             try
             {
                 //Redefinir nome caso já exista um igual
-                string nomefinal = CriarNome(nome, path);
-                string destination = Global.DefaultFolder;
+                string nomefinal = CriarNome(nome, destination);
+                string destinationPath = Global.DefaultFolder;
 
                 //Definir pasta informada como destino
-                if (!string.IsNullOrEmpty(path))
+                if (!string.IsNullOrEmpty(destination))
                 {
-                    destination = (await SearchPaths(path, true)).FirstOrDefault();
+                    destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
+
+                    //---------ERRO: pasta de destino não encontrada---------
+                    if (string.IsNullOrEmpty(destinationPath))
+                    {
+                        Global.nextErrorMessage.Clear();
+                        Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível encontrar a pasta de destino chamada ");
+                        Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(Global.nextErrorMessage, ".");
+                        return Global.nextErrorMessage.Rtf;
+                    }
+                    //----------------------------------------
                 }
 
-                //Caminho a ser criado
-                string newPath = Path.Combine(destination, nomefinal);
 
-                using (FileStream fs = File.Create(newPath))
-                Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
+                string newPath = Path.Combine(destinationPath, nomefinal);
 
-                OpenFileExplorer(newPath, false);
+                if (!Directory.Exists(newPath))
+                {
+                    //Criar arquivo
+                    using (FileStream fs = File.Create(newPath))
+                    OpenFileExplorer(newPath, false);
+                }
+                //---------ERRO: pasta com mesmo nome---------
+                else
+                {
+                    Global.nextErrorMessage.Clear();
+                    Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar um arquivo chamado ");
+                    Global.AppendFormattedText(Global.nextErrorMessage, destination, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(Global.nextErrorMessage, ", pois já existe uam pasta com esse nome.");
+                    return Global.nextErrorMessage.Rtf;
+                }
+                //----------------------------------------
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao criar arquivo: " + ex.Message);
+                Global.nextErrorMessage.Clear();
+                Global.AppendPlainText(Global.nextErrorMessage, "Não foi possível criar o arquivo.\n");
+                Global.AppendFormattedText(Global.nextErrorMessage, destination, Color.Gray, FontStyle.Regular);
+                return Global.nextErrorMessage.Rtf;
             }
+            //----------------------------------------
         }
 
 

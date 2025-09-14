@@ -37,17 +37,17 @@ namespace Vados
 
         private void ExitMessage()
         {
-            Form1 form = (Form1)this.Owner;
+            Form1 form = (Form1)Owner;
             form.Focus();
             form.ToggleOverlay(false);
-            this.Hide();
+            Hide();
         }
 
 
-        private void ClearCommand(bool focus = false)
+        private void FocusCommand(bool clear = false)
         {
             UserControlHome page = (UserControlHome)userControl;
-            page.ClearCommand(focus);
+            page.FocusCommand(clear);
         }
 
 
@@ -75,7 +75,7 @@ namespace Vados
 
             if (commandType != "")
             {
-                AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, FontStyle.Bold);
 
                 //Conector após comando
                 switch (commandType)
@@ -115,14 +115,14 @@ namespace Vados
             {
                 string objectStr = objectType;
                 if (amount != "") objectStr += "s";
-                AppendPlainText(textBox, commandConnector + objectType);
+                Global.AppendPlainText(textBox, commandConnector + objectType);
             }
 
 
             //Formato
             if (format != "")
             {
-                AppendPlainText(textBox, " de " + format);
+                Global.AppendPlainText(textBox, " de " + format);
             }
 
 
@@ -133,8 +133,8 @@ namespace Vados
                 if (objectType == "pasta") connector = " chamada";
                 if (amount != "") connector += "s";
 
-                AppendPlainText(textBox, connector + " ");
-                AppendFormattedText(textBox, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(textBox, connector + " ");
+                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
@@ -160,7 +160,7 @@ namespace Vados
                         break;
                 }
 
-                AppendPlainText(textBox, modifier + size + " " + sizeUnit);
+                Global.AppendPlainText(textBox, modifier + size + " " + sizeUnit);
             }
 
 
@@ -170,8 +170,8 @@ namespace Vados
                 string insideIndicator = " presente na pasta ";
                 if (amount != "") insideIndicator = " presentes na pasta ";
 
-                AppendPlainText(textBox, insideIndicator);
-                AppendFormattedText(textBox, origin, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(textBox, insideIndicator);
+                Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
@@ -192,20 +192,20 @@ namespace Vados
                 }
 
 
-                AppendPlainText(textBox, destinationIndicator);
-                AppendFormattedText(textBox, destination, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(textBox, destinationIndicator);
+                Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
             //Novo nome
             if (newName != "")
             {
-                AppendPlainText(textBox, " para ");
-                AppendFormattedText(textBox, newName, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(textBox, " para ");
+                Global.AppendFormattedText(textBox, newName, Colors.greenHighlight, FontStyle.Bold);
             }
 
 
-            AppendPlainText(textBox, "?");
+            Global.AppendPlainText(textBox, "?");
         }
 
 
@@ -275,42 +275,18 @@ namespace Vados
             textBox.Text = criteriaMessage;
         }
 
-        public static void AppendPlainText(RichTextBox textBox, string text)
-        {
-            //Iniciar seleção no fim da string
-            textBox.SelectionStart = textBox.TextLength;
-            textBox.SelectionLength = 0;
-
-            //Resetar formatação
-            textBox.SelectionColor = textBox.ForeColor;
-            textBox.SelectionFont = textBox.Font;
-
-            //Adicionar texto
-            textBox.AppendText(text);
-        }
-
-        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
-        {
-            //Iniciar seleção no fim da string
-            textBox.SelectionStart = textBox.TextLength;
-            textBox.SelectionLength = 0;
-
-            //Formatar texto
-            textBox.SelectionColor = color;
-            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
-
-            //Adicionar texto
-            textBox.AppendText(text);
-        }
 
         #endregion
 
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_)
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "")
         {
             InitializeComponent();
             criteria = criteria_;
             isErrorMessage = isErrorMessage_;
+
+            //Definir mensagem
+            txtMessage.Rtf = messageRtf;
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -345,12 +321,18 @@ namespace Vados
                 btnCancel.FlatAppearance.BorderColor = Colors.redErrorLight;
 
                 //Mensagem
-                SetErrorMessage(txtMessage, criteria);
+                if (txtMessage.Text == "")
+                {
+                    SetErrorMessage(txtMessage, criteria);
+                }
             }
             //Mensagem de confirmação
             else
             {
-                SetConfirmationMessage(txtMessage, criteria);
+                if (txtMessage.Text == "")
+                {
+                    SetConfirmationMessage(txtMessage, criteria);
+                }
             }
 
 
@@ -397,21 +379,50 @@ namespace Vados
             //Limpar textbox (descartar)
             if (isErrorMessage == false)
             {
-                ClearCommand(true);
+                FocusCommand(true);
             }
         }
 
 
-        private void btnConfirm_Click(object sender, EventArgs e)
+        private async void btnConfirm_Click(object sender, EventArgs e)
         {
-            Comandos.ExecuteCommand(criteria);
-            ExitMessage();
 
-            //Limpar textbox (confirmar)
-            if (isErrorMessage == false)
+            //Limpar textbox
+            if (isErrorMessage == true)
             {
-                ClearCommand(true);
+                FocusCommand();
             }
+            //Executar comando
+            else
+            {
+                Form1 form = (Form1)Owner;
+                CommandCriteria criteriaCopy = criteria;
+
+                _ = Task.Run(async () =>    //Iniciar uma task, que realiza o código separadamente quando terminar
+                {
+                    try
+                    {
+                        //Realizar comando
+                        var errorMessage = await Comandos.ExecuteCommand(criteria);
+
+                        //Mostrar mensagem de erro
+                        if (errorMessage != "")
+                        {
+                            form.BeginInvoke((MethodInvoker)(() =>
+                            {
+                                MessageBox.Show("mensagem de erro");
+                                form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
+                            }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro ao executar comando: {ex.Message}");
+                    }
+                });
+            }
+
+            ExitMessage();
         }
 
 

@@ -61,18 +61,16 @@ namespace Vados
             var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
             //Mostrar mensagem de confirmação
-            bool isErrorMessage = !arguments.success;
-            var message = new FormMessage(arguments.criteria, isErrorMessage);
-            message.Owner = parentForm;
-            message.userControl = this;
-            message.Show();
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
         }
 
 
-        public void ClearCommand(bool focus = false)
+        public void FocusCommand(bool clear = false)
         {
-            txtComando.Text = "";
-            if (focus) txtComando.Focus();
+            txtComando.SelectionLength = 0;
+            txtComando.SelectionStart = txtComando.Text.Length;
+            txtComando.Focus();
+            if (clear) txtComando.Text = "";
         }
 
 

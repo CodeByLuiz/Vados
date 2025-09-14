@@ -31,6 +31,10 @@ namespace Vados
             overlayForm.ShowInTaskbar = false;
             overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
+
+            //Definir variáveis da textbox que armazena a próxima mensagem de erro
+            Global.nextErrorMessage.ForeColor = Color.Black;
+            Global.nextErrorMessage.Font = new Font("Segoe UI", 11f, FontStyle.Regular);
         }
 
         public void ToggleOverlay(bool visible)
@@ -46,6 +50,18 @@ namespace Vados
             {
                 overlayForm.Hide();
             }
+        }
+
+
+        //Ativar mensagem
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "")
+        {
+            ToggleOverlay(true);
+
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf);
+            message.Owner = form;
+            message.userControl = userControl;
+            message.Show();
         }
 
 

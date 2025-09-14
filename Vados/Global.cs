@@ -12,6 +12,9 @@ namespace Vados
     {
         public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
+        //Armazena texto formatado para a próxima mensagem de erro
+        public static RichTextBox nextErrorMessage = new RichTextBox();
+
 
         #region PRIORIDADES E EXCEÇÕES
 
@@ -57,7 +60,7 @@ namespace Vados
             Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
             //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-            Path.Combine(root),
+            //Path.Combine(root),
         };
 
         public static List<string> exePriorities = new List<string>
@@ -168,6 +171,37 @@ namespace Vados
             }
 
             return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
+        }
+
+
+        //Adiciona texto simples a uma RichTextBox
+        public static void AppendPlainText(RichTextBox textBox, string text)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Resetar formatação
+            textBox.SelectionColor = textBox.ForeColor;
+            textBox.SelectionFont = textBox.Font;
+
+            //Adicionar texto
+            textBox.AppendText(text);
+        }
+
+        //Adiciona texto formatado a uma RichTextBox
+        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Formatar texto
+            textBox.SelectionColor = color;
+            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
+
+            //Adicionar texto
+            textBox.AppendText(text);
         }
     }
 }

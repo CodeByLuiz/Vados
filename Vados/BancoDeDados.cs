@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Data.Sqlite;
 
 namespace Vados
 {
@@ -78,7 +79,7 @@ namespace Vados
             return novoGuid;
         }
 
-        public static void AdicionarEntrada(DateTime data, string comando, List<string> pastas)
+        public static void AdicionarEntrada(string comando, List<string> pastas)
         {
             using (var db = new DbConnection())
             {
@@ -97,7 +98,7 @@ namespace Vados
                 db.Historico.Add(novaEntrada);
                 db.SaveChanges();
 
-                Console.WriteLine($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
+                MessageBox.Show($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
 
 
 
@@ -105,6 +106,37 @@ namespace Vados
                 //comando: "mkdir novaPasta",
                 //pastas: new List<string> { "C:\\Projetos", "D:\\Backup" }
                 // negocio pra colocar dentro do treco de executar comandos
+            }
+        }
+
+         
+        public static void ListarEntradas() //pra mostrar todas as tabelase os bglh dentro se dar certo, dps pode tirar
+        {
+            using (var db = new DbConnection())
+            {
+                db.Database.EnsureCreated();
+
+                var entradas = db.Historico.OrderBy(e => e.Data).ToList();
+
+                if (entradas.Count == 0)
+                {
+                    MessageBox.Show("Nenhuma entrada encontrada.");
+                    return;
+                }
+
+                foreach (var entrada in entradas)
+                {
+                    MessageBox.Show($"-----------\n ID: {entrada.Id}\n ComputadorId: {entrada.ComputadorId}\n Data: {entrada.Data}\n Comando: {entrada.Comando}\n Pastas:");
+                    //MessageBox.Show($"ID: {entrada.Id}");
+                   // MessageBox.Show($"ComputadorId: {entrada.ComputadorId}");
+                    //MessageBox.Show($"Data: {entrada.Data}");
+                    //MessageBox.Show($"Comando: {entrada.Comando}");
+                    //MessageBox.Show($"Pastas:");
+                    foreach (var pasta in entrada.Pastas)
+                    {
+                        MessageBox.Show($"  - {pasta}\n");
+                    }
+                }
             }
         }
 

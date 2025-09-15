@@ -26,12 +26,14 @@ namespace Vados
         public UserControlSettings()
         {
             InitializeComponent();
+            
 
 
         }
         private void UserControlSettings_Load(object sender, EventArgs e)
         {
             PopularDispositivosAudio();
+           
         }
 
 
@@ -43,16 +45,22 @@ namespace Vados
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlHome));
         }
 
-        private void btnCriar_Click(object sender, EventArgs e)
+        private async void btnCriar_Click(object sender, EventArgs e)
         {
-
             string extension = "";
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
 
 
-
+           
             Comandos.CriarPasta(nome, destino);
+            List<string> nomecompleto = (await Comandos.SearchPaths(nome, true)).ToList();
+            BancoDeDados.AdicionarEntrada(
+                comando: "Criar Pasta",
+                pastas: nomecompleto
+            );
+
+            BancoDeDados.ListarEntradas();
 
             //else
             //{
@@ -62,13 +70,13 @@ namespace Vados
             //    @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
             //    @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
 
-            //};
+                //};
 
-            //    foreach (string x in nomes)
-            //    {
-            //        Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
-            //    }
-            //}
+                //    foreach (string x in nomes)
+                //    {
+                //        Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
+                //    }
+                //}
 
 
 

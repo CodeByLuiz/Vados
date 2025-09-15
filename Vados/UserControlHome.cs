@@ -46,6 +46,7 @@ namespace Vados
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
         bool textboxActive = false;
+        
 
 
         public void PerformCommand(string command)
@@ -83,7 +84,7 @@ namespace Vados
         public UserControlHome()
         {
             InitializeComponent();
-
+            Console.ReadLine();
 
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16; //~60 FPS

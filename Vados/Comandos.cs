@@ -776,15 +776,15 @@ namespace Vados
             {
                 //Criar
                 case "criar":
-                    if (objectType == "pasta") { return await CriarPasta(name, destination); }
-                    if (objectType == "arquivo") { return await CriarArquivo(name, destination); }
+                    if (objectType == "pasta") { return await CriarPasta(name, destinationPath); }
+                    if (objectType == "arquivo") { return await CriarArquivo(name, destinationPath); }
                     break;
 
 
                 //Renomear
                 case "renomear":
-                    if (objectType == "pasta") { RenomearPasta(name, newName, origin); }
-                    if (objectType == "arquivo") { RenomearArquivo(name, newName, origin); }
+                    if (objectType == "pasta") { return await RenomearPasta(name, newName, originPath); }
+                    if (objectType == "arquivo") { return await RenomearArquivo(name, newName, originPath); }
                     break;
 
 
@@ -805,8 +805,8 @@ namespace Vados
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { MoverPasta(paths.list, destinationPath); }
-                    if (objectType == "arquivo") { MoverArquivo(paths.list, destinationPath); }
+                    if (objectType == "pasta") { return await MoverPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { return await MoverArquivo(paths.list, destinationPath); }
                     break;
 
 
@@ -1331,7 +1331,7 @@ namespace Vados
         {
 
             string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-            //MessageBox.Show(caminhoPadrao);
+            
             try
             {
                 if (!Directory.Exists(caminhoPadrao))
@@ -1527,87 +1527,145 @@ namespace Vados
         }
 
 
-        public static async void RenomearArquivo(string nome, string novoNome, string pastaOrigem) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        public static async Task<string> RenomearArquivo(string name, string newName, string originPath)
         {
-            string path = (await SearchPaths(nome, false, rootFolder: pastaOrigem)).FirstOrDefault();
-            if (path == null) return;
+            string path = (await SearchPaths(name, false, rootFolder: originPath)).FirstOrDefault();
 
-            string novoPath = Path.Combine(Path.GetDirectoryName(path), novoNome);
+            //---------ERRO: arquivo não encontrado---------
+            if (string.IsNullOrEmpty(path))
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível encontrar o arquivo chamado ");
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ".");
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
 
+            string newPath = Path.Combine(Path.GetDirectoryName(path), newName);
+
+            //Renomear
             if (File.Exists(path))
             {
-                File.Move(path, novoPath);
-                Console.WriteLine("Arquivo " + nome + " renomeado para " + novoNome);
+                File.Move(path, newPath);
             }
-            else
-            {
-                MessageBox.Show("esse arquivo não existe");
-            }
+
+            return "";
         }
 
-        public static async void RenomearPasta(string nome, string novoNome, string pastaOrigem) // renomear pasta(mesmo erro de logica do renomear arquivo)
+
+        public static async Task<string> RenomearPasta(string name, string newName, string originPath)
         {
-            string path = (await SearchPaths(nome, true, rootFolder: pastaOrigem)).FirstOrDefault();
-            string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
+            string path = (await SearchPaths(name, true, rootFolder: originPath)).FirstOrDefault();
+
+            //---------ERRO: pasta não encontrada---------
+            if (string.IsNullOrEmpty(path))
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta chamada ");
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ".");
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
+
+            string newPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + newName);
 
             if (Directory.Exists(path))
             {
-                Directory.Move(path, novoPath);
-                Console.WriteLine("Pasta" + nome + "Renomeada para " + novoNome);
+                Directory.Move(path, newPath);
             }
-            else
-            {
-                MessageBox.Show("essa pasta não existe");
-            }
+
+            return "";
         }
 
 
-        public static void MoverPasta(List<string> Pathnomes, string destino)
+        public static async Task<string> MoverPasta(List<string> paths, string destination)
         {
             try
             {
-                foreach (string nome in Pathnomes)
+                foreach (string path in paths)
                 {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    //MessageBox.Show(destinoNovo);
+                    string newPath = Path.Combine(destination, Path.GetFileName(path));
 
-                    if (Directory.Exists(destinoNovo))
+                    //---------ERRO: pasta de mesmo nome já existe---------
+                    if (Directory.Exists(newPath))
                     {
-                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                        continue;
+                        using (var rtb = new RichTextBox())
+                        {
+                            Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, " na pasta ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, ".");
+                            return rtb.Rtf;
+                        }
                     }
+                    //----------------------------------------
 
-                    Directory.Move(nome, destinoNovo);
+                    Directory.Move(path, newPath);
                 }
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao mover pasta: " + ex.Message);
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível mover a(s) pasta(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
             }
+            //----------------------------------------
         }
 
-        public static void MoverArquivo(List<string> Pathnomes, string destino) 
+        public static async Task<string> MoverArquivo(List<string> paths, string destination) 
         {
-            foreach (string nome in Pathnomes)
+            try
             {
-                try
+                foreach (string path in paths)
                 {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
+                    string newPath = Path.Combine(destination, Path.GetFileName(path));
 
-                    if (File.Exists(destinoNovo))
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (File.Exists(newPath))
                     {
-                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        continue;
+                        using (var rtb = new RichTextBox())
+                        {
+                            Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, " na pasta ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, ".");
+                            return rtb.Rtf;
+                        }
                     }
-                    File.Move(nome, destinoNovo);
+                    //----------------------------------------
+
+                    File.Move(path, newPath);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
-                }
+
+                return "";
             }
 
-            return;
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível mover o(s) arquivos(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
         }
 
 

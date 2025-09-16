@@ -60,7 +60,7 @@ namespace Vados
                 pastas: nomecompleto
             );
 
-            BancoDeDados.ListarEntradas();
+            BancoDeDados.ListarTodasEntradas();
 
             //else
             //{

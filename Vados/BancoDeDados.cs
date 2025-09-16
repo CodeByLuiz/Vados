@@ -110,7 +110,7 @@ namespace Vados
         }
 
          
-        public static void ListarEntradas() //pra mostrar todas as tabelase os bglh dentro se dar certo, dps pode tirar
+        public static void ListarTodasEntradas() //pra mostrar todas as tabelase os bglh dentro se dar certo, dps pode tirar
         {
             using (var db = new DbConnection())
             {

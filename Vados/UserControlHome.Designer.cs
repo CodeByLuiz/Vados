@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             pnlBottom = new OptmizedPanel();
+            btnHistorico = new PictureBox();
             lblText = new Label();
             lblDebug = new Label();
             btnManual = new PictureBox();
@@ -38,6 +39,7 @@
             textBox1 = new TextBox();
             txtComando = new TextBox();
             pnlBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
@@ -45,6 +47,7 @@
             // 
             // pnlBottom
             // 
+            pnlBottom.Controls.Add(btnHistorico);
             pnlBottom.Controls.Add(lblText);
             pnlBottom.Controls.Add(lblDebug);
             pnlBottom.Controls.Add(btnManual);
@@ -61,6 +64,19 @@
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
             pnlBottom.Resize += pnlBottom_Resize;
+            // 
+            // btnHistorico
+            // 
+            btnHistorico.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnHistorico.Cursor = Cursors.Hand;
+            btnHistorico.Image = (Image)resources.GetObject("btnHistorico.Image");
+            btnHistorico.Location = new Point(1417, 18);
+            btnHistorico.Name = "btnHistorico";
+            btnHistorico.Size = new Size(73, 67);
+            btnHistorico.SizeMode = PictureBoxSizeMode.Zoom;
+            btnHistorico.TabIndex = 10;
+            btnHistorico.TabStop = false;
+            btnHistorico.Click += btnHistorico_Click;
             // 
             // lblText
             // 
@@ -162,6 +178,7 @@
             KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
@@ -177,5 +194,6 @@
         private PictureBox btnConfigs;
         private PictureBox imgLogo;
         private Label lblText;
+        private PictureBox btnHistorico;
     }
 }

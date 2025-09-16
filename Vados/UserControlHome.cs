@@ -30,7 +30,7 @@ namespace Vados
         bool circleHovering = false;
         bool lastCircleHovering = false;
         float circleSizeRatio = 1;
-        
+
 
         //Variáveis da textbox
         int txtAreaPaddingW = 18;
@@ -46,7 +46,7 @@ namespace Vados
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
         bool textboxActive = false;
-        
+
 
 
         public void PerformCommand(string command)
@@ -95,7 +95,7 @@ namespace Vados
             txtComando.Select(0, 0);
         }
 
-       
+
 
         private void txtComando_Click(object sender, EventArgs e)
         {
@@ -125,10 +125,10 @@ namespace Vados
 
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
-          
-            
+
+
             int middleX = this.Width / 2;
-            
+
             int middleY = 85 + (lblText.Top - 85) / 2;
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -158,7 +158,7 @@ namespace Vados
 
 
             //Contorno do círculo
-             float outlineSize = Math.Max(20f, Math.Min(circleSize * 0.05f, 25f));
+            float outlineSize = Math.Max(20f, Math.Min(circleSize * 0.05f, 25f));
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
             RectangleF rect = new RectangleF(circleX, circleY, circleSize, circleSize);
@@ -202,7 +202,7 @@ namespace Vados
 
 
 
-        
+
 
 
 
@@ -304,8 +304,8 @@ namespace Vados
 
             if (Math.Abs(circleSizeTarget - circleSize) < 1)
                 circleSize = circleSizeTarget;
-                
-            
+
+
 
             pnlBottom.Invalidate();
         }
@@ -338,7 +338,7 @@ namespace Vados
 
             circleX = middleX - circleSize / 2;
             circleY = middleY - circleSize / 2;
-            
+
             #endregion
 
             #region AJUSTAR TEXTBOX
@@ -357,7 +357,7 @@ namespace Vados
             int txtY = labelY + txtComando.Height + lblText.Height;
             txtY = Math.Clamp(txtComando.Location.Y, 0, this.Height - 10);
             txtComando.Location = new Point(middleX - txtComando.Width / 2, txtY);
-           
+
 
             //Variáveis da área atrás da textbox
             float txtOldAreaHeight = txtComando.Height + txtAreaPaddingH * 2;
@@ -373,7 +373,7 @@ namespace Vados
             setTextboxWidth = true;
 
             #endregion
-          
+
 
             pnlBottom.Invalidate();
         }
@@ -417,7 +417,7 @@ namespace Vados
         {
 
         }
-        
+
         private void UserControlHome_KeyDown(object sender, KeyEventArgs e)
         {
             //MessageBox.Show("enter");
@@ -426,6 +426,11 @@ namespace Vados
             {
                 PerformCommand(txtComando.Text);
             }
+        }
+
+        private void btnHistorico_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

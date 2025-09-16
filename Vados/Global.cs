@@ -12,6 +12,9 @@ namespace Vados
     {
         public static string DefaultFolder = Comandos.CriarPastaPadrao();
 
+
+        #region PRIORIDADES E EXCEÇÕES
+
         public static List<string> defaultExceptions = new List<string>
         {
             "$RECYCLE.BIN",
@@ -34,49 +37,46 @@ namespace Vados
 
 
 
-       public static string root = @"" + Comandos.driveverifica(null);
+        public static string root = @"" + Comandos.driveverifica(null);
 
         public static List<string> defaultPriorities = new List<string>
-            {
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-                Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-                //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+        {
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
+            Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
+            //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-                Path.Combine(root),
+            //Path.Combine(root),
+        };
 
-            };
         public static List<string> exePriorities = new List<string>
-            {
-                DefaultFolder,
-                @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                @"C:\Program Files",
-                @"C:\Program Files (x86)",
+        {
+            DefaultFolder,
+            @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+            @"C:\Program Files",
+            @"C:\Program Files (x86)",
 
-                //Path.Combine(root),
-            };
+            //Path.Combine(root),
+        };
 
-
-
+        #endregion
 
 
         //Inicializar user controls
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
         public static UserControlManual userControlManual = new UserControlManual();
-
-
 
       
         //Desenhar retângulo arredondado
@@ -131,6 +131,102 @@ namespace Vados
             {
                 SizeF size = g.MeasureString(textBox.Text, textBox.Font, width);
                 textBox.Height = (int)Math.Ceiling(size.Height) + extraPadding + textBox.Padding.Vertical;
+            }
+        }
+
+
+        public static void LabelFitWidth(Label label, int extraPadding = 2)
+        {
+            if (label == null) return;
+
+            Graphics g = label.CreateGraphics();
+            SizeF size = g.MeasureString(label.Text, label.Font, label.Width);
+            label.Width = (int)Math.Ceiling(size.Width) + extraPadding + label.Padding.Horizontal;
+        }
+
+
+        //Mudar brilho de uma cor em porcentagem
+        public static Color ChangeColorBrightness(Color color, float correctionFactor)
+        {
+            float red = color.R;
+            float green = color.G;
+            float blue = color.B;
+
+            if (correctionFactor < 0)
+            {
+                //Escurecer
+                correctionFactor = 1 + correctionFactor;
+                red *= correctionFactor;
+                green *= correctionFactor;
+                blue *= correctionFactor;
+            }
+            else
+            {
+                //Clarear
+                red = red + (255 - red) * correctionFactor;
+                green = green + (255 - green) * correctionFactor;
+                blue = blue + (255 - blue) * correctionFactor;
+            }
+
+            return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
+        }
+
+
+        //Adiciona texto simples a uma RichTextBox
+        public static void AppendPlainText(RichTextBox textBox, string text)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Resetar formatação
+            textBox.SelectionColor = textBox.ForeColor;
+            textBox.SelectionFont = textBox.Font;
+
+            //Adicionar texto
+            textBox.AppendText(text);
+        }
+
+        //Adiciona texto formatado a uma RichTextBox
+        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
+        {
+            //Iniciar seleção no fim da string
+            textBox.SelectionStart = textBox.TextLength;
+            textBox.SelectionLength = 0;
+
+            //Formatar texto
+            textBox.SelectionColor = color;
+            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
+
+            //Adicionar texto
+            textBox.AppendText(text);
+        }
+
+        //Muda apenas a fonte de um rtf (texto formatado)
+        public static string RtfChangeFont(string rtf, Font newFont)
+        {
+            using (var rtb = new RichTextBox())
+            {
+                rtb.Rtf = rtf;
+
+                //Mudar fonte de cada caractere
+                for (int i = 0; i < rtb.TextLength; i++)
+                {
+                    rtb.Select(i, 1);
+                    var currentFont = rtb.SelectionFont;
+
+                    if (currentFont != null)
+                    {
+                        rtb.SelectionFont = new Font(
+                            newFont.FontFamily,
+                            newFont.Size,
+                            currentFont.Style   //Manter negrito, itálico, etc
+                        );
+                    }
+                }
+
+                rtb.Select(0, 0);
+                return rtb.Rtf;
             }
         }
     }

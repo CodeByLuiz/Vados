@@ -52,7 +52,7 @@ namespace Vados
         public void PerformCommand(string command)
         {
             //Escurecer tela
-            var parentForm = this.FindForm() as Form1;
+            var parentForm = FindForm() as Form1;
             if (parentForm != null)
             {
                 parentForm.ToggleOverlay(true);
@@ -62,9 +62,16 @@ namespace Vados
             var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
             //Mostrar mensagem de confirmação
-            var message = new FormMessage(arguments);
-            message.Owner = this.FindForm();
-            message.Show();
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
+        }
+
+
+        public void FocusCommand(bool clear = false)
+        {
+            txtComando.SelectionLength = 0;
+            txtComando.SelectionStart = txtComando.Text.Length;
+            txtComando.Focus();
+            if (clear) txtComando.Text = "";
         }
 
 
@@ -340,6 +347,7 @@ namespace Vados
             circleY = middleY - circleSize / 2;
 
             #endregion
+
 
             #region AJUSTAR TEXTBOX
 

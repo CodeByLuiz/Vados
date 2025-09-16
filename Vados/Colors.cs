@@ -14,5 +14,7 @@ namespace Vados
 
         public static Color blueHighlight = Color.FromArgb(31, 73, 179);
         public static Color greenHighlight = Color.FromArgb(42, 124, 69);
+        public static Color redErrorDark = Color.FromArgb(104, 27, 27);
+        public static Color redErrorLight = Color.FromArgb(158, 55, 55);
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -10,9 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\Icons\closeIcon.png" />
     <None Remove="Images\Icons\configIcon.png" />
+    <None Remove="Images\Icons\confirmIcon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
     <None Remove="Images\Icons\sendIcon.png" />
+    <None Remove="Images\Icons\warningIcon.png" />
     <None Remove="Images\Logo.jpg" />
     <None Remove="Images\LogoAzul.png" />
     <None Remove="Images\LogoBranco.png" />
@@ -32,7 +35,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Images\Icons\closeIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Icons\configIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\confirmIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\manualIcon.png">
@@ -45,6 +54,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\vados-icone.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\warningIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Logo.jpg">

@@ -13,6 +13,9 @@
     <Compile Update="OptmizedPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="RoundedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="UserControlHome.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -24,6 +27,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Form1.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

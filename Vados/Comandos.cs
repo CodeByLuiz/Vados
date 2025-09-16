@@ -606,7 +606,6 @@ namespace Vados
                 //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
                 foreach (string extension in Comandos.WordGetExtensions(format))
                 {
-                    //MessageBox.Show("extension: " + extension);
                     List<string> newPaths = (await SearchPaths(name + "." + extension, objectType == "pasta",
                                                         rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound,
                                                         exceptions: exceptions, priorities: priorities).ConfigureAwait(false)).ToList();
@@ -1100,7 +1099,6 @@ namespace Vados
                             }
 
                             //Se passar por todos os critérios, adicionar a lista de resultados
-                            MessageBox.Show("passou criterio");
                             resultados.Add(folderPath);
                             pathAmount -= 1;
                         }
@@ -1108,7 +1106,6 @@ namespace Vados
                         //Retornar resultados ao chegar na quantidade necessária
                         if (pathAmount <= 0)
                         {
-                            MessageBox.Show("acabou");
                             return resultados;
                         }
                     }
@@ -1130,8 +1127,6 @@ namespace Vados
                             }
                         });
 
-                        //MessageBox.Show("Pasta: " + atual + "\r\nArquivos: " + string.Join("|", files.Select(Regex.Escape)));
-
                         //Percorrer todos os arquivos da pasta atual
                         foreach (var filePath in files)
                         {
@@ -1144,7 +1139,6 @@ namespace Vados
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
 
-                            //MessageBox.Show("Nome: " + actualName + "\r\nEsperado: " + searchName);
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
@@ -1359,8 +1353,6 @@ namespace Vados
 
         public static async Task<string> CriarPasta(string name, string destinationPath)
         {
-            MessageBox.Show("criar pasta");
-
             try
             {
                 //Definir pasta padrão como pasta de destino caso não seja especificada
@@ -1374,7 +1366,6 @@ namespace Vados
 
 
                 string path = Path.Combine(destinationPath, finalName);
-                MessageBox.Show(path);
 
                 if (!File.Exists(path))
                 {
@@ -1474,10 +1465,6 @@ namespace Vados
                     {
                         File.Delete(path);
                     }
-                    else
-                    {
-                        MessageBox.Show("esse arquivo não existe");
-                    }
                 }
 
                 return "";
@@ -1516,10 +1503,6 @@ namespace Vados
 
                         }
                         Directory.Delete(path);
-                    }
-                    else
-                    {
-                        MessageBox.Show("essa pasta não existe");
                     }
                 }
 
@@ -1684,8 +1667,6 @@ namespace Vados
 
         public static async Task<string> DuplicarPasta(List<string> paths, string destination)
         {
-            MessageBox.Show("funcao");
-
             try
             {
                 foreach (string path in paths)
@@ -1695,8 +1676,6 @@ namespace Vados
                     {
                         destination = Path.GetDirectoryName(path);
                     }
-
-                    MessageBox.Show("destination: " + destination);
 
                     //Definir nome da pasta
                     string folderName = CriarNome(Path.GetFileName(path), destination);
@@ -1872,7 +1851,6 @@ namespace Vados
             int i = 2;
             string newName = nome;
 
-            MessageBox.Show(Path.Combine(destination, newName));
 
             while (Path.Exists(Path.Combine(destination, newName)))
             {
@@ -1880,7 +1858,6 @@ namespace Vados
                 i++;
             }
 
-            //MessageBox.Show("Nome: " + newName);
             return newName;
         }
         

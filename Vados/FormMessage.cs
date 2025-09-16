@@ -405,14 +405,12 @@ namespace Vados
                     {
                         //Realizar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
-                        MessageBox.Show("erro: " + errorMessage);
 
                         //Mostrar mensagem de erro
                         if (errorMessage != "")
                         {
                             form.BeginInvoke((MethodInvoker)(() =>
                             {
-                                MessageBox.Show("mensagem de erro");
                                 form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
                             }));
                         }

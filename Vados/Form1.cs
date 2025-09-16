@@ -58,6 +58,7 @@ namespace Vados
             message.Owner = form;
             message.userControl = userControl;
             message.Show();
+            CorrectMessageForm();
         }
 
 

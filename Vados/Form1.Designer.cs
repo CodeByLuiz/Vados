@@ -39,7 +39,6 @@
             panelContainer.Name = "panelContainer";
             panelContainer.Size = new Size(1264, 681);
             panelContainer.TabIndex = 1;
-            panelContainer.Paint += panelContainer_Paint;
             // 
             // Form1
             // 
@@ -54,6 +53,8 @@
             Text = "Vados";
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
+            Move += Form1_Move;
+            Resize += Form1_Resize;
             ResumeLayout(false);
         }
 

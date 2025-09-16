@@ -18,14 +18,10 @@ namespace Vados
         public event EventHandler<LoadPageEventArgs> loadPage;
 
         System.Windows.Forms.Timer timer;
-
-
-      
-
         private Image micIcon;
 
-
         //Variáveis do botão do microfone
+        float circleSizeMax = 325;
         float circleSizeDefault = 325;
         float circleSize = 325;
         float circleSizeTarget = 325;
@@ -33,6 +29,7 @@ namespace Vados
         float circleY = 0;
         bool circleHovering = false;
         bool lastCircleHovering = false;
+        float circleSizeRatio = 1;
         
 
         //Variáveis da textbox
@@ -53,16 +50,27 @@ namespace Vados
 
         public void PerformCommand(string command)
         {
-            if (textboxActive == true)
+            //Escurecer tela
+            var parentForm = FindForm() as Form1;
+            if (parentForm != null)
             {
-                MessageBox.Show(Comandos.RemoveDiacritics(txtComando.Text));
-
-                //Extrair argumentos do comando
-                var arguments = Comandos.CommandGetArguments(txtComando.Text);
-
-                //Executar comando
-                Comandos.ExecuteCommand(arguments);
+                parentForm.ToggleOverlay(true);
             }
+
+            //Extrair argumentos do comando
+            var arguments = Comandos.CommandGetArguments(txtComando.Text);
+
+            //Mostrar mensagem de confirmação
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
+        }
+
+
+        public void FocusCommand(bool clear = false)
+        {
+            txtComando.SelectionLength = 0;
+            txtComando.SelectionStart = txtComando.Text.Length;
+            txtComando.Focus();
+            if (clear) txtComando.Text = "";
         }
 
 
@@ -91,7 +99,6 @@ namespace Vados
 
             micIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png"));
             txtComando.Select(0, 0);
-
         }
 
        
@@ -311,33 +318,35 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            #region ajustar label
-            int middleX = this.Width  / 2;
-            int middleY = 85 + (lblText.Top - 85) / 2;
+            #region AJUSTAR LABEL
+
+            int labelX = this.Width / 2 - lblText.Width / 2;
+            int labelY = txtComando.Top - lblText.Height - 40;
+
+            lblText.Location = new Point(labelX, labelY);
+
+            #endregion
 
 
+            #region AJUSTAR BOTÃO DO MICROFONE
+
+            //Corrigir tamanho
+            int minY = 85;
+            int maxY = lblText.Top;
+            float newSize = (maxY - minY) * 0.8f;
+            circleSizeDefault = Math.Min(newSize, circleSizeMax);
+            circleSize = circleSizeDefault;
+            circleSizeTarget = circleSizeDefault;
+
+            //Reposicionar círculo no centro
+            int middleX = this.Width / 2;
+            int middleY = minY + (lblText.Top - minY) / 2;
 
             circleX = middleX - circleSize / 2;
             circleY = middleY - circleSize / 2;
-
-            int labelX = this.Width / 2 - lblText.Width / 2;
-            int labelY = (int)(circleY + circleSize + lblText.Height);
-
-            labelY = Math.Clamp(lblText.Location.Y, 0, txtComando.Location.Y - 5);
-
-            lblText.Location = new Point(labelX, labelY);
-            #endregion
-
-
-            #region Ajustar botao mic
-            circleSizeDefault = Math.Min(this.Height * 0.4f, 325);
-            circleSizeTarget = circleSizeDefault;
             
-
-
-
-
             #endregion
+
 
             #region AJUSTAR TEXTBOX
 
@@ -372,8 +381,6 @@ namespace Vados
 
             #endregion
           
-
-
 
             pnlBottom.Invalidate();
         }
@@ -420,7 +427,7 @@ namespace Vados
         
         private void UserControlHome_KeyDown(object sender, KeyEventArgs e)
         {
-            MessageBox.Show("enter");
+            //MessageBox.Show("enter");
 
             if (e.KeyCode == Keys.Enter)
             {

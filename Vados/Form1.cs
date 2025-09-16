@@ -4,6 +4,8 @@ namespace Vados
 {
     public partial class Form1 : Form
     {
+        Form overlayForm = new Form();
+
         private bool isFullscreen = false;
         private FormWindowState lastWindowState;
         private FormBorderStyle lastBorderStyle;
@@ -15,15 +17,76 @@ namespace Vados
             InitializeComponent();
             KeyPreview = true;
 
+            //Otimizar pintura
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint, true);
 
+            //Criar form transparente para escurecer a tela quando preciso
+            overlayForm.FormBorderStyle = FormBorderStyle.None;
+            overlayForm.BackColor = Color.Black;
+            overlayForm.Opacity = 0.25;
+            overlayForm.ShowInTaskbar = false;
+            overlayForm.Owner = this;
+            overlayForm.StartPosition = FormStartPosition.Manual;
+        }
 
-            
+        public void ToggleOverlay(bool visible)
+        {
+            //Ativar tela escura
+            if (visible)
+            {
+                overlayForm.Show();
+                overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+            }
+            //Desativar
+            else
+            {
+                overlayForm.Hide();
+            }
         }
 
 
-      
+        //Ativar mensagem
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "")
+        {
+            ToggleOverlay(true);
 
-        //Função para trocar user control
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf);
+            message.Owner = form;
+            message.userControl = userControl;
+            message.Show();
+            CorrectMessageForm();
+        }
+
+
+        public void CorrectMessageForm()
+        {
+            FormMessage messageForm = null;
+
+            //Encontrar form
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormMessage)
+                {
+                    messageForm = (FormMessage)openForm;
+                    break;
+                }
+            }
+
+            if (messageForm == null) return;    //Parar se não encontrar form
+
+
+            //Corrigir posição
+            int newX = Width / 2 - messageForm.Width / 2;
+            int newY = Height / 2 - messageForm.Height / 2;
+            messageForm.Location =  PointToScreen(new Point(newX, newY));
+        }
+
+
+        //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
         {
             panelContainer.Controls.Clear();
@@ -80,9 +143,21 @@ namespace Vados
             }
         }
 
-        private void panelContainer_Paint(object sender, PaintEventArgs e)
+        private void Form1_Resize(object sender, EventArgs e)
         {
-           
+            //Corrigir tamanho da tela preta
+            overlayForm.Bounds = RectangleToScreen(this.ClientRectangle);
+
+            CorrectMessageForm();
+        }
+
+        private void Form1_Move(object sender, EventArgs e)
+        {
+            //Corrigir posição da tela preta
+            Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
+            overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
+
+            CorrectMessageForm();
         }
     }
 }

@@ -538,7 +538,7 @@ namespace Vados
 
 
         //Retorna os caminhos encontrados conforme os critérios
-        static async Task<(List<string>, string)> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
+        static async Task<(List<string> list, string errorMessage)> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
         {
             if (priorities == null) priorities = Global.defaultPriorities;
             if (exceptions == null) priorities = Global.defaultExceptions;
@@ -608,14 +608,15 @@ namespace Vados
                 {
                     //MessageBox.Show("extension: " + extension);
                     List<string> newPaths = (await SearchPaths(name + "." + extension, objectType == "pasta",
-                                                        rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions, priorities: priorities)).ToList();
+                                                        rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound,
+                                                        exceptions: exceptions, priorities: priorities).ConfigureAwait(false)).ToList();
                     paths.AddRange(newPaths);
                 }
             }
             else
             {
-                //Procura normal usando o nome
-                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound)).ToList();
+                //Procura normal usando o nome                
+                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ConfigureAwait(false)).ToList();
             }
 
 
@@ -727,7 +728,7 @@ namespace Vados
 
             if (!string.IsNullOrEmpty(origin))
             {
-                originPath = (await SearchPaths(origin, true, pathAmount: 1)).FirstOrDefault();
+                originPath = (await SearchPaths(origin, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
 
                 #region---------ERRO: pasta de origem não existe---------
 
@@ -750,7 +751,7 @@ namespace Vados
 
             if (!string.IsNullOrEmpty(destination))
             {
-                destinationPath = (await SearchPaths(destination, true, pathAmount: 1)).FirstOrDefault();
+                destinationPath = (await SearchPaths(destination, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
 
                 #region---------ERRO: pasta de destino não existe---------
 
@@ -790,7 +791,7 @@ namespace Vados
 
                 //Excluir
                 case "excluir":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
@@ -801,7 +802,7 @@ namespace Vados
 
                 //Mover
                 case "mover":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
@@ -812,31 +813,38 @@ namespace Vados
 
                 //Duplicar
                 case "duplicar":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { DuplicarPasta(paths.list, destinationPath); }
-                    if (objectType == "arquivo") { DuplicarArquivo(paths.list, destinationPath); }
+                    if (objectType == "pasta") { return await DuplicarPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { return await DuplicarArquivo(paths.list, destinationPath); }
                     break;
 
 
                 //Abrir
                 case "abrir":
-                    if (objectType == "pasta") break;
-
                     //Procurar caminhos mais eficientemente
-                    if (objectType == "arquivo")
+                    if (objectType == "arquivo" || objectType == "pasta")
                     {
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
                     } 
                     else
                     {
                         //Prioridades e excessões para procurar aplicativos
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions).ConfigureAwait(false);
                     }
 
-                    ExecutarCaminho(paths.list.FirstOrDefault());
+                    //Erro na busca
+                    if (paths.errorMessage != "") return paths.errorMessage;
+
+
+                    if (objectType != "pasta")
+                        //Abrir arquivo / programa
+                        return await ExecutarCaminho(paths.list.FirstOrDefault());
+                    else
+                        //Abrir explorador de arquivos no caminho da pasta
+                        OpenFileExplorer(paths.list.FirstOrDefault(), true);
                     break;
             }
 
@@ -1092,6 +1100,7 @@ namespace Vados
                             }
 
                             //Se passar por todos os critérios, adicionar a lista de resultados
+                            MessageBox.Show("passou criterio");
                             resultados.Add(folderPath);
                             pathAmount -= 1;
                         }
@@ -1099,6 +1108,7 @@ namespace Vados
                         //Retornar resultados ao chegar na quantidade necessária
                         if (pathAmount <= 0)
                         {
+                            MessageBox.Show("acabou");
                             return resultados;
                         }
                     }
@@ -1349,6 +1359,8 @@ namespace Vados
 
         public static async Task<string> CriarPasta(string name, string destinationPath)
         {
+            MessageBox.Show("criar pasta");
+
             try
             {
                 //Definir pasta padrão como pasta de destino caso não seja especificada
@@ -1362,6 +1374,7 @@ namespace Vados
 
 
                 string path = Path.Combine(destinationPath, finalName);
+                MessageBox.Show(path);
 
                 if (!File.Exists(path))
                 {
@@ -1669,96 +1682,135 @@ namespace Vados
         }
 
 
-        public static void DuplicarPasta(List<string> paths, string destino)
+        public static async Task<string> DuplicarPasta(List<string> paths, string destination)
         {
-            try
-            {
-                //nome = SearchPaths(nome, true).FirstOrDefault();
-                foreach (string nome in paths)
-                {
-                    string destinoNovo;
-                    if (string.IsNullOrEmpty(destino))
-                    {
-                         destinoNovo = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
-                    }
-                    else
-                    {
-                         destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    }
-
-
-                    //MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
-                    if (Directory.Exists(destinoNovo))
-                    {
-                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                        return;
-                    }
-
-                    Directory.CreateDirectory(destinoNovo);
-                    foreach (string arquivo in Directory.GetFiles(nome))
-                    {
-
-
-                        string nomeArquivo = Path.GetFileName(arquivo);
-                        string destinoArquivo = Path.Combine(destinoNovo, nomeArquivo);
-                        File.Copy(arquivo, destinoArquivo, true);
-
-                    }
-                    foreach (string subPasta in Directory.GetDirectories(nome))
-                    {
-                        string nomeSubPasta = Path.GetFileName(subPasta);
-                        string destinoSubPasta = Path.Combine(destinoNovo, nomeSubPasta);
-                        //MessageBox.Show(destinoSubPasta);
-                        //MessageBox.Show(nomeSubPasta);
-                        var subpastas = new List<string>();
-                        subpastas.Add(subPasta);
-                        DuplicarPasta(subpastas, destinoNovo);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao duplicar pasta: " + ex.Message);
-            }
-        }
-
-        public static void DuplicarArquivo(List<string> Pathnomes, string destination)
-        {
+            MessageBox.Show("funcao");
 
             try
             {
-                string newDestination = "";
-
-                foreach (string nome in Pathnomes)
+                foreach (string path in paths)
                 {
-                    //Definir destino como a mesma pasta caso não seja informado
+                    //Definir mesma pasta como destino caso não seja especificada
                     if (string.IsNullOrEmpty(destination))
                     {
-                        destination = Path.GetDirectoryName(nome);
+                        destination = Path.GetDirectoryName(path);
                     }
 
-                    string fileName = CriarNome(Path.GetFileName(nome), destination);
-                    newDestination = Path.Combine(destination, fileName);
+                    MessageBox.Show("destination: " + destination);
 
-                    //if (File.Exists(destinoNovo))
-                    //{
-                    //    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                    //}
-                    //MessageBox.Show("pasta: " + destination);
-                    //MessageBox.Show("destino novo: " + newDestination);
+                    //Definir nome da pasta
+                    string folderName = CriarNome(Path.GetFileName(path), destination);
+                    string folderPath = Path.Combine(destination, folderName);
 
-                    File.Copy(nome, newDestination, false);
+
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (Directory.Exists(folderPath))
+                    {
+                        using (var rtb = new RichTextBox())
+                        {
+                            Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, " na pasta ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, ".");
+                            return rtb.Rtf;
+                        }
+                    }
+                    //----------------------------------------
+
+
+                    //Criar pasta na nova pasta
+                    Directory.CreateDirectory(folderPath);
+
+                    //Duplicar arquivos internos
+                    foreach (string file in Directory.GetFiles(path))
+                    {
+                        string fileName = Path.GetFileName(file);
+                        string fileNewPath = Path.Combine(folderPath, fileName);
+                        File.Copy(file, fileNewPath, true);
+                    }
+
+                    //Duplicar subpastas internas
+                    foreach (string subFolder in Directory.GetDirectories(path))
+                    {
+                        string subFolderName = Path.GetFileName(subFolder);
+                        string subFolderPath = Path.Combine(folderPath, subFolderName);
+                        var subpastas = new List<string>() { subFolder };
+                        DuplicarPasta(subpastas, subFolderPath);
+                    }
                 }
 
-                OpenFileExplorer(newDestination, false);
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao duplicar arquivo: " + ex.Message);
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível duplicar a(s) pasta(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
+        }
+
+        public static async Task<string> DuplicarArquivo(List<string> paths, string destination)
+        {
+
+            try
+            {
+                string newPath = "";
+
+                foreach (string path in paths)
+                {
+                    //Definir mesma pasta como destino caso não seja especificada
+                    if (string.IsNullOrEmpty(destination))
+                    {
+                        destination = Path.GetDirectoryName(path);
+                    }
+
+                    //Definir nome do arquivo
+                    string fileName = CriarNome(Path.GetFileName(path), destination);
+                    newPath = Path.Combine(destination, fileName);
+
+
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (Directory.Exists(newPath))
+                    {
+                        using (var rtb = new RichTextBox())
+                        {
+                            Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, " na pasta ");
+                            Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                            Global.AppendPlainText(rtb, ".");
+                            return rtb.Rtf;
+                        }
+                    }
+                    //----------------------------------------
+
+
+                    //Mover arquivo
+                    File.Copy(path, newPath, false);
+                }
+
+                OpenFileExplorer(newPath, false);
+                return "";
             }
 
-
-
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível duplicar o(s) arquivo(s).\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
         }
 
 
@@ -1817,12 +1869,14 @@ namespace Vados
 
         public static string CriarNome(string nome, string destination)
         {
-            int i = 1;
+            int i = 2;
             string newName = nome;
 
-            while (File.Exists(Path.Combine(destination, newName)))
+            MessageBox.Show(Path.Combine(destination, newName));
+
+            while (Path.Exists(Path.Combine(destination, newName)))
             {
-                newName = $"{nome}({i})";
+                newName = $"{nome} ({i})";
                 i++;
             }
 
@@ -1830,20 +1884,30 @@ namespace Vados
             return newName;
         }
         
-        public static void ExecutarCaminho(string caminho)
+        public static async Task<string> ExecutarCaminho(string caminho)
         {
             ProcessStartInfo processInfo = new ProcessStartInfo();
-            MessageBox.Show("caminho: " + caminho);
 
-            if (caminho == null)
+            try
             {
-                MessageBox.Show("Caminho não encontrado");
-                return;
+                processInfo.FileName = caminho;
+                processInfo.UseShellExecute = true;
+                Process.Start(processInfo);
             }
 
-            processInfo.FileName = caminho;
-            processInfo.UseShellExecute = true;
-            Process.Start(processInfo);
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                using (var rtb = new RichTextBox())
+                {
+                    Global.AppendPlainText(rtb, "Não foi possível abrir o arquivo / programa.\n");
+                    Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                    return rtb.Rtf;
+                }
+            }
+            //----------------------------------------
+
+            return "";
         }
     }
 

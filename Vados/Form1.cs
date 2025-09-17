@@ -85,9 +85,11 @@ namespace Vados
             messageForm.Location =  PointToScreen(new Point(newX, newY));
         }
 
+         
+
         public void ShowHistoryTab(Form form, UserControl userControl)
         {
-            ToggleOverlay(true);
+            //ToggleOverlay(true);
 
             var history = new FormHistory();
             history.Owner = form;
@@ -96,7 +98,26 @@ namespace Vados
             CorrectHistoryForm();
 
         }
+        public void CloseHistoryTab()
+        {
+            FormHistory historyForm = null;
 
+            // Encontrar o formulário aberto do tipo FormHistory
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormHistory)
+                {
+                    historyForm = (FormHistory)openForm;
+                    break;
+                }
+            }
+
+            if (historyForm != null)
+            {
+                historyForm.Close();
+                                     
+            }
+        }
         public void CorrectHistoryForm()
         {
             FormHistory historyForm = null;
@@ -113,13 +134,16 @@ namespace Vados
 
             if (historyForm == null) return;
 
-            int newX = (int)(this.Width * 0.05);  
-            int newY = (int)(this.Height * 0.95); 
+            int refX = (int)(this.Width - 35 );  
+            int refY = (int)(this.Height * 0.10);
 
-            historyForm.Location = this.PointToScreen(new Point(newX, newY));
+            int posX = refX - historyForm.Width;  // desloca para a esquerda pela largura do form
+            int posY = refY;
+
+            historyForm.Location = this.PointToScreen(new Point(posX, posY));
+            historyForm.Height = Height - (historyForm.Top - Top);
+            //historyForm.Size = new Size(newWidth, newHeight);
         }
-
-
         //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
         {
@@ -145,8 +169,11 @@ namespace Vados
             //Eventos de mudar de página (pra cada user control)
             Global.userControlHome.loadPage += LoadPage;
             Global.userControlSettings.loadPage += LoadPage;
-        }
 
+            
+            
+        }
+        
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -181,7 +208,7 @@ namespace Vados
         {
             //Corrigir tamanho da tela preta
             overlayForm.Bounds = RectangleToScreen(this.ClientRectangle);
-
+            CorrectHistoryForm();
             CorrectMessageForm();
         }
 
@@ -190,8 +217,9 @@ namespace Vados
             //Corrigir posição da tela preta
             Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
             overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
-
+            CorrectHistoryForm();
             CorrectMessageForm();
         }
+        
     }
 }

@@ -13,8 +13,19 @@ namespace Vados
 {
     public partial class FormHistory : Form
     {
+
         public UserControl userControl;
 
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        private static extern IntPtr CreateRoundRectRgn
+       (
+           int nLeftRect,
+           int nTopRect,
+           int nRightRect,
+           int nBottomRect,
+           int nWidthEllipse,
+           int nHeightEllipse
+       );
 
         public FormHistory()
         {
@@ -29,15 +40,12 @@ namespace Vados
         }
 
         //Bordas arredondadas
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn
-        (
-            int nLeftRect,
-            int nTopRect,
-            int nRightRect,
-            int nBottomRect,
-            int nWidthEllipse,
-            int nHeightEllipse
-        );
+       
+
+        private void FormHistory_Resize_1(object sender, EventArgs e)
+        {
+            int roundValue = (int)(0.1 * Width);
+            Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
+        }
     }
 }

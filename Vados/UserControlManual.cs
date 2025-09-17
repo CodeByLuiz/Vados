@@ -121,8 +121,8 @@ namespace Vados
             Label title = new Label
             {
                 Text = Title,
-                Font = new Font("Arial", 40),
-                ForeColor = Color.White,
+                Font = new Font("Darker Grotesque ExtraBold", 40,FontStyle.Bold),
+                ForeColor = Color.FromArgb(48 ,61 ,99),
                 Dock = DockStyle.Top,
                 Padding = new Padding(10),
                 AutoSize = true,
@@ -134,17 +134,47 @@ namespace Vados
             Label descriptionLabel = new Label
             {
                 Text = description,
-                Font = new Font("Arial", 12),
-                ForeColor = Color.Gray,
-                Dock = DockStyle.Fill,
+                Font = new Font("Darker Grotesque", 12, FontStyle.Regular),
+                ForeColor = Color.Black,
+                Dock = DockStyle.Top,
             TextAlign = ContentAlignment.TopLeft,
                 Padding = new Padding(10),
-                AutoSize = false
+                AutoSize = true,
+                MaximumSize = new Size(panelContent.Width - 40, 0)
             };
             panelContent.Controls.Add(descriptionLabel);
         }
 
-       
+        private void AddExampleBox(string texto)
+        {
+            Panel examplePanel = new Panel
+            {
+                AutoSize = true,
+                BackColor = Color.FromArgb(231,231, 231), 
+                Dock = DockStyle.Top,
+                Height = 40,
+                Padding = new Padding(10, 8, 10, 8),
+                Margin = new Padding(10, 5, 10, 5),
+                MaximumSize = new Size(panelContent.Width - 80, 0),
+            };
+
+            Label lblExample = new Label
+            {
+                AutoSize = true,
+                Text = texto,
+                ForeColor = Color.FromArgb(60, 60, 60),
+                Font = new Font("Darker Grotesque", 10),
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            examplePanel.Controls.Add(lblExample);
+
+           
+            panelContent.Controls.Add(examplePanel);
+            examplePanel.BringToFront();
+        }
+
 
 
         private void SetupNavBar()
@@ -207,10 +237,12 @@ namespace Vados
             {
                 
                Dock = DockStyle.Fill,
-                BackColor = Color.Red
+                BackColor = Color.FromArgb(223, 223 ,223)
             };
             this.Controls.Add(panelContent);
         }
+
+        
 
         private void AddSection(FlowLayoutPanel flow, string sectionTitle, string[] commands)
         {
@@ -278,6 +310,30 @@ namespace Vados
             }
         }
 
+
+        private void AddImageToContent(string caminhoimagem)
+        {
+            if (System.IO.File.Exists(caminhoimagem))
+            {
+                Panel imageWrapper = new Panel
+                {
+                    Dock = DockStyle.Top,
+                    Padding = new Padding(0, 60, 0, 10),
+                    Height = 400,
+                    Width = 600,
+                };
+                PictureBox picture = new PictureBox
+                {
+                    Image = Image.FromFile(caminhoimagem),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Dock = DockStyle.Fill,
+                };
+                imageWrapper.Controls.Add(picture);
+                panelContent.Controls.Add(imageWrapper);
+                picture.BringToFront(); 
+            }
+        }
+
         private void NavButton_Click(object sender, EventArgs e)
         {
 
@@ -304,8 +360,10 @@ namespace Vados
 
             if (buttonText == "Criar uma pasta")
             {
-                // AddImageToContent("caminho_da_imagem_da_pasta.png");
-                AddDescriptionToContent("Para criar uma nova pasta, clique no botão 'Criar Pasta'...");
+                AddExampleBox("lalalalalalalalalalalaq");
+                AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+                AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+              
                 AddTitleToContent("Criar Pasta");
                 
             }

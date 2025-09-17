@@ -17,11 +17,23 @@ namespace Vados
         private Button selectedButton = null;
         private Panel panelNav;
         private FlowLayoutPanel flow;
+        private Panel panelContent = null;
+
+
+        
+
+
 
         public UserControlManual()
         {
             InitializeComponent();
+
+            SetupContentArea();
+            this.Controls.Add(panelContent);
+
+
             SetupNavBar();
+            this.Controls.Add(panelNav);
         }
 
 
@@ -101,6 +113,39 @@ namespace Vados
             }
         }
 
+        
+
+
+        private void AddTitleToContent(string Title)
+        {
+            Label title = new Label
+            {
+                Text = Title,
+                Font = new Font("Arial", 40),
+                ForeColor = Color.White,
+                Dock = DockStyle.Top,
+                Padding = new Padding(10),
+                AutoSize = true,
+            };
+            panelContent.Controls.Add(title);
+        }
+        private void AddDescriptionToContent(string description)
+        {
+            Label descriptionLabel = new Label
+            {
+                Text = description,
+                Font = new Font("Arial", 12),
+                ForeColor = Color.Gray,
+                Dock = DockStyle.Fill,
+            TextAlign = ContentAlignment.TopLeft,
+                Padding = new Padding(10),
+                AutoSize = false
+            };
+            panelContent.Controls.Add(descriptionLabel);
+        }
+
+       
+
 
         private void SetupNavBar()
         {
@@ -109,7 +154,7 @@ namespace Vados
                 Dock = DockStyle.Left,
                 Width = 260,
                 BackColor = Color.FromArgb(48, 61, 99),
-                AutoScroll = true
+               
 
             };
             this.Controls.Add(panelNav);
@@ -118,7 +163,7 @@ namespace Vados
             //panel que organiza os bagulho dentro do panel nav
             flow = new FlowLayoutPanel
             {
-                Dock = DockStyle.Fill,
+               Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 AutoScroll = true
@@ -156,7 +201,16 @@ namespace Vados
             AddSection(flow, "Sistema ", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
         }
 
-
+        private void SetupContentArea()
+        {
+            panelContent = new Panel
+            {
+                
+               Dock = DockStyle.Fill,
+                BackColor = Color.Red
+            };
+            this.Controls.Add(panelContent);
+        }
 
         private void AddSection(FlowLayoutPanel flow, string sectionTitle, string[] commands)
         {
@@ -164,7 +218,7 @@ namespace Vados
             {
                 Text = sectionTitle,
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = new Font("Darker Grotesque", 19, FontStyle.Bold),
+                Font = new Font("Darker Grotesque", 18, FontStyle.Bold),
                 Height = 30,
                 Width = flow.Width - 20,
                 Margin = new Padding(10, 10, 10, 5)
@@ -182,7 +236,7 @@ namespace Vados
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
-                    Font = new Font("Darker Grotesque", 18,FontStyle.Regular),
+                    Font = new Font("Darker Grotesque", 16,FontStyle.Regular),
                     Padding = new Padding(15, 0, 15, 0),
                     Margin = new Padding(15, 3, 15, 3) 
                 };
@@ -238,8 +292,26 @@ namespace Vados
 
             selectedButton = sender as Button;
             selectedButton.BackColor = Color.FromArgb(82, 99, 152);
-            selectedButton.Font = new Font("Darker Grotesque", 18, FontStyle.Bold);
+            selectedButton.Font = new Font("Darker Grotesque", 15, FontStyle.Bold);
+
+            LoadContentBasedOnSelection(selectedButton.Text);
+
         }
+
+        private void LoadContentBasedOnSelection(string buttonText)
+        {
+            panelContent.Controls.Clear(); // Limpa o conteúdo atual
+
+            if (buttonText == "Criar uma pasta")
+            {
+                // AddImageToContent("caminho_da_imagem_da_pasta.png");
+                AddDescriptionToContent("Para criar uma nova pasta, clique no botão 'Criar Pasta'...");
+                AddTitleToContent("Criar Pasta");
+                
+            }
+            
+        }
+
 
     }
 }

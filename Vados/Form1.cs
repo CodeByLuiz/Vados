@@ -85,6 +85,40 @@ namespace Vados
             messageForm.Location =  PointToScreen(new Point(newX, newY));
         }
 
+        public void ShowHistoryTab(Form form, UserControl userControl)
+        {
+            ToggleOverlay(true);
+
+            var history = new FormHistory();
+            history.Owner = form;
+            history.userControl= userControl;
+            history.Show();
+            CorrectHistoryForm();
+
+        }
+
+        public void CorrectHistoryForm()
+        {
+            FormHistory historyForm = null;
+
+            //Encontrar form
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormHistory)
+                {
+                    historyForm = (FormHistory)openForm;
+                    break;
+                }
+            }
+
+            if (historyForm == null) return;
+
+            int newX = (int)(this.Width * 0.05);  
+            int newY = (int)(this.Height * 0.95); 
+
+            historyForm.Location = this.PointToScreen(new Point(newX, newY));
+        }
+
 
         //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)

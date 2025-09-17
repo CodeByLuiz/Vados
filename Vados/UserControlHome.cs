@@ -15,6 +15,7 @@ namespace Vados
 {
     public partial class UserControlHome : UserControl
     {
+
         public event EventHandler<LoadPageEventArgs> loadPage;
 
         System.Windows.Forms.Timer timer;
@@ -438,7 +439,6 @@ namespace Vados
 
         private void btnHistorico_Click(object sender, EventArgs e)
         {
-            
         }
     }
 }

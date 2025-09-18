@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Vados
 
 
         
-
+      
 
 
         public UserControlManual()
@@ -34,7 +35,9 @@ namespace Vados
 
             SetupNavBar();
             this.Controls.Add(panelNav);
-        }
+        } 
+
+        PrivateFontCollection pfc = new PrivateFontCollection();
 
 
         public class RoundedButton : Button

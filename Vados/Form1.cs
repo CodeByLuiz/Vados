@@ -137,11 +137,11 @@ namespace Vados
             int refX = (int)(this.Width - 35 );  
             int refY = (int)(this.Height * 0.10);
 
-            int posX = refX - historyForm.Width;  // desloca para a esquerda pela largura do form
+            int posX = refX - historyForm.Width;  
             int posY = refY;
 
             historyForm.Location = this.PointToScreen(new Point(posX, posY));
-            historyForm.Height = Height - (historyForm.Top - Top);
+            historyForm.Height = Height - (historyForm.Top - Top+20);
             //historyForm.Size = new Size(newWidth, newHeight);
         }
         //Trocar user control (página)

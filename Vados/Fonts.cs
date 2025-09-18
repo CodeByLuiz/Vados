@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Vados
 {
@@ -11,26 +13,26 @@ namespace Vados
     {
         private static PrivateFontCollection _fontCollection = new PrivateFontCollection();
 
-        public static Font DarkerRegular { get; private set; }
-        public static Font DarkerBold { get; private set; }
-        public static Font DarkerExtraBold { get; private set; }
-        public static Font DarkerLight { get; private set; }
-        public static Font DarkerSemiBold { get; private set; }
-        public static Font DarkerMedium { get; private set; }
-        public static Font DarkerBlack { get; private set; }
+        public static FontFamily DarkerRegular { get; private set; }
+        public static FontFamily DarkerBold { get; private set; }
+        public static FontFamily DarkerExtraBold { get; private set; }
+        public static FontFamily DarkerLight { get; private set; }
+        public static FontFamily DarkerSemiBold { get; private set; }
+        public static FontFamily DarkerMedium { get; private set; }
+        public static FontFamily DarkerBlack { get; private set; }
 
-        // Fontes da família Maven Pro
-        public static Font MavenRegular { get; private set; }
-        public static Font MavenBold { get; private set; }
-        public static Font MavenExtraBold { get; private set; }
-        public static Font MavenLight { get; private set; }
-        public static Font MavenSemiBold { get; private set; }
-        public static Font MavenMedium { get; private set; }
-        public static Font MavenBlack { get; private set; }
+        // Maven Pro
+        public static FontFamily MavenRegular { get; private set; }
+        public static FontFamily MavenBold { get; private set; }
+        public static FontFamily MavenExtraBold { get; private set; }
+        public static FontFamily MavenLight { get; private set; }
+        public static FontFamily MavenSemiBold { get; private set; }
+        public static FontFamily MavenMedium { get; private set; }
+        public static FontFamily MavenBlack { get; private set; }
 
         static Fonts()
         {
-            // Carrega as fontes e inicializa as propriedades
+            // Carrega as fontes
             DarkerRegular = LoadFont("Fonts\\DarkerGrotesque-Regular.ttf");
             DarkerBold = LoadFont("Fonts\\DarkerGrotesque-Bold.ttf");
             DarkerExtraBold = LoadFont("Fonts\\DarkerGrotesque-ExtraBold.ttf");
@@ -48,13 +50,8 @@ namespace Vados
             MavenBlack = LoadFont("Fonts\\MavenPro-Black.ttf");
         }
 
-
-
-
-        private static Font LoadFont(string fontpath)
+        private static FontFamily LoadFont(string fontpath)
         {
-
-
             string fullPath = Path.Combine(Application.StartupPath, fontpath);
 
             if (!File.Exists(fullPath))
@@ -62,10 +59,14 @@ namespace Vados
 
             _fontCollection.AddFontFile(fullPath);
 
-            // Sempre pega a última adicionada
+            // Retorna apenas a FontFamily
             return _fontCollection.Families[_fontCollection.Families.Length - 1];
         }
 
-
+       
+        public static Font GetFont(FontFamily family, float size)
+        {
+            return new Font(family, size);
         }
+    }
 }

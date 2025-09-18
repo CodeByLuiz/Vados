@@ -10,6 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\DarkerGrotesque-Black.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-Bold.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-ExtraBold.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-Light.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-Medium.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-Regular.ttf" />
+    <None Remove="Fonts\DarkerGrotesque-SemiBold.ttf" />
+    <None Remove="Fonts\MavenPro-Black.ttf" />
+    <None Remove="Fonts\MavenPro-Bold.ttf" />
+    <None Remove="Fonts\MavenPro-ExtraBold.ttf" />
+    <None Remove="Fonts\MavenPro-Medium.ttf" />
+    <None Remove="Fonts\MavenPro-Regular.ttf" />
+    <None Remove="Fonts\MavenPro-SemiBold.ttf" />
     <None Remove="Images\Icons\configIcon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
     <None Remove="Images\Icons\sendIcon.png" />
@@ -33,6 +46,45 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Fonts\DarkerGrotesque-Black.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-ExtraBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-Light.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\DarkerGrotesque-SemiBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-Black.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-ExtraBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\MavenPro-SemiBold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Icons\configIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

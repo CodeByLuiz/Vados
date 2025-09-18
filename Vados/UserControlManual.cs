@@ -21,7 +21,7 @@ namespace Vados
         private Panel panelContent = null;
 
 
-        
+
       
 
 
@@ -124,7 +124,7 @@ namespace Vados
             Label title = new Label
             {
                 Text = Title,
-                Font = new Font("Darker Grotesque ExtraBold", 40,FontStyle.Bold),
+                Font = Fonts.GetFont(Fonts.DarkerBold,22),
                 ForeColor = Color.FromArgb(48 ,61 ,99),
                 Dock = DockStyle.Top,
                 Padding = new Padding(10),

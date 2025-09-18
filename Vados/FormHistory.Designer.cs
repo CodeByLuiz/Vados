@@ -42,6 +42,7 @@
             ShowIcon = false;
             ShowInTaskbar = false;
             SizeGripStyle = SizeGripStyle.Hide;
+            Paint += FormHistory_Paint;
             Resize += FormHistory_Resize_1;
             ResumeLayout(false);
         }

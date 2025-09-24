@@ -77,6 +77,7 @@
             btnHistorico.TabIndex = 10;
             btnHistorico.TabStop = false;
             btnHistorico.Click += btnHistorico_Click;
+           
             // 
             // lblText
             // 

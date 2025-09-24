@@ -6,11 +6,12 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static Vados.BancoDeDados;
 
+
 namespace Vados
 {
     public partial class FormHistory : Form
     {
-        private Panel scrollPanel;
+        private Panel historyPanel;
         private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
 
@@ -39,16 +40,16 @@ namespace Vados
             this.BackColor = Color.White;
 
             // Painel com rolagem automática
-            scrollPanel = new Panel
+            historyPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 Padding = new Padding(20),
                 BackColor = Color.White
             };
-            this.Controls.Add(scrollPanel);
+            this.Controls.Add(historyPanel);
 
-            // Timer opcional para repintura (caso precise de atualizações dinâmicas)
+            // Timer pra repintar 
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16;
             timer.Tick += Timer_Tick;
@@ -59,7 +60,7 @@ namespace Vados
 
         private void LoadCommands()
         {
-            scrollPanel.Controls.Clear(); // Limpa comandos antigos
+            historyPanel.Controls.Clear(); // Limpa comandos antigos
 
             using (var db = new BancoDeDados.DbConnection())
             {
@@ -72,11 +73,13 @@ namespace Vados
             int margin = 10;
             int startY = 10;
             int rectangleHeight = 75;
-            int rectangleWidth = scrollPanel.ClientSize.Width - 40;
+            int rectangleWidth = historyPanel.ClientSize.Width - 40;
+
+           
 
             foreach (var entry in entradas)
             {
-                int posX = (scrollPanel.ClientSize.Width - rectangleWidth) / 2;
+                int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
 
 
                 Panel entryPanel = new Panel
@@ -85,22 +88,44 @@ namespace Vados
 
                     Size = new Size(rectangleWidth, rectangleHeight),
                     BackColor = Color.LightGray,
-                    BorderStyle = BorderStyle.FixedSingle
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Padding = new Padding(5),  // Leve padding para melhorar o visual
+                    Cursor = Cursors.Hand
                 };
 
                 Label lbl = new Label
                 {
-                    Text = $"{entry.Data:dd/MM/yyyy HH:mm:ss}: {entry.Comando}\n {entry.Id}",
+                    Text = $"{entry.Data:dd/MM/yyyy HH:mm:ss}: {entry.Comando}",
                     Location = new Point(10, 15),
                     AutoSize = true
                 };
-
+                Label lbl2 = new Label
+                {
+                    Text = $"id: {entry.Id}",
+                    
+                    AutoSize = true
+                };
+                
+                historyPanel.Controls.Add(entryPanel);
                 entryPanel.Controls.Add(lbl);
-                scrollPanel.Controls.Add(entryPanel);
+
+                
+
+                // Faz o hover bonito
+                void HoverEnter(object sender, EventArgs e) => entryPanel.BackColor = Color.SkyBlue;
+                void HoverLeave(object sender, EventArgs e) => entryPanel.BackColor = Color.LightGray;
+
+                // Adiciona os eventos tanto ao painel quanto a label
+                entryPanel.MouseEnter += HoverEnter;
+                entryPanel.MouseLeave += HoverLeave;
+                lbl.MouseEnter += HoverEnter;
+                lbl.MouseLeave += HoverLeave;
+
 
                 startY += rectangleHeight + margin;
             }
         }
+       
 
         private void FormHistory_Resize_1(object sender, EventArgs e)
         {
@@ -110,7 +135,7 @@ namespace Vados
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            scrollPanel.Invalidate(); // Força atualização visual se necessário
+            historyPanel.Invalidate(); // Força atualização visual se necessário
         }
     }
 }

@@ -452,7 +452,9 @@ namespace Vados
                 parentForm.CloseHistoryTab();
                 historyOpen = false;
             }
-            
+
         }
+
+        
     }
 }

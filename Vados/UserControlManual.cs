@@ -124,7 +124,7 @@ namespace Vados
             Label title = new Label
             {
                 Text = Title,
-                Font = Fonts.GetFont(Fonts.DarkerBold,22),
+                Font = Fonts.GetFont(Fonts.DarkerExtraBold,42f),
                 ForeColor = Color.FromArgb(48 ,61 ,99),
                 Dock = DockStyle.Top,
                 Padding = new Padding(10),
@@ -137,7 +137,7 @@ namespace Vados
             Label descriptionLabel = new Label
             {
                 Text = description,
-                Font = new Font("Darker Grotesque", 12, FontStyle.Regular),
+                Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
                 Dock = DockStyle.Top,
             TextAlign = ContentAlignment.TopLeft,
@@ -185,7 +185,7 @@ namespace Vados
             panelNav = new Panel
             {
                 Dock = DockStyle.Left,
-                Width = 260,
+                
                 BackColor = Color.FromArgb(48, 61, 99),
                
 
@@ -199,9 +199,14 @@ namespace Vados
                Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                AutoScroll = true
+                AutoScroll = true,
+              
             };
             panelNav.Controls.Add(flow);
+            flow.HorizontalScroll.Visible = false;
+            panelNav.HorizontalScroll.Visible = false;
+            flow.VerticalScroll.Visible = true;
+            panelNav.VerticalScroll.Visible = false;
 
             PictureBox pictureLogo = new PictureBox
             {
@@ -219,7 +224,7 @@ namespace Vados
             {
                 Text = "Comandos",
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = new Font("Darker Grotesque", 22, FontStyle.Bold),
+                Font = Fonts.GetFont(Fonts.DarkerExtraBold, 26f),
                 Height = 50,
                 Width = flow.Width,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -253,7 +258,7 @@ namespace Vados
             {
                 Text = sectionTitle,
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = new Font("Darker Grotesque", 18, FontStyle.Bold),
+                Font = Fonts.GetFont(Fonts.DarkerExtraBold, 18f),
                 Height = 30,
                 Width = flow.Width - 20,
                 Margin = new Padding(10, 10, 10, 5)
@@ -271,7 +276,7 @@ namespace Vados
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
-                    Font = new Font("Darker Grotesque", 16,FontStyle.Regular),
+                    Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                     Padding = new Padding(15, 0, 15, 0),
                     Margin = new Padding(15, 3, 15, 3) 
                 };
@@ -342,7 +347,7 @@ namespace Vados
 
             foreach (var btn in flow.Controls.OfType<Button>())
             {
-                btn.Font = new Font(btn.Font, FontStyle.Regular);
+                btn.Font = Fonts.GetFont(Fonts.DarkerRegular, 16f);
             }// tira a merda do negrito dos outros botoes pra colocar depois apenas no selecionado
 
             if (selectedButton != null)
@@ -351,7 +356,7 @@ namespace Vados
 
             selectedButton = sender as Button;
             selectedButton.BackColor = Color.FromArgb(82, 99, 152);
-            selectedButton.Font = new Font("Darker Grotesque", 15, FontStyle.Bold);
+            selectedButton.Font = Fonts.GetFont(Fonts.DarkerExtraBold, 16f);
 
             LoadContentBasedOnSelection(selectedButton.Text);
 

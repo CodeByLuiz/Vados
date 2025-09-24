@@ -13,6 +13,20 @@ namespace Vados
     {
         private static PrivateFontCollection _fontCollection = new PrivateFontCollection();
 
+        static Fonts()
+        {
+            // Carrega as fontes
+            DarkerRegular = LoadFont("Fonts/DarkerGrotesque-Regular.ttf");
+            DarkerBold = LoadFont("Fonts\\DarkerGrotesque-Bold.ttf");
+            DarkerExtraBold = LoadFont("Fonts\\DarkerGrotesque-ExtraBold.ttf");
+            DarkerLight = LoadFont("Fonts\\DarkerGrotesque-Light.ttf");
+            DarkerSemiBold = LoadFont("Fonts\\DarkerGrotesque-SemiBold.ttf");
+            DarkerMedium = LoadFont("Fonts\\DarkerGrotesque-Medium.ttf");
+            DarkerBlack = LoadFont("Fonts\\DarkerGrotesque-Black.ttf");
+
+          
+        }
+
         public static FontFamily DarkerRegular { get; private set; }
         public static FontFamily DarkerBold { get; private set; }
         public static FontFamily DarkerExtraBold { get; private set; }
@@ -30,25 +44,7 @@ namespace Vados
         public static FontFamily MavenMedium { get; private set; }
         public static FontFamily MavenBlack { get; private set; }
 
-        static Fonts()
-        {
-            // Carrega as fontes
-            DarkerRegular = LoadFont("Fonts\\DarkerGrotesque-Regular.ttf");
-            DarkerBold = LoadFont("Fonts\\DarkerGrotesque-Bold.ttf");
-            DarkerExtraBold = LoadFont("Fonts\\DarkerGrotesque-ExtraBold.ttf");
-            DarkerLight = LoadFont("Fonts\\DarkerGrotesque-Light.ttf");
-            DarkerSemiBold = LoadFont("Fonts\\DarkerGrotesque-SemiBold.ttf");
-            DarkerMedium = LoadFont("Fonts\\DarkerGrotesque-Medium.ttf");
-            DarkerBlack = LoadFont("Fonts\\DarkerGrotesque-Black.ttf");
-
-            MavenRegular = LoadFont("Fonts\\MavenPro-Regular.ttf");
-            MavenBold = LoadFont("Fonts\\MavenPro-Bold.ttf");
-            MavenExtraBold = LoadFont("Fonts\\MavenPro-ExtraBold.ttf");
-            MavenLight = LoadFont("Fonts\\MavenPro-Light.ttf");
-            MavenSemiBold = LoadFont("Fonts\\MavenPro-SemiBold.ttf");
-            MavenMedium = LoadFont("Fonts\\MavenPro-Medium.ttf");
-            MavenBlack = LoadFont("Fonts\\MavenPro-Black.ttf");
-        }
+        
 
         private static FontFamily LoadFont(string fontpath)
         {
@@ -59,7 +55,7 @@ namespace Vados
 
             _fontCollection.AddFontFile(fullPath);
 
-            // Retorna apenas a FontFamily
+           
             return _fontCollection.Families[_fontCollection.Families.Length - 1];
         }
 

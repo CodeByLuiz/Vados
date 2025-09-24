@@ -31,13 +31,14 @@ namespace Vados
             InitializeComponent();
 
             
+
             historyPanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 AutoScroll = true,
                 Padding = new Padding(20),
-                BackColor = Color.White,
-                
+                BackColor = Color.White
+
 
 
             };
@@ -71,6 +72,22 @@ namespace Vados
             int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
             int startY = spacing ;
 
+            Label title = new Label
+            {
+                Text = "Histórico de comandos",
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleCenter,
+                // BackColor = Color.Blue,
+                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                ForeColor = Colors.bluePrimary
+
+
+            }; 
+            historyPanel.Controls.Add(title);
+            title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);// Deixa ele nomeio
+            
+
+            startY += title.Height + spacing;
             foreach (var entry in entradas)
             {
                 int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
@@ -81,23 +98,24 @@ namespace Vados
                     Location = new Point(posX, startY),
 
                     Size = new Size(rectangleWidth, rectangleHeight),
-                    BackColor = Color.LightGray,
+                    BackColor = ColorTranslator.FromHtml("#F0F3F4"),
                     BorderStyle = BorderStyle.None,
-                    
-                    Padding = new Padding(5),  
-                    
+
+                    Padding = new Padding(5),
+
                     Cursor = Cursors.Hand
                 };
-                
-                
+
+
                 Label lbl = new Label
                 {
-                    Text = $"{entry.Data:dd/MM/yyyy HH:mm:ss}: {entry.Comando} id: {entry.Id} qqqqqqqqqqqqqqqqqq qqqqqqqqqqqqqqqqq qqqqqqqqqqqqqqqqqqqq qqqqqqqqqqq qqqq qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+                    Text = $"{entry.Data:dd/MM/yyyy HH:mm:ss}: {entry.Comando} \nid: {entry.Id}\nuuid: {entry.ComputadorId}",
                     Location = new Point(10, 15),
-                   // AutoSize = false,
-                    Width = rectangleWidth -10 ,
+                    // AutoSize = false,
+                    Width = rectangleWidth - 10,
                     Height = rectangleHeight,
-                   
+                    ForeColor = Colors.bluePrimary,
+
 
                 };
 
@@ -113,8 +131,17 @@ namespace Vados
                 entryPanel.SizeChanged += (s, e) => SetRoundedRegion(entryPanel, 15);
 
                 // Faz o hover bonito
-                void HoverEnter(object sender, EventArgs e) => entryPanel.BackColor = Color.SkyBlue;
-                void HoverLeave(object sender, EventArgs e) => entryPanel.BackColor = Color.LightGray;
+                void HoverEnter(object sender, EventArgs e) 
+                {
+                    entryPanel.BackColor = Colors.blueTernary;
+                    lbl.ForeColor = Color.White; 
+                    
+                }
+                void HoverLeave(object sender, EventArgs e) 
+                { 
+                    entryPanel.BackColor = ColorTranslator.FromHtml("#F0F3F4");
+                    lbl.ForeColor = Colors.bluePrimary;
+                }
 
                 // Adiciona os eventos tanto ao painel quanto a label
                 entryPanel.MouseEnter += HoverEnter;

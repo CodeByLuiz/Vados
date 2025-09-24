@@ -415,11 +415,15 @@ namespace Vados
         private void btnManual_Click(object sender, EventArgs e)
         {
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
+
+            
         }
 
         private void btnConfigs_Click(object sender, EventArgs e)
         {
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
+
+           
         }
 
         private void txtComando_TextChanged(object sender, EventArgs e)
@@ -437,6 +441,8 @@ namespace Vados
             }
         }
         private bool historyOpen = false;
+
+        
         private void btnHistorico_Click(object sender, EventArgs e)
         {
             var parentForm = FindForm() as Form1;

@@ -96,12 +96,14 @@ namespace Vados
             //history.userControl= userControl;
             history.Show();
             CorrectHistoryForm();
+            Global.userControlHome.HistoryOpen = true;
 
         }
         public void CloseHistoryTab()
         {
             FormHistory historyForm = null;
 
+            
             // Encontrar o formulário aberto do tipo FormHistory
             foreach (Form openForm in Application.OpenForms)
             {
@@ -115,7 +117,7 @@ namespace Vados
             if (historyForm != null)
             {
                 historyForm.Close();
-                                     
+                Global.userControlHome.HistoryOpen = false;
             }
         }
         public void CorrectHistoryForm()
@@ -157,6 +159,11 @@ namespace Vados
         //Trocar de página (user control) através dos eventos de outros user controls
         private void LoadPage(object sender, LoadPageEventArgs e)
         {
+
+            var parentForm = FindForm() as Form1;
+            parentForm.CloseHistoryTab();
+            
+
             LoadUserControl(e.userControl);
         }
 

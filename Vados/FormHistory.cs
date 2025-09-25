@@ -71,6 +71,7 @@ namespace Vados
             int rectangleWidth = historyPanel.ClientSize.Width - 40;
             int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
             int startY = spacing ;
+            Color entryColor = ColorTranslator.FromHtml("#F0F5FF");
 
             Label title = new Label
             {
@@ -98,12 +99,12 @@ namespace Vados
                     Location = new Point(posX, startY),
 
                     Size = new Size(rectangleWidth, rectangleHeight),
-                    BackColor = ColorTranslator.FromHtml("#F0F3F4"),
+                    BackColor = entryColor,
                     BorderStyle = BorderStyle.None,
-
                     Padding = new Padding(5),
-
                     Cursor = Cursors.Hand
+                    
+                   
                 };
 
 
@@ -114,8 +115,20 @@ namespace Vados
                     // AutoSize = false,
                     Width = rectangleWidth - 10,
                     Height = rectangleHeight,
-                    ForeColor = Colors.bluePrimary,
+                    ForeColor = Color.Black,
 
+
+                };
+
+                PictureBox btnExcluir = new PictureBox
+                {
+
+                    //BackColor = Color.White,
+                    //BackgroundImage = Image.FromFile("\\Vados\\Vados\\Images\\Icons\\deleteicon")
+                    Size = new Size(25, 25),
+                   
+                    BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\deleteicon.png")),
+                    BackgroundImageLayout = ImageLayout.Stretch
 
                 };
 
@@ -127,19 +140,28 @@ namespace Vados
 
                 historyPanel.Controls.Add(entryPanel);
                 entryPanel.Controls.Add(lbl);
+                entryPanel.Controls.Add(btnExcluir);
 
+                //arredonda as bordas da entrada
                 entryPanel.SizeChanged += (s, e) => SetRoundedRegion(entryPanel, 15);
+
+                //ajeita o botão de excluir
+                btnExcluir.Location = new Point(entryPanel.Width - btnExcluir.Width-5,5);
+                
+                btnExcluir.BringToFront();
+
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e) 
                 {
-                    entryPanel.BackColor = Colors.blueTernary;
-                    lbl.ForeColor = Color.White; 
+                   
+                    entryPanel.BackColor = Global.ChangeColorBrightness(entryColor,-0.1f);
+                    lbl.ForeColor = Colors.bluePrimary; 
                     
                 }
                 void HoverLeave(object sender, EventArgs e) 
                 { 
-                    entryPanel.BackColor = ColorTranslator.FromHtml("#F0F3F4");
+                    entryPanel.BackColor = entryColor;
                     lbl.ForeColor = Colors.bluePrimary;
                 }
 
@@ -155,13 +177,13 @@ namespace Vados
             }
             
 
-            Panel spacer = new Panel
+            Panel footer = new Panel
             {
                 Location = new Point(0, startY-margin),
                 Size = new Size(rectangleWidth, spacing)
             };
 
-            historyPanel.Controls.Add(spacer);
+            historyPanel.Controls.Add(footer);
         }
 
         // arredonda as bordas das entradas

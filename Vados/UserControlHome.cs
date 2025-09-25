@@ -442,21 +442,26 @@ namespace Vados
         }
         private bool historyOpen = false;
 
-        
+        public bool HistoryOpen
+        {
+            get { return historyOpen; }
+            set { historyOpen = value; } 
+        }
+
+
         private void btnHistorico_Click(object sender, EventArgs e)
         {
             var parentForm = FindForm() as Form1;
             if (!historyOpen)
             {
                 //var parentForm = FindForm() as Form1;
-
                 parentForm.ShowHistoryTab(parentForm, this);
-                historyOpen = true;
+                
             }
             else
             {
                 parentForm.CloseHistoryTab();
-                historyOpen = false;
+               
             }
 
         }

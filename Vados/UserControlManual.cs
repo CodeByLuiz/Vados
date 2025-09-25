@@ -19,10 +19,12 @@ namespace Vados
         private Panel panelNav;
         private FlowLayoutPanel flow;
         private Panel panelContent = null;
+        private Panel imageWrapper = null;
 
 
 
-      
+
+
 
 
         public UserControlManual()
@@ -35,6 +37,8 @@ namespace Vados
 
             SetupNavBar();
             this.Controls.Add(panelNav);
+
+            LoadContentBasedOnSelection("Criar uma pasta");
         } 
 
         PrivateFontCollection pfc = new PrivateFontCollection();
@@ -157,29 +161,21 @@ namespace Vados
 
         private void AddExampleBox(string texto)
         {
+
             Panel examplePanel = new Panel
             {
-                AutoSize = true,
                 BackColor = Color.FromArgb(231,231, 231), 
-                Dock = DockStyle.Top,
+                //Dock = DockStyle.Top,
+                Width = 480,
                 Height = 40,
-                Padding = new Padding(10, 8, 10, 8),
+                Location = new Point(panelContent.Location.X + 20,  panelContent.Location.Y  ) , 
                 Margin = new Padding(10, 5, 10, 5),
-                MaximumSize = new Size(panelContent.Width - 80, 0),
+                MaximumSize = new Size(panelContent.Width - 80, 40),
             };
+            
 
-            Label lblExample = new Label
-            {
-                AutoSize = true,
-                Text = texto,
-                ForeColor = Color.FromArgb(60, 60, 60),
-                Font = new Font("Darker Grotesque", 10),
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
-            };
 
-            examplePanel.Controls.Add(lblExample);
-
+        
            
             panelContent.Controls.Add(examplePanel);
             examplePanel.BringToFront();
@@ -327,7 +323,7 @@ namespace Vados
         {
             if (System.IO.File.Exists(caminhoimagem))
             {
-                Panel imageWrapper = new Panel
+                 imageWrapper = new Panel
                 {
                     Dock = DockStyle.Top,
                     Padding = new Padding(0, 60, 0, 10),
@@ -345,7 +341,7 @@ namespace Vados
                 picture.BringToFront(); 
             }
         }
-
+        
         private void NavButton_Click(object sender, EventArgs e)
         {
 
@@ -365,7 +361,7 @@ namespace Vados
             LoadContentBasedOnSelection(selectedButton.Text);
 
         }
-
+       
         private void LoadContentBasedOnSelection(string buttonText)
         {
             panelContent.Controls.Clear(); // Limpa o conteúdo atual

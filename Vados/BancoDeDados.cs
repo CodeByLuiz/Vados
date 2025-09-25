@@ -140,5 +140,22 @@ namespace Vados
             }
         }
 
+        public static void DeleteEntryID(int id)
+        {
+            using (var db = new DbConnection())
+            {
+                db.Database.EnsureCreated();
+
+                var entrada = db.Historico.FirstOrDefault(e => e.Id == id);
+                if (entrada == null)
+                {                    return;
+                }
+
+                db.Historico.Remove(entrada);
+                db.SaveChanges();
+            }
+        }
+
+
     }
 }

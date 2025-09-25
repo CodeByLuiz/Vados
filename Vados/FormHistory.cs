@@ -67,8 +67,8 @@ namespace Vados
 
             int margin = 10;
             
-            int rectangleHeight = 75;
-            int rectangleWidth = historyPanel.ClientSize.Width - 40;
+            int rectangleHeight = 105;
+            int rectangleWidth = historyPanel.ClientSize.Width - 30;
             int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
             int startY = spacing ;
             Color entryColor = ColorTranslator.FromHtml("#F0F5FF");
@@ -102,7 +102,7 @@ namespace Vados
                     BackColor = entryColor,
                     BorderStyle = BorderStyle.None,
                     Padding = new Padding(5),
-                    Cursor = Cursors.Hand
+                   
                     
                    
                 };
@@ -116,6 +116,7 @@ namespace Vados
                     Width = rectangleWidth - 10,
                     Height = rectangleHeight,
                     ForeColor = Color.Black,
+                    Font = new Font("Arial", 12, FontStyle.Regular)
 
 
                 };
@@ -126,7 +127,7 @@ namespace Vados
                     //BackColor = Color.White,
                     //BackgroundImage = Image.FromFile("\\Vados\\Vados\\Images\\Icons\\deleteicon")
                     Size = new Size(25, 25),
-                   
+                    Cursor = Cursors.Hand,
                     BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\deleteicon.png")),
                     BackgroundImageLayout = ImageLayout.Stretch
 
@@ -136,6 +137,7 @@ namespace Vados
                 entryPanel.Region = Region.FromHrgn(
                     CreateRoundRectRgn(0, 0, entryPanel.Width, entryPanel.Height, radius, radius)
                 );
+
 
 
                 historyPanel.Controls.Add(entryPanel);
@@ -156,13 +158,19 @@ namespace Vados
                 {
                    
                     entryPanel.BackColor = Global.ChangeColorBrightness(entryColor,-0.1f);
-                    lbl.ForeColor = Colors.bluePrimary; 
+                   // lbl.ForeColor = Color.Black; 
                     
                 }
                 void HoverLeave(object sender, EventArgs e) 
                 { 
                     entryPanel.BackColor = entryColor;
-                    lbl.ForeColor = Colors.bluePrimary;
+                    //lbl.ForeColor = Colors.bluePrimary;
+                }
+
+                void DeleteEntry(object sender, EventArgs e)
+                {
+                    BancoDeDados.DeleteEntryID(entry.Id);
+                    LoadCommands();
                 }
 
                 // Adiciona os eventos tanto ao painel quanto a label
@@ -170,7 +178,10 @@ namespace Vados
                 entryPanel.MouseLeave += HoverLeave;
                 lbl.MouseEnter += HoverEnter;
                 lbl.MouseLeave += HoverLeave;
+                btnExcluir.MouseEnter += HoverEnter;
+                btnExcluir.MouseLeave += HoverEnter;
 
+                btnExcluir.Click += DeleteEntry;
 
                 startY += rectangleHeight + margin;
 

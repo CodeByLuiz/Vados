@@ -50,10 +50,16 @@ namespace Vados
                 this.DoubleBuffered = true;
                 this.ResizeRedraw = true;
                 this.FlatStyle = FlatStyle.Flat;
+                this.SetStyle(ControlStyles.Selectable, false);
+                this.FlatAppearance.MouseOverBackColor = Color.Transparent; 
+                this.FlatAppearance.MouseDownBackColor = Color.Transparent; 
+                this.TabStop = false;
             }
 
             protected override void OnPaint(PaintEventArgs e)
             {
+
+                base.OnPaint(e);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
                
@@ -67,8 +73,9 @@ namespace Vados
                         e.Graphics.FillPath(brush, path);
                     }
                 }
+             
 
-                
+
                 Rectangle textRect = new Rectangle(
                     this.Padding.Left,
                     this.Padding.Top,
@@ -185,7 +192,7 @@ namespace Vados
             panelNav = new Panel
             {
                 Dock = DockStyle.Left,
-                
+                Width = 250,
                 BackColor = Color.FromArgb(48, 61, 99),
                
 
@@ -199,14 +206,11 @@ namespace Vados
                Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                AutoScroll = true,
+                AutoScroll = false,
               
             };
             panelNav.Controls.Add(flow);
-            flow.HorizontalScroll.Visible = false;
-            panelNav.HorizontalScroll.Visible = false;
-            flow.VerticalScroll.Visible = true;
-            panelNav.VerticalScroll.Visible = false;
+            
 
             PictureBox pictureLogo = new PictureBox
             {

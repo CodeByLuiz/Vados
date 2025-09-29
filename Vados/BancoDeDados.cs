@@ -20,16 +20,10 @@ namespace Vados
             [Key] public int Id { get; set; }
             public Guid ComputadorId { get; set; }  
             public DateTime Data { get; set; }
-             
+             public string Comandotitle { get; set; }
             public string Comando { get; set; }
 
-            public string PastasJson { get; set; }  // Armazenado no BD pq o sqlite n aceita lista normal :(
-            [NotMapped]
-            public List<string> Pastas
-            {
-                get => JsonSerializer.Deserialize<List<string>>(PastasJson ?? "[]")!;
-                set => PastasJson = JsonSerializer.Serialize(value);
-            }
+            
             public HistoryEntry()
             {
                 Data = DateTime.Now;
@@ -79,7 +73,7 @@ namespace Vados
             return novoGuid;
         }
 
-        public static void AdicionarEntrada(string comando, List<string> pastas)
+        public static void AdicionarEntrada(string comando, string titulo)
         {
             using (var db = new DbConnection())
             {
@@ -91,7 +85,8 @@ namespace Vados
                 {
                     //Data = data,
                     Comando = comando,
-                    Pastas = pastas,
+                    Comandotitle = titulo
+                    
                     
                 };
 
@@ -131,11 +126,7 @@ namespace Vados
                    // MessageBox.Show($"ComputadorId: {entrada.ComputadorId}");
                     //MessageBox.Show($"Data: {entrada.Data}");
                     //MessageBox.Show($"Comando: {entrada.Comando}");
-                    //MessageBox.Show($"Pastas:");
-                    foreach (var pasta in entrada.Pastas)
-                    {
-                        MessageBox.Show($"  - {pasta}\n");
-                    }
+                   
                 }
             }
         }

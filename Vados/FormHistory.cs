@@ -110,7 +110,7 @@ namespace Vados
 
                 Label lbl = new Label
                 {
-                    Text = $"{entry.Data:dd/MM/yyyy HH:mm:ss}: {entry.Comando} \nid: {entry.Id}\nuuid: {entry.ComputadorId}",
+                    Text = $"{entry.Comandotitle}\n{entry.Comando}",
                     Location = new Point(10, 15),
                     // AutoSize = false,
                     Width = rectangleWidth - 10,

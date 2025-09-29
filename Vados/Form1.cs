@@ -50,11 +50,11 @@ namespace Vados
 
 
         //Ativar mensagem
-        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "")
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "",string Comandotxt="")
         {
             ToggleOverlay(true);
 
-            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf);
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf,txtbd:Comandotxt);
             message.Owner = form;
             message.userControl = userControl;
             message.Show();

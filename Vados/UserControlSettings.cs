@@ -57,7 +57,8 @@ namespace Vados
             List<string> nomecompleto = (await Comandos.SearchPaths(nome, true)).ToList();
             BancoDeDados.AdicionarEntrada(
                 comando: "Criar Pasta",
-                pastas: nomecompleto
+                titulo:""
+                
             );
 
             //BancoDeDados.ListarTodasEntradas();

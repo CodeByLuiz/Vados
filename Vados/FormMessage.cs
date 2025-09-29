@@ -21,6 +21,7 @@ namespace Vados
         CommandCriteria criteria;
         bool isErrorMessage = false;
         public UserControl userControl;
+        private string ComandoBdTxt;
 
         //Bordas arredondadas
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
@@ -278,13 +279,16 @@ namespace Vados
 
         #endregion
 
+        
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "")
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string txtbd="")
         {
             InitializeComponent();
             criteria = criteria_;
             isErrorMessage = isErrorMessage_;
 
+            
+            ComandoBdTxt = txtbd;
             //Definir mensagem
             var messageFont = new System.Drawing.Font("Segoe UI", 11f);
             txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
@@ -405,7 +409,7 @@ namespace Vados
                     {
                         //Realizar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
-
+                       
                         //Mostrar mensagem de erro
                         if (errorMessage != "")
                         {
@@ -413,6 +417,14 @@ namespace Vados
                             {
                                 form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
                             }));
+                        }
+                        else if (!String.IsNullOrEmpty(ComandoBdTxt))
+                        {
+                            BancoDeDados.AdicionarEntrada(
+                             comando: ComandoBdTxt,
+                             titulo: $"{criteria.Action} {criteria.ObjectType} "
+                             
+                            );
                         }
                     }
                     catch (Exception ex)

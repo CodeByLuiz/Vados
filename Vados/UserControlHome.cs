@@ -63,7 +63,7 @@ namespace Vados
             var arguments = Comandos.CommandGetArguments(txtComando.Text);
 
             //Mostrar mensagem de confirmação
-            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria,Comandotxt:txtComando.Text);
         }
 
 

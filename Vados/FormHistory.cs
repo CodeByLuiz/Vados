@@ -108,15 +108,26 @@ namespace Vados
                 };
 
 
+                Label lbltitle = new Label
+                {
+                    Text = $"{entry.Comandotitle}",
+                    Location = new Point(10, 5),
+                    AutoSize = true,
+                    ForeColor = Color.Black,
+                    Font = new Font("Arial", 15, FontStyle.Bold)
+
+
+                };
                 Label lbl = new Label
                 {
-                    Text = $"{entry.Comandotitle}\n{entry.Comando}",
-                    Location = new Point(10, 15),
+                    Text = $"{entry.Comando}",
+                    Location = new Point(10, lbltitle.Height+10),
                     // AutoSize = false,
                     Width = rectangleWidth - 10,
                     Height = rectangleHeight,
                     ForeColor = Color.Black,
-                    Font = new Font("Arial", 12, FontStyle.Regular)
+                    Font = new Font("Arial", 12, FontStyle.Regular),
+
 
 
                 };
@@ -139,19 +150,21 @@ namespace Vados
                 );
 
 
-
+                MessageBox.Show(lbltitle.Height.ToString());
                 historyPanel.Controls.Add(entryPanel);
                 entryPanel.Controls.Add(lbl);
+                entryPanel.Controls.Add(lbltitle);
                 entryPanel.Controls.Add(btnExcluir);
 
                 //arredonda as bordas da entrada
                 entryPanel.SizeChanged += (s, e) => SetRoundedRegion(entryPanel, 15);
 
-                //ajeita o botão de excluir
+                //ajusta a posição dos elementos necessarios
                 btnExcluir.Location = new Point(entryPanel.Width - btnExcluir.Width-5,5);
-                
                 btnExcluir.BringToFront();
-
+                
+                
+               
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e) 

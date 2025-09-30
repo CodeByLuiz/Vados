@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="GIFs\loading.gif" />
+    <None Remove="Images\Icons\activeMicIcon.png" />
     <None Remove="Images\Icons\closeIcon.png" />
     <None Remove="Images\Icons\configIcon.png" />
     <None Remove="Images\Icons\confirmIcon.png" />
@@ -20,6 +22,7 @@
     <None Remove="Images\LogoAzul.png" />
     <None Remove="Images\LogoBranco.png" />
     <None Remove="Images\micIcon.png" />
+    <None Remove="Models\ggml-base.bin" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +38,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="GIFs\loading.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\activeMicIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Icons\closeIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -47,7 +56,7 @@
     <Content Include="Images\Icons\manualIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Icons\micIcon.png">
+    <Content Include="Images\Icons\inactiveMicIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\sendIcon.png">
@@ -86,7 +95,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\" />
     <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Vosk" Version="0.3.38" />
+    <PackageReference Include="Whisper.net" Version="1.8.1" />
+    <PackageReference Include="Whisper.net.Runtime" Version="1.8.1" />
   </ItemGroup>
 
 </Project>

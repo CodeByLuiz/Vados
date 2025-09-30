@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             pnlBottom = new OptmizedPanel();
+            btnHistorico = new PictureBox();
             lblText = new Label();
             lblDebug = new Label();
             btnManual = new PictureBox();
@@ -38,6 +39,7 @@
             textBox1 = new TextBox();
             txtComando = new TextBox();
             pnlBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
@@ -45,6 +47,7 @@
             // 
             // pnlBottom
             // 
+            pnlBottom.Controls.Add(btnHistorico);
             pnlBottom.Controls.Add(lblText);
             pnlBottom.Controls.Add(lblDebug);
             pnlBottom.Controls.Add(btnManual);
@@ -54,13 +57,28 @@
             pnlBottom.Controls.Add(txtComando);
             pnlBottom.Dock = DockStyle.Fill;
             pnlBottom.Location = new Point(0, 0);
+            pnlBottom.Margin = new Padding(3, 4, 3, 4);
             pnlBottom.Name = "pnlBottom";
-            pnlBottom.Size = new Size(1680, 810);
+            pnlBottom.Size = new Size(1920, 1080);
             pnlBottom.TabIndex = 3;
             pnlBottom.Click += pnlBottom_Click;
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
             pnlBottom.Resize += pnlBottom_Resize;
+            // 
+            // btnHistorico
+            // 
+            btnHistorico.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnHistorico.Cursor = Cursors.Hand;
+            btnHistorico.Image = (Image)resources.GetObject("btnHistorico.Image");
+            btnHistorico.Location = new Point(1619, 24);
+            btnHistorico.Margin = new Padding(3, 4, 3, 4);
+            btnHistorico.Name = "btnHistorico";
+            btnHistorico.Size = new Size(83, 89);
+            btnHistorico.SizeMode = PictureBoxSizeMode.Zoom;
+            btnHistorico.TabIndex = 10;
+            btnHistorico.TabStop = false;
+            btnHistorico.Click += btnHistorico_Click;
             // 
             // lblText
             // 
@@ -68,9 +86,9 @@
             lblText.AutoSize = true;
             lblText.BackColor = Color.Transparent;
             lblText.Font = new Font("Segoe UI Semibold", 27F, FontStyle.Bold);
-            lblText.Location = new Point(608, 445);
+            lblText.Location = new Point(695, 593);
             lblText.Name = "lblText";
-            lblText.Size = new Size(425, 48);
+            lblText.Size = new Size(531, 61);
             lblText.TabIndex = 9;
             lblText.Text = "O que você deseja fazer?";
             lblText.TextAlign = ContentAlignment.TopCenter;
@@ -78,9 +96,9 @@
             // lblDebug
             // 
             lblDebug.AutoSize = true;
-            lblDebug.Location = new Point(231, 60);
+            lblDebug.Location = new Point(264, 80);
             lblDebug.Name = "lblDebug";
-            lblDebug.Size = new Size(42, 15);
+            lblDebug.Size = new Size(54, 20);
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
             // 
@@ -89,9 +107,10 @@
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1505, 25);
+            btnManual.Location = new Point(1720, 33);
+            btnManual.Margin = new Padding(3, 4, 3, 4);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(69, 50);
+            btnManual.Size = new Size(79, 67);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
@@ -102,9 +121,10 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1593, 25);
+            btnConfigs.Location = new Point(1821, 33);
+            btnConfigs.Margin = new Padding(3, 4, 3, 4);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(65, 50);
+            btnConfigs.Size = new Size(74, 67);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
@@ -113,9 +133,10 @@
             // imgLogo
             // 
             imgLogo.Image = (Image)resources.GetObject("imgLogo.Image");
-            imgLogo.Location = new Point(13, 13);
+            imgLogo.Location = new Point(15, 17);
+            imgLogo.Margin = new Padding(3, 4, 3, 4);
             imgLogo.Name = "imgLogo";
-            imgLogo.Size = new Size(204, 72);
+            imgLogo.Size = new Size(233, 96);
             imgLogo.SizeMode = PictureBoxSizeMode.Zoom;
             imgLogo.TabIndex = 5;
             imgLogo.TabStop = false;
@@ -124,9 +145,10 @@
             // 
             textBox1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             textBox1.BorderStyle = BorderStyle.None;
-            textBox1.Location = new Point(809, 608);
+            textBox1.Location = new Point(925, 811);
+            textBox1.Margin = new Padding(3, 4, 3, 4);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(93, 16);
+            textBox1.Size = new Size(106, 20);
             textBox1.TabIndex = 2;
             textBox1.TabStop = false;
             // 
@@ -139,11 +161,12 @@
             txtComando.Font = new Font("Segoe UI", 20F);
             txtComando.ForeColor = Color.FromArgb(88, 99, 152);
             txtComando.ImeMode = ImeMode.NoControl;
-            txtComando.Location = new Point(293, 551);
-            txtComando.MaximumSize = new Size(1085, 0);
-            txtComando.MinimumSize = new Size(299, 4);
+            txtComando.Location = new Point(335, 735);
+            txtComando.Margin = new Padding(3, 4, 3, 4);
+            txtComando.MaximumSize = new Size(1240, 0);
+            txtComando.MinimumSize = new Size(342, 4);
             txtComando.Name = "txtComando";
-            txtComando.Size = new Size(1085, 36);
+            txtComando.Size = new Size(1240, 45);
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
@@ -152,16 +175,18 @@
             // 
             // UserControlHome
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(231, 231, 231);
             Controls.Add(pnlBottom);
-            MinimumSize = new Size(360, 180);
+            Margin = new Padding(3, 4, 3, 4);
+            MinimumSize = new Size(411, 240);
             Name = "UserControlHome";
-            Size = new Size(1680, 810);
+            Size = new Size(1920, 1080);
             KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
@@ -177,5 +202,6 @@
         private PictureBox btnConfigs;
         private PictureBox imgLogo;
         private Label lblText;
+        private PictureBox btnHistorico;
     }
 }

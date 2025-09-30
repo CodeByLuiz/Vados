@@ -18,6 +18,10 @@ using System.Globalization;
 using static System.Windows.Forms.DataFormats;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using Vosk;
+using Microsoft.VisualBasic;
+using NAudio.Wave;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
 
 namespace Vados
@@ -49,6 +53,28 @@ namespace Vados
             "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
         };
 
+
+        #region RECONHECIMENTO DE VOZ
+
+        //Palavras ignoradas no reconhecimento de voz
+        public static List<string> speechIgnoreWords = new List<string>()
+        {
+            "[música]",
+            "[música de fundo]",
+            "[aplausos]",
+            "[risos]",
+            "[inaudível]",
+            "[ruído]",
+            "[conversas]",
+        };
+
+        //Palavras aceitas/esperadas no reconhecimento de voz que não estão em nenhuma outra lista
+        public static List<string> extraSpeechWords = new List<string>()
+        {
+            "para",
+        };
+
+        #endregion
 
         #region COMANDOS
 
@@ -329,6 +355,23 @@ namespace Vados
         #endregion
 
 
+        //Palavras de cumprimento
+        public static List<string> greetingWords = new List<string>()
+        {
+            "oi",
+            "ola",
+            "hello",
+            "bom dia",
+            "boa tarde",
+            "boa noite",
+            "oie",
+            "como vai",
+            "tudo bem",
+            "como esta",
+            "como voce esta",
+        };
+
+
         //Formas de começar o comando
         public static List<string> startWords = new List<string>()
         {
@@ -341,6 +384,14 @@ namespace Vados
             "por favor",
             "por obsequio",
             "por gentileza",
+            "voce pode",
+            "pode",
+            "poderia",
+            "voce poderia",
+            "e possivel",
+            "seria possivel",
+            "seria possivel voce",
+            "seria possivel que voce",
         };
 
         //Formas de indicar a pasta de criação (comando criar)
@@ -459,7 +510,7 @@ namespace Vados
             CommandCriteria criteria = new CommandCriteria();
 
             //Definir tipo de comando
-            ActionExtractor actionExtractor = new ActionExtractor(startWords, allCommands);
+            ActionExtractor actionExtractor = new ActionExtractor(greetingWords, startWords, allCommands);
             actionExtractor.Extract(command, criteria);
 
 
@@ -903,6 +954,144 @@ namespace Vados
             return true;
         }
 
+
+        #region RECONHECIMENTO DE VOZ
+
+        //Filtra palavras indesejadas no texto
+        public static string CleanText(string text)
+        {
+            //Deixar texto minúsculo e remover acentos
+            text = text.ToLower();
+
+            //Remover cada uma das palavras indesejadas
+            foreach(var word in Comandos.speechIgnoreWords)
+            {
+                text = text.Replace(word, "");
+            }
+
+            return text;
+        }
+
+
+        //Corrige o texto com as palavras mais parecidas
+        public static string CorrectText(string inputStr, List<string> hints, int maxDistance = 2)
+        {
+            MessageBox.Show(inputStr);
+            inputStr = inputStr.ToLowerInvariant();
+            var words = inputStr.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();    //Separa a string em uma lista de palavras
+            var corrected = new List<string>();
+
+            //Para cada palavra da string
+            int i = 0;
+            while (i < words.Count)
+            {
+                string bestMatch = null;        //Correspondência mais parecida
+                int bestLen = 0;                //Número de palavras da possível correspondência
+                int bestDist = int.MaxValue;    //Número de edições da melhor correspondência (menor possível)
+                MessageBox.Show(i.ToString() + " " + words[i]);
+
+                //Pular palavra se ela for muito pequena
+                if (words[i].Length <= 2)
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                    continue;
+                }
+
+
+                //Pular palavra se a anterior for uma de nomeação (ex: chamado, de nome)
+                if (corrected.Count > 0 && Comandos.namingWords.Contains(corrected[i - 1]))
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                    continue;
+                }
+
+
+                //Para cada possivel correspondência
+                foreach (var hint in hints)
+                {
+                    var hintWords = hint.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    //Ignorar caso a correspondência tenha mais palavras que a string
+                    if (i + hintWords.Length > words.Count)
+                        continue;
+
+                    //Juntar palavras da string para ficar com a mesma quantidade da possível correspondência
+                    string segment = string.Join(" ", words.Skip(i).Take(hintWords.Length));
+                    int dist = LevenshteinDistance(segment, string.Join(" ", hintWords));   //Quantidade de edições
+
+                    if (dist <= maxDistance && dist < bestDist)
+                    {
+                        //Definir melhor correspondência
+                        bestMatch = hint;
+                        bestLen = hintWords.Length;
+                        bestDist = dist;
+                    }
+                }
+
+
+                //Adicionar correspondência
+                if (bestMatch != null)
+                {
+                    corrected.Add(bestMatch);
+                    i += bestLen;
+                }
+                //Manter palavra original se não encontrar nenhuma correspondência
+                else
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                }
+            }
+
+
+            //Retornar frase modificada
+            return string.Join(" ", corrected);
+        }
+
+
+        //Retorna o número de edições para uma palavra se tornar a outra    (ex: caixa -> baixo  =  2 edições)
+        private static int LevenshteinDistance(string s, string t)
+        {
+            int[,] dp = new int[s.Length + 1, t.Length + 1];
+
+            for (int i = 0; i <= s.Length; i++)
+                dp[i, 0] = i;
+
+            for (int j = 0; j <= t.Length; j++)
+                dp[0, j] = j;
+
+            for (int i = 1; i <= s.Length; i++)
+            {
+                for (int j = 1; j <= t.Length; j++)
+                {
+                    int cost = (s[i - 1] == t[j - 1]) ? 0 : 1;
+                    dp[i, j] = Math.Min(
+                        Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                        dp[i - 1, j - 1] + cost
+                    );
+                }
+            }
+
+            return dp[s.Length, t.Length];
+        }
+
+
+        public static List<int> PopulateAudioDevices()
+        {
+            List<int> deviceIds = new List<int>(); ;
+
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                var cap = WaveIn.GetCapabilities(i);
+                deviceIds.Add(i);
+            }
+
+            return deviceIds;
+        }
+
+        #endregion
+
         #endregion
 
 
@@ -1071,6 +1260,7 @@ namespace Vados
                         //Percorrer todas as pastas dentro da pasta atual
                         foreach (var folderPath in subpasta)
                         {
+                            //MessageBox.Show(folderPath);
                             Console.WriteLine(folderPath);
 
                             //Checar se a pasta tem o nome correto
@@ -1314,6 +1504,13 @@ namespace Vados
         #endregion
 
 
+        #region RECONHECIMENTO DE VOZ
+
+       // ainda to vendo alguma forma legal de fazer isso aqui dar certo :(
+
+        #endregion
+
+
         public static string driveverifica(string[] args)
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
@@ -1346,7 +1543,7 @@ namespace Vados
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao criar a pasta padrão: " + ex.Message);
-                return null;
+                return "";
             }
         }
 

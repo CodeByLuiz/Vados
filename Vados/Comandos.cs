@@ -56,16 +56,30 @@ namespace Vados
 
         #region RECONHECIMENTO DE VOZ
 
-        //Palavras ignoradas no reconhecimento de voz
+        //Termos ignorados no reconhecimento de voz
         public static List<string> speechIgnoreWords = new List<string>()
         {
             "[música]",
+            "[Música]",
+            "[MÚSICA]",
             "[música de fundo]",
+            "[Música de fundo]",
+            "[MÚSICA DE FUNDO]",
             "[aplausos]",
+            "[Aplausos]",
+            "[APLAUSOS]",
             "[risos]",
+            "[Risos]",
+            "[RISOS]",
             "[inaudível]",
+            "[Inaudível]",
+            "[INAUDÍVEL]",
             "[ruído]",
+            "[Ruído]",
+            "[RUÍDO]",
             "[conversas]",
+            "[Conversas]",
+            "[CONVERSAS]",
         };
 
         //Palavras aceitas/esperadas no reconhecimento de voz que não estão em nenhuma outra lista

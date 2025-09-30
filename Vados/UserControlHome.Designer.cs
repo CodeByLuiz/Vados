@@ -170,7 +170,6 @@
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
-            txtComando.TextChanged += txtComando_TextChanged;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
             // UserControlHome
@@ -183,7 +182,6 @@
             MinimumSize = new Size(411, 240);
             Name = "UserControlHome";
             Size = new Size(1920, 1080);
-            KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnHistorico).EndInit();

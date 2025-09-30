@@ -19,13 +19,18 @@ namespace Vados
         public event EventHandler<LoadPageEventArgs> loadPage;
 
         System.Windows.Forms.Timer timer;
-        private Image inactiveMicIcon;
-        private Image activeMicIcon;
-        private Image loadingMicIcon;
-        private Image micIcon;
+
+        //Botões de pausar e parar comando de voz
+        PictureBox btnPause;
+        PictureBox btnStop;
+
         bool hasTranscribedAudio = false;
 
         //Variáveis do botão do microfone
+        Image inactiveMicIcon;
+        Image activeMicIcon;
+        Image loadingMicIcon;
+        Image micIcon;
         float circleSizeDefaultMax = 325;
         float circleSizeCurrent = 325;
         float circleSize = 325;
@@ -43,7 +48,19 @@ namespace Vados
         float circleListeningY = 0;
         Color circleColor = Colors.grayPrimary;
         bool circleHovering = false;
-        bool lastCircleHovering = false;
+
+
+        //Variáveis da onda de áudio
+        int barHeight = 100;
+        int barWidth = 4;
+        int barMargin = 2;
+        int waveAreaMargin = 30;
+        float waveAreaLeft;
+        float waveAreaRight;
+        float waveAreaTop;
+        float waveAreaWidth;
+        float waveAreaHeight;
+        int maxBars;
 
 
         //Variáveis da textbox
@@ -61,6 +78,56 @@ namespace Vados
         bool setTextboxWidth = false;
         bool textboxActive = false;
 
+
+        public UserControlHome()
+        {
+            InitializeComponent();
+            Console.ReadLine();
+
+            //Timer para pintar tela a 60 FPS
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 16;
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            //Variáveis do botão de microfone
+            inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
+            activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
+            loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
+            micIcon = inactiveMicIcon;
+            ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
+
+            txtComando.Select(0, 0);
+
+
+            //Inicializar botões de pausar e parar comando de voz
+            btnPause = new PictureBox();
+            btnStop = new PictureBox();
+
+            btnPause.Click += btnPause_Click;
+            btnPause.Visible = false;
+            btnPause.Enabled = false;
+            btnPause.SizeMode = PictureBoxSizeMode.Zoom;
+            btnPause.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
+            btnPause.Cursor = Cursors.Hand;
+            pnlBottom.Controls.Add(btnPause);
+
+            btnStop.Click += btnStop_Click;
+            btnStop.Visible = false;
+            btnStop.Enabled = false;
+            btnStop.SizeMode = PictureBoxSizeMode.Zoom;
+            btnStop.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopListeningIcon.png"));
+            btnStop.Cursor = Cursors.Hand;
+            pnlBottom.Controls.Add(btnStop);
+
+
+            //Otimizar pintura
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint, true);
+        }
 
 
         public void PerformCommand(string command)
@@ -83,7 +150,6 @@ namespace Vados
             parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
         }
 
-
         public void FocusCommand(bool clear = false)
         {
             txtComando.SelectionLength = 0;
@@ -103,17 +169,24 @@ namespace Vados
             circleColor = Colors.bluePrimary;
 
             //Definir posição e tamanho corretos quando gravando áudio
-            CircleCorrect(true);
+            CorrectMicButton(true);
+
+            //Ativar botões de pausar e parar
+            btnStop.Enabled = true;
+            btnStop.Visible = true;
+            btnPause.Enabled = true;
+            btnPause.Visible = true;
+
 
             TextBoxReset("Escutando...");
-
         }
         
-
         //Para de escutar o comando falado
         public async void StopListening()
         {
             micIcon = loadingMicIcon;
+            btnStop.Enabled = false;
+            btnPause.Enabled = false;
 
             TextBoxReset("Transcrevendo...");
             string result = await Global.VoiceRecognizer.Stop();
@@ -124,19 +197,22 @@ namespace Vados
             micIcon = inactiveMicIcon;
             circleColor = Colors.grayPrimary;
 
+            //Desativar os botões de pausar e parar
+            btnStop.Visible = false;
+            btnPause.Visible = false;
+
             //Retornar o botão do microfone para a posição e tamanho padrões
-            CircleCorrect(true);
+            CorrectMicButton(true);
         }
 
 
         public void TextBoxReset(string text, bool canClick = true)
         {
             txtComando.Text = text;
-            txtComando.ForeColor = Colors.blueTernary;
+            txtComando.ForeColor = Colors.blueSecondary;
             textboxActive = false;
             //textboxCanClick = canClick;
         }
-
 
         public void TextBoxWrite(string text)
         {
@@ -147,7 +223,7 @@ namespace Vados
         }
 
 
-        public void CircleCorrect(bool setOnlyTargets = false)
+        public void CorrectMicButton(bool setOnlyTargets = false)
         {
             //Corrigir tamanho
             int minY = 85;
@@ -198,6 +274,39 @@ namespace Vados
             circleY = circleTargetY;
         }
 
+        public void CorrectAudioWave()
+        {
+            waveAreaLeft = circleX + circleSize / 2 + waveAreaMargin;
+            waveAreaTop = circleY - circleSizeListening / 2;
+            waveAreaRight = (txtAreaX + txtAreaWidth + txtAreaOutSize);
+            waveAreaWidth = waveAreaRight - (circleX + circleSize / 2 + waveAreaMargin);
+            waveAreaHeight = circleSizeListening;
+            maxBars = (int)(waveAreaWidth / (barWidth + barMargin));
+        }
+
+        public void CorrectVoiceButtons()
+        {
+            //Definir posições dos botões
+            float fixedLeft = circleX + circleSizeListening / 2 + waveAreaMargin;
+            float buttonLeftMargin = 30;
+            int buttonSize = 40;
+            int buttonDistance = 30 + buttonSize;
+            int buttonTopMargin = 15;
+            float buttonTop = waveAreaTop + waveAreaHeight / 2 + barHeight / 2 + buttonTopMargin;
+
+            //Botão de parar
+            btnPause.Width = buttonSize;
+            btnPause.Height = buttonSize;
+            btnPause.Left = (int)(fixedLeft + buttonLeftMargin);
+            btnPause.Top = (int)buttonTop;
+
+            //Botão de parar
+            btnStop.Width = buttonSize;
+            btnStop.Height = buttonSize;
+            btnStop.Left = (int)(fixedLeft + buttonLeftMargin + buttonDistance);
+            btnStop.Top = (int)buttonTop;
+        }
+
 
         //Realizar comando quando apertar enter
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -212,38 +321,8 @@ namespace Vados
         }
 
 
-        public UserControlHome()
-        {
-            InitializeComponent();
-            //PopulateAudioDevices();
-            Console.ReadLine();
-
-            //Timer para pintar tela a 60 fps
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16;
-            timer.Tick += Timer_Tick;
-            timer.Start();
-
-            //Inicializar variáveis
-            inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
-            activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
-            loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
-            micIcon = inactiveMicIcon;
-            ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
-
-            txtComando.Select(0, 0);
-
-
-            //Otimizar pintura
-            this.DoubleBuffered = true;
-            this.ResizeRedraw = true;
-            SetStyle(ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.UserPaint |
-                     ControlStyles.AllPaintingInWmPaint, true);
-        }
-
-
-
+        
+        //Eventos da textbox
         private void txtComando_Click(object sender, EventArgs e)
         {
             //Apagar texto temporário
@@ -263,7 +342,7 @@ namespace Vados
         }
 
 
-
+        //Eventos do painel (onde tudo está e é desenhado)
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -303,6 +382,8 @@ namespace Vados
 
 
             //-----Ícone do microfone-----
+            ImageAnimator.UpdateFrames(micIcon);    //Animar imagem do botão de microfone (se for gif)
+
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
@@ -337,16 +418,8 @@ namespace Vados
 
             #region ONDA DE ÁUDIO
 
-            int barHeight = 100;
-            int barWidth = 4;
-            int barMargin = 2;
-            int waveAreaMargin = 30;
-            float waveAreaLeft = circleX + circleSize / 2 + waveAreaMargin;
-            float waveAreaTop = circleY - circleSize / 2;
-            float waveAreaWidth = (txtAreaX + txtAreaWidth + txtAreaOutSize) - (circleX + circleSize / 2 + waveAreaMargin);
-            float waveAreaHeight = circleSize;
-
-            int maxBars = (int)(waveAreaWidth / (barWidth + barMargin));
+            CorrectAudioWave();
+            CorrectVoiceButtons();
 
             //Desenhar cada barra de áudio
             if (Global.VoiceRecognizer.isRunning)
@@ -358,7 +431,8 @@ namespace Vados
                 for (int i = start; i < bars.Count; i++)
                 {
                     double height = bars[i];
-                    height = barHeight - (height / -100 * barHeight);
+                    //height = barHeight - (height / -100 * barHeight);
+                    height = barHeight;
                     int distance = barWidth + barMargin;
                     float barX = waveAreaLeft + distance * i;
                     barX -= distance * start;
@@ -408,7 +482,7 @@ namespace Vados
             #endregion
         }
 
-        private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
+        private void pnlBottom_Click(object sender, EventArgs e)
         {
             //Informações do mouse
             pnlBottom.Cursor = Cursors.Default;
@@ -419,26 +493,19 @@ namespace Vados
 
             #region BOTÃO DE MICROFONE
 
-            lastCircleHovering = circleHovering;
-            circleHovering = false;
+            //MessageBox.Show(circleHovering);
 
-            //Diminuir  tamanho do botão do microfone quando passar o mouse
-            float distanceX = circleX - mouseX;
-            float distanceY = circleY - mouseY;
-            double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
-
-            //Resetar tamanho do círculo
-            if (Global.VoiceRecognizer.isRunning == false)
-                circleSizeTarget = circleSizeCurrent;
-
-            //Checar se o mouse está dentro do círculo
-            if (distance <= circleSize / 2)
+            if (circleHovering)
             {
-                circleHovering = true;
-
-                //Diminuir tamanho do círculo
-                if (Global.VoiceRecognizer.isRunning == false)
-                    circleSizeTarget = circleSizeCurrent * 0.9f;
+                //Ativar microfone
+                if (Global.VoiceRecognizer.isRunning)
+                {
+                    StopListening();
+                }
+                else
+                {
+                    StartListening();
+                }
             }
 
             #endregion
@@ -446,56 +513,18 @@ namespace Vados
 
             #region BOTÃO DE ENVIAR COMANDO
 
-            float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
-            float txtIconY = txtAreaY + txtIconMarginH;
-            RectangleF rect = new RectangleF(txtIconX, txtIconY, txtIconSize, txtIconSize);
-
-            //lblDebug.Text = rect.Width.ToString() + ", " + rect.Height.ToString() + " - " + rect.X.ToString() + ", " + rect.Y.ToString() + " - " + mouseX.ToString() + ", " + mouseY.ToString();
+            float sendButtonX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float sendButtonY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(sendButtonX, sendButtonY, txtIconSize, txtIconSize);
 
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                //Trocar imagem do mouse
-                pnlBottom.Cursor = Cursors.Hand;
+                PerformCommand(txtComando.Text);
             }
 
             #endregion
-        }
 
-        private void Timer_Tick(object? sender, EventArgs e)
-        {
-            int circleSizeChangeSpeed = 3;
-
-            //Vibrar botão do microfone enquanto estiver escutando a voz
-            if (Global.VoiceRecognizer != null && Global.VoiceRecognizer.isRunning)
-            {
-                double decibels;
-                if (double.TryParse(Global.decibeis, out decibels))
-                {
-                    circleSizeChangeSpeed = 2;
-                    float maxSize = 1.2f * circleSizeListening;
-                    float normalizedDecibels = 1f - ((float)decibels / -100f);
-                    circleSizeTarget = circleSizeListening + (maxSize - circleSizeListening) * normalizedDecibels;
-                }
-            }
-
-            //Ajustar tamanho do botão do microfone
-            circleSize += (circleSizeTarget - circleSize) / circleSizeChangeSpeed;
-
-            if (Math.Abs(circleSizeTarget - circleSize) < 1)
-                circleSize = circleSizeTarget;
-
-
-            //Ajustar posição do microfone
-            circleX += (circleTargetX - circleX) / 4;
-            circleY += (circleTargetY - circleY) / 4;
-
-            //lblDebug.Text = Global.decibeis;
-
-            //Animar imagem do botão de microfone (se for gif)
-            ImageAnimator.UpdateFrames();
-
-            pnlBottom.Invalidate();
         }
 
         private void pnlBottom_Resize(object sender, EventArgs e)
@@ -548,7 +577,8 @@ namespace Vados
 
             if (Global.VoiceRecognizer != null)
             { 
-                CircleCorrect();
+                CorrectMicButton();
+                CorrectAudioWave();
             }
 
             #endregion
@@ -557,7 +587,7 @@ namespace Vados
             pnlBottom.Invalidate();
         }
 
-        private void pnlBottom_Click(object sender, EventArgs e)
+        private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
         {
             //Informações do mouse
             pnlBottom.Cursor = Cursors.Default;
@@ -568,19 +598,25 @@ namespace Vados
 
             #region BOTÃO DE MICROFONE
 
-            //MessageBox.Show(circleHovering);
+            circleHovering = false;
 
-            if (circleHovering)
+            //Diminuir  tamanho do botão do microfone quando passar o mouse
+            float distanceX = circleX - mouseX;
+            float distanceY = circleY - mouseY;
+            double distance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
+
+            //Resetar tamanho do círculo
+            if (Global.VoiceRecognizer.isRunning == false)
+                circleSizeTarget = circleSizeCurrent;
+
+            //Checar se o mouse está dentro do círculo
+            if (distance <= circleSize / 2)
             {
-                //Ativar microfone
-                if (Global.VoiceRecognizer.isRunning)
-                {
-                    StopListening();
-                }
-                else
-                {
-                    StartListening();
-                }
+                circleHovering = true;
+
+                //Diminuir tamanho do círculo
+                if (Global.VoiceRecognizer.isRunning == false)
+                    circleSizeTarget = circleSizeCurrent * 0.9f;
             }
 
             #endregion
@@ -588,20 +624,59 @@ namespace Vados
 
             #region BOTÃO DE ENVIAR COMANDO
 
-            float sendButtonX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
-            float sendButtonY = txtAreaY + txtIconMarginH;
-            RectangleF rect = new RectangleF(sendButtonX, sendButtonY, txtIconSize, txtIconSize);
+            float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
+            float txtIconY = txtAreaY + txtIconMarginH;
+            RectangleF rect = new RectangleF(txtIconX, txtIconY, txtIconSize, txtIconSize);
+
+            //lblDebug.Text = rect.Width.ToString() + ", " + rect.Height.ToString() + " - " + rect.X.ToString() + ", " + rect.Y.ToString() + " - " + mouseX.ToString() + ", " + mouseY.ToString();
 
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                PerformCommand(txtComando.Text);
+                //Trocar imagem do mouse
+                pnlBottom.Cursor = Cursors.Hand;
             }
 
             #endregion
-
         }
 
+        
+        //Evento que acontece todo frame
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            int circleSizeChangeSpeed = 3;
+
+            //Vibrar botão do microfone enquanto estiver escutando a voz
+            if (Global.VoiceRecognizer != null && Global.VoiceRecognizer.isRunning)
+            {
+                double decibels;
+                if (double.TryParse(Global.decibeis, out decibels))
+                {
+                    circleSizeChangeSpeed = 2;
+                    float maxSize = 1.2f * circleSizeListening;
+                    float normalizedDecibels = 1f - ((float)decibels / -100f);
+                    circleSizeTarget = circleSizeListening + (maxSize - circleSizeListening) * normalizedDecibels;
+                }
+            }
+
+            //Ajustar tamanho do botão do microfone
+            circleSize += (circleSizeTarget - circleSize) / circleSizeChangeSpeed;
+
+            if (Math.Abs(circleSizeTarget - circleSize) < 1)
+                circleSize = circleSizeTarget;
+
+
+            //Ajustar posição do microfone
+            circleX += (circleTargetX - circleX) / 4;
+            circleY += (circleTargetY - circleY) / 4;
+
+            //lblDebug.Text = Global.decibeis;
+
+            pnlBottom.Invalidate();
+        }
+
+        
+        //Botões da interface
         private void btnManual_Click(object sender, EventArgs e)
         {
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
@@ -612,22 +687,19 @@ namespace Vados
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
         }
 
-        private void txtComando_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void UserControlHome_KeyDown(object sender, KeyEventArgs e)
-        {
-            //MessageBox.Show("enter");
-
-            if (e.KeyCode == Keys.Enter)
-            {
-                PerformCommand(txtComando.Text);
-            }
-        }
-
         private void btnHistorico_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        //Botões do comando falado
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPause_Click(object sender, EventArgs e)
         {
 
         }

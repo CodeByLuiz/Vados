@@ -17,9 +17,12 @@ namespace Vados
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
 
+
+
+         
         System.Windows.Forms.Timer timer;
         private Image micIcon;
-
+        private Image sendIcon;
         //Variáveis do botão do microfone
         float circleSizeMax = 325;
         float circleSizeDefault = 325;
@@ -83,13 +86,14 @@ namespace Vados
         public UserControlHome()
         {
             InitializeComponent();
-
+            this.DoubleBuffered = true;
 
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16; //~60 FPS
             timer.Tick += Timer_Tick;
             timer.Start();
 
+            sendIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
             micIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\micIcon.png"));
             txtComando.Select(0, 0);
         }
@@ -236,11 +240,18 @@ namespace Vados
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
 
-            string sendimgPath = Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png");
-            Image sendIcon = Image.FromFile(sendimgPath);
+            
+            
             e.Graphics.DrawImage(sendIcon, txtIconX, txtIconY, txtIconSize, txtIconSize);
 
             #endregion
+
+
+
+            pathBrush.Dispose();
+            path.Dispose();
+            brush.Dispose();
+
         }
 
         private void pnlBottom_MouseMove(object sender, MouseEventArgs e)
@@ -303,10 +314,11 @@ namespace Vados
 
             if (Math.Abs(circleSizeTarget - circleSize) < 1)
                 circleSize = circleSizeTarget;
-                
-            
 
-            pnlBottom.Invalidate();
+
+
+            pnlBottom.Invalidate(new Rectangle((int)circleX, (int)circleY, (int)circleSize+ 20, (int)circleSize + 20));
+
         }
 
         private void pnlBottom_Resize(object sender, EventArgs e)

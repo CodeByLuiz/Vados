@@ -10,7 +10,11 @@ namespace Vados
     //Variáveis que podem ser acessadas de qualquer lugar
     public class Global
     {
-        public static string DefaultFolder = Comandos.CriarPastaPadrao();
+        public static string DefaultFolder = "";            //Pasta padrão para os comandos
+        public static string VoiceRecognitionFolder = "";   //Pasta do modelo de reconhecimento de voz
+        public static WhisperRecognizer VoiceRecognizer = null;    //Objeto do reconhecedor de voz
+        public static string decibeis = "nao iniciado";
+
 
 
         #region PRIORIDADES E EXCEÇÕES
@@ -57,7 +61,7 @@ namespace Vados
             Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
             //Path.Combine(root, @"Users\"+Environment.UserName+@""),
 
-            //Path.Combine(root),
+            Path.Combine(root),
         };
 
         public static List<string> exePriorities = new List<string>
@@ -76,6 +80,7 @@ namespace Vados
         //Inicializar user controls
         public static UserControlHome userControlHome = new UserControlHome();
         public static UserControlSettings userControlSettings = new UserControlSettings();
+        public static UserControlManual userControlManual = new UserControlManual();
 
       
         //Desenhar retângulo arredondado

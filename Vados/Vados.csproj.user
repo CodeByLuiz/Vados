@@ -4,6 +4,9 @@
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FormMessage.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -16,6 +19,9 @@
     <Compile Update="UserControlHome.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="UserControlManual.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="UserControlSettings.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -25,6 +31,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="UserControlHome.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

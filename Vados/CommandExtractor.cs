@@ -98,11 +98,13 @@ namespace Vados
     //Extrai o tipo de comando
     public class ActionExtractor : CriteriaExtractor
     {
+        List<string> greetings;
         List<string> actions;
         List<string> starts;
 
-        public ActionExtractor(List<string> starts_, List<string> actions_)
+        public ActionExtractor(List<string> greetings_, List<string> starts_, List<string> actions_)
         {
+            greetings = greetings_;
             starts = starts_;
             actions = actions_;
         }
@@ -110,9 +112,10 @@ namespace Vados
         public override bool Extract(string command, CommandCriteria criteria)
         {
             command = command.ToLower();
+            string patternGreetings = string.Join("|", greetings.Select(Regex.Escape));
             string patternStarts = string.Join("|", starts.Select(Regex.Escape));
             string patternAction = string.Join("|", actions.Select(Regex.Escape));
-            string pattern = $@"^(({patternStarts})\s+)?({patternAction})";
+            string pattern = $@"^(({patternGreetings})\s+)?(({patternStarts})\s+)?({patternAction})";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -120,13 +123,13 @@ namespace Vados
             //Extrair comando
             if (match.Success)
             {
-                string action = match.Groups[3].Value;
+                string action = match.Groups[5].Value;
                 string correctAction = Comandos.WordGetSynonym(action);
                 criteria.Action = correctAction;
             }
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            //MessageBox.Show("Comando -> " + actionStr);
+            MessageBox.Show("Comando -> " + actionStr);
             return match.Success;
         }
     }

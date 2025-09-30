@@ -116,7 +116,13 @@ namespace Vados
 
             textboxActive = true;
         }
+        public string TxtComandoEditar
+        {
+            
+            get { return txtComando.Text; }
+            set { txtComando.Text = value; }
 
+        }
         private void txtComando_LostFocus(object sender, EventArgs e)
         {
             //Retornar texto temporário

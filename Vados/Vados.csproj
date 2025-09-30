@@ -14,6 +14,7 @@
     <None Remove="Images\Icons\configIcon.png" />
     <None Remove="Images\Icons\confirmIcon.png" />
     <None Remove="Images\Icons\deleteicon.png" />
+    <None Remove="Images\Icons\editicon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
     <None Remove="Images\Icons\sendIcon.png" />
     <None Remove="Images\Icons\warningIcon.png" />
@@ -46,6 +47,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\deleteicon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\editicon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\manualIcon.png">

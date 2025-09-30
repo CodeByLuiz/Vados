@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -67,11 +68,12 @@ namespace Vados
 
             int margin = 10;
             
-            int rectangleHeight = 105;
+            int rectangleHeight = 115;
             int rectangleWidth = historyPanel.ClientSize.Width - 30;
             int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
             int startY = spacing ;
-            Color entryColor = ColorTranslator.FromHtml("#F0F5FF");
+            Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
+
 
             Label title = new Label
             {
@@ -92,7 +94,7 @@ namespace Vados
             foreach (var entry in entradas)
             {
                 int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
-
+                string HistoryTitle = char.ToUpper(entry.Comandotitle[0]) + entry.Comandotitle.Substring(1).ToLower(); // titulo com a primeira letra maiuscula
 
                 Panel entryPanel = new Panel
                 {
@@ -107,29 +109,42 @@ namespace Vados
                    
                 };
 
+                
 
+                
                 Label lbltitle = new Label
                 {
-                    Text = $"{entry.Comandotitle}",
+                    Text = $"{HistoryTitle}",
                     Location = new Point(10, 5),
                     AutoSize = true,
+                    
                     ForeColor = Color.Black,
-                    Font = new Font("Arial", 15, FontStyle.Bold)
+                    Font = new Font("Arial", 14, FontStyle.Bold),
+                  
 
 
                 };
                 Label lbl = new Label
                 {
                     Text = $"{entry.Comando}",
-                    Location = new Point(10, lbltitle.Height+10),
+                    Location = new Point(lbltitle.Location.X+2, lbltitle.Location.Y + lbltitle.Height+2),
                     // AutoSize = false,
                     Width = rectangleWidth - 10,
                     Height = rectangleHeight,
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 12, FontStyle.Regular),
+                    
 
 
 
+                };
+
+                Label lblData = new Label 
+                {
+                    Text = $"{entry.Data.ToString("g", CultureInfo.CurrentCulture)}",
+                    AutoSize = true,
+                    ForeColor = Color.Black,
+                    Font = new Font("Arial", 12, FontStyle.Italic),
                 };
 
                 PictureBox btnExcluir = new PictureBox
@@ -144,27 +159,48 @@ namespace Vados
 
                 };
 
+                PictureBox btnEditar = new PictureBox
+                {
+
+                    //BackColor = Color.White,
+                    //BackgroundImage = Image.FromFile("\\Vados\\Vados\\Images\\Icons\\deleteicon")
+                    Size = new Size(25, 25),
+                    Cursor = Cursors.Hand,
+                    BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\editicon.png")),
+                    BackgroundImageLayout = ImageLayout.Stretch
+
+                };
+
+                //arredonda as bordas do painel
+
                 int radius = 15;
                 entryPanel.Region = Region.FromHrgn(
                     CreateRoundRectRgn(0, 0, entryPanel.Width, entryPanel.Height, radius, radius)
                 );
 
 
-                MessageBox.Show(lbltitle.Height.ToString());
+                
                 historyPanel.Controls.Add(entryPanel);
                 entryPanel.Controls.Add(lbl);
                 entryPanel.Controls.Add(lbltitle);
+                entryPanel.Controls.Add(lblData);
+                entryPanel.Controls.Add(btnEditar);
                 entryPanel.Controls.Add(btnExcluir);
 
                 //arredonda as bordas da entrada
                 entryPanel.SizeChanged += (s, e) => SetRoundedRegion(entryPanel, 15);
 
                 //ajusta a posição dos elementos necessarios
-                btnExcluir.Location = new Point(entryPanel.Width - btnExcluir.Width-5,5);
+                btnEditar.Location = new Point(10,entryPanel.Height-btnEditar.Height-5);
+                btnEditar.BringToFront();
+
+                btnExcluir.Location = new Point(btnEditar.Location.X +btnExcluir.Width+15, btnEditar.Location.Y);
                 btnExcluir.BringToFront();
-                
-                
-               
+
+                lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
+
+
+
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e) 
@@ -185,6 +221,14 @@ namespace Vados
                     BancoDeDados.DeleteEntryID(entry.Id);
                     LoadCommands();
                 }
+                void EditEntry(object sender, EventArgs e)
+                {
+                    
+
+                    Global.userControlHome.TxtComandoEditar = entry.Comando;
+                    Global.userControlHome.HistoryOpen = false;
+                    this.Close();
+                }
 
                 // Adiciona os eventos tanto ao painel quanto a label
                 entryPanel.MouseEnter += HoverEnter;
@@ -195,6 +239,7 @@ namespace Vados
                 btnExcluir.MouseLeave += HoverEnter;
 
                 btnExcluir.Click += DeleteEntry;
+                btnEditar.Click += EditEntry;
 
                 startY += rectangleHeight + margin;
 

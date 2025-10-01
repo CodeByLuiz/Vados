@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
@@ -34,7 +35,7 @@ namespace Vados
 
             SetupContentArea();
             this.Controls.Add(panelContent);
-
+            this.Resize += UserControlManual_Resize;
 
             SetupNavBar();
             this.Controls.Add(panelNav);
@@ -112,7 +113,6 @@ namespace Vados
                         break;
                 }
 
-                // Desenhar o texto usando o rect que considera padding
                 TextRenderer.DrawText(e.Graphics, this.Text, this.Font, textRect, this.ForeColor, flags);
             }
 
@@ -131,7 +131,19 @@ namespace Vados
 
 
 
+      private void UserControlManual_Resize(Object sender,EventArgs e ) {
 
+            foreach (Control control in tableLayoutContent.Controls)
+            {
+                if (control is Label label && label.Tag?.ToString() == "descrição")
+                {
+                    label.MaximumSize = new Size(panelContent.Width - 60, 0);
+                }
+            }
+
+
+
+        }
 
 
 
@@ -170,7 +182,7 @@ namespace Vados
                 AutoSize = true,
             };
 
-            // Adiciona uma nova linha no TableLayoutPanel para o título
+          
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(title, 0, tableLayoutContent.RowCount - 1);
@@ -187,10 +199,11 @@ namespace Vados
                 TextAlign = ContentAlignment.TopLeft,
                 Padding = new Padding(65, 10, 10, 30),
                 AutoSize = true,
-                MaximumSize = new Size(panelContent.Width - 40, 0)
+                MaximumSize = new Size(panelContent.Width - 40, 0),
+                Tag = "descrição"
             };
 
-            // Adiciona uma nova linha no TableLayoutPanel para a descrição
+         
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(descriptionLabel, 0, tableLayoutContent.RowCount - 1);
@@ -218,7 +231,6 @@ namespace Vados
 
                 imageWrapper.Controls.Add(picture);
 
-                // Adiciona uma nova linha no TableLayoutPanel para a imagem
                 tableLayoutContent.RowCount++;
                 tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.Absolute, 400));
                 tableLayoutContent.Controls.Add(imageWrapper, 0, tableLayoutContent.RowCount - 1);
@@ -234,24 +246,27 @@ namespace Vados
                 BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
                 Height = 200,
-                Margin = new Padding(10, 5, 10, 5),
+                Margin = new Padding(270, 40, 10, 5),
                 AutoSize = false
             };
 
-            // Aqui você pode adicionar um Label ou outro controle dentro do examplePanel com o texto, se quiser
-            Label exampleLabel = new Label
-            {
+           
+            RichTextBox exampleRichTextBox = new RichTextBox { 
                 Text = texto,
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10),
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
+                BorderStyle = BorderStyle.None,
+                ReadOnly = true,
+                BackColor = Color.FromArgb(231, 231, 231),
+                TabStop = false,
+                Cursor= Cursors.Arrow,     
+                Margin= new Padding(10,10,10,10)
+
             };
+            exampleRichTextBox.GotFocus += (s, e) => this.ActiveControl = null;
+            exampleRichTextBox.MouseDown += (s, e) => exampleRichTextBox.SelectionLength = 0;
+            exampleRichTextBox.SelectionChanged += (s, e) => exampleRichTextBox.SelectionLength = 0;
+            examplePanel.Controls.Add(exampleRichTextBox);
 
-            examplePanel.Controls.Add(exampleLabel);
-
-            // Adiciona uma nova linha no TableLayoutPanel para o examplePanel
+          
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
             tableLayoutContent.Controls.Add(examplePanel, 0, tableLayoutContent.RowCount - 1);
@@ -411,7 +426,7 @@ namespace Vados
 
         private void LoadContentBasedOnSelection(string buttonText)
         {
-            panelContent.Controls.Clear(); // Limpa o conteúdo atual
+          
 
         
             tableLayoutContent.Controls.Clear();
@@ -434,12 +449,13 @@ namespace Vados
             }
         }
 
-         private void LoadCriarPastaContent()
+        private void LoadCriarPastaContent()
         {
-            AddExampleBox("lalalalalalalalalalalaq");
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
             AddTitleToContent("Criar Pasta");
+            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddExampleBox("lalalalalalalalalalalaq");
+            
         }
 
         private void LoadAbrirPastaContent()

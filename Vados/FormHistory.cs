@@ -14,9 +14,22 @@ namespace Vados
 {
     public partial class FormHistory : Form
     {
-        private Panel historyPanel;
+
+        private OptmizedPanel historyPanel;
         private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
+        private Label title;
+        private OptmizedPanel footer;
+
+        private int margin = 10;
+        private int rectangleHeight = 115;
+        private int rectangleWidth;
+        private int spacing;
+        private int startY;
+        private Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
+
+
+
 
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
         private static extern IntPtr CreateRoundRectRgn(
@@ -32,34 +45,96 @@ namespace Vados
         {
             InitializeComponent();
 
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint, true);
 
 
-            historyPanel = new Panel
+
+            title = new Label
             {
-                Size = new Size(this.ClientSize.Width, this.ClientSize.Height ),
-                AutoScroll = true,
-                Padding = new Padding(20),
-                BackColor = Color.White
+                Text = "Histórico de comandos",
+                AutoSize = true,
+
+                TextAlign = ContentAlignment.MiddleCenter,
+                // BackColor = Color.Blue,
+                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                ForeColor = Colors.bluePrimary,
 
 
 
             };
+
+            historyPanel = new OptmizedPanel
+            {
+                //Dock = DockStyle.Fill,
+                Size = new Size(this.ClientSize.Width, this.ClientSize.Height ),
+                AutoScroll = true,
+                Padding = new Padding(20),
+                BackColor = Color.White
+                
+                
+
+            };
+
+            footer = new OptmizedPanel
+            {
+
+            };
             this.Controls.Add(historyPanel);
+            this.Controls.Add(title);
+            historyPanel.Controls.Add(footer);
+            title.BringToFront();
+            footer.BringToFront();
+
+            
+            
+            
+
+            PositionFix();
+            //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
 
             // Timer pra repintar 
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16;
             timer.Tick += Timer_Tick;
-            timer.Start();
 
-
+            this.Resize += FormHistory_Resize_1;
 
             LoadCommands();
         }
 
+
+        private void PositionFix()
+        {
+
+            //historyPanel.SuspendLayout();
+
+            rectangleWidth = historyPanel.ClientSize.Width - 35;
+            spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
+            startY = spacing;
+
+            //tamanho
+            
+            footer.Size = new Size(rectangleWidth, spacing);
+            historyPanel.Height = this.Height - (title.Location.Y + title.Height)-footer.Height;
+            
+
+            //local
+            title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);
+            historyPanel.Top = title.Bottom;
+            footer.Top = historyPanel.Bottom;
+
+            //historyPanel.ResumeLayout();
+        }
+
         private void LoadCommands()
         {
-            historyPanel.Controls.Clear(); // Limpa comandos antigos
+            historyPanel.SuspendLayout();
+
+            //historyPanel.Controls.Clear(); 
 
             using (var db = new BancoDeDados.DbConnection())
             {
@@ -69,56 +144,24 @@ namespace Vados
                              .ToList();
             }
 
-            int margin = 10;
             
-            int rectangleHeight = 115;
-            int rectangleWidth = historyPanel.ClientSize.Width - 35;
-            int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
-            int startY = spacing ;
-            Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
-
-
-
-
-            Label title = new Label
-            {
-                Text = "Histórico de comandos",
-                AutoSize = true,
-               
-                TextAlign = ContentAlignment.MiddleCenter,
-                // BackColor = Color.Blue,
-                Font = new Font("Segoe UI", 20, FontStyle.Bold),
-                ForeColor = Colors.bluePrimary,
-                
-
-
-            }; 
-            this.Controls.Add(title);
-            title.BringToFront();
-            title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);// Deixa ele nomeio
-
-
-            historyPanel.Top = title.Bottom;
-            
-
-            //startY += title.Height + spacing;
-
             foreach (var entry in entradas)
             {
                 int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
                 string HistoryTitle = char.ToUpper(entry.Comandotitle[0]) + entry.Comandotitle.Substring(1).ToLower(); // titulo com a primeira letra maiuscula
 
-                Panel entryPanel = new Panel
+                OptmizedPanel entryPanel = new OptmizedPanel
                 {
                     Location = new Point(posX, startY),
 
                     Size = new Size(rectangleWidth, rectangleHeight),
                     BackColor = entryColor,
                     BorderStyle = BorderStyle.None,
-                    Padding = new Padding(5),
-                   
+                    Padding = new Padding(5)
                     
-                   
+
+
+
                 };
                 
                 Label lbltitle = new Label
@@ -254,16 +297,8 @@ namespace Vados
                 startY += rectangleHeight + margin;
 
             }
-            
 
-            Panel footer = new Panel
-            {
-                Location = new Point(0, startY-margin),
-                Size = new Size(rectangleWidth, spacing),
-                ForeColor = Color.Red
-            };
-
-            historyPanel.Controls.Add(footer);
+            historyPanel.ResumeLayout();
         }
 
         // arredonda as bordas das entradas
@@ -280,12 +315,13 @@ namespace Vados
         private void FormHistory_Resize_1(object sender, EventArgs e)
         {
             int roundValue = (int)(0.1 * Width);
-            Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
+            //Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            historyPanel.Invalidate(); // Força atualização visual se necessário
+            //PositionFix();
+            historyPanel.Invalidate();
         }
     }
 }

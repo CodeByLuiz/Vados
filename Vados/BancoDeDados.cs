@@ -93,7 +93,7 @@ namespace Vados
                 db.Historico.Add(novaEntrada);
                 db.SaveChanges();
 
-                MessageBox.Show($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
+                Console.WriteLine($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
 
 
 

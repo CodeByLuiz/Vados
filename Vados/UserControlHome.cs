@@ -28,7 +28,7 @@ namespace Vados
         Image pauseIcon;
         Image playIcon;
 
-        bool hasTranscribedAudio = false;
+        bool hasTranscribedAudio = true;
         System.Windows.Forms.Timer audioTimer;
         int audioSeconds = 0;
 
@@ -177,6 +177,13 @@ namespace Vados
         //Começa a escutar o comando de voz
         public void StartListening()
         {
+            //Box.Show("start");
+            //Definir evento que acontece quando houver silêncio
+            if (Global.VoiceRecognizer.HasSubscribers == false)
+            {
+                Global.VoiceRecognizer.OnSilence += OnSilence;
+            }
+
             hasTranscribedAudio = false;
             Global.VoiceRecognizer.Start();
 
@@ -200,7 +207,7 @@ namespace Vados
         }
         
         //Para de escutar o comando de voz
-        public async void StopListening()
+        public async Task StopListening()
         {
             micIcon = loadingMicIcon;
             btnStop.Enabled = false;
@@ -208,9 +215,9 @@ namespace Vados
 
             audioTimer.Stop();  //Parar timer
 
+
             //Transcrever audio
             TextBoxReset("Transcrevendo...");
-
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
 
@@ -269,6 +276,7 @@ namespace Vados
 
         public void TextBoxReset(string text, bool canClick = true)
         {
+            //MessageBox.Show("textbox");
             txtComando.Text = text;
             txtComando.ForeColor = Colors.blueSecondary;
             textboxActive = false;
@@ -724,7 +732,7 @@ namespace Vados
 
         
         //Evento que acontece todo frame
-        private void Timer_Tick(object? sender, EventArgs e)
+        private async void Timer_Tick(object? sender, EventArgs e)
         {
             int circleSizeChangeSpeed = 3;
 
@@ -752,8 +760,7 @@ namespace Vados
             circleX += (circleTargetX - circleX) / 4;
             circleY += (circleTargetY - circleY) / 4;
 
-            //lblDebug.Text = Global.decibeis;
-
+            //Redesenhar tela
             pnlBottom.Invalidate();
         }
 
@@ -800,6 +807,12 @@ namespace Vados
                 //Pausar
                 PauseListening();
             }
+        }
+
+
+        private async void OnSilence(object sender, EventArgs e)
+        {
+            Invoke((MethodInvoker)(() => StopListening()));
         }
     }
 }

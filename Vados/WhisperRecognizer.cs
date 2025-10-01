@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Win32;
 
 namespace Vados
 {
@@ -25,6 +26,18 @@ namespace Vados
         private int deviceNumber;
         public List<string> hints;
         public List<double> audioWaveBars = new List<double>();
+
+        private DateTime lastSpeechTime;
+        private int speechTimeoutMs = 2500;
+        private double silenceDecibels = -90;   //A partir desse número de decibeis é considerado silêncio
+        public event EventHandler _OnSilence;
+        public event EventHandler OnSilence
+        {
+            add { _OnSilence += value; }
+            remove { _OnSilence -= value; }
+        }
+
+        public bool HasSubscribers => _OnSilence != null;
 
         public WhisperRecognizer(string modelPath_, List<string> hints_, int deviceNumber_ = 0)
         {
@@ -86,6 +99,8 @@ namespace Vados
             if (isRunning)
                 return;
 
+            MessageBox.Show("start listening");
+
             //Resetar ondas de áudio
             audioWaveBars.Clear();
 
@@ -98,11 +113,13 @@ namespace Vados
             audioBuffer = new MemoryStream();
             waveWriter = new WaveFileWriter(audioBuffer, waveIn.WaveFormat);
 
-            waveIn.DataAvailable += OnDataAvailable;
             waveIn.StartRecording();
+            waveIn.DataAvailable += OnDataAvailable;
 
             isRunning = true;
             isPaused = false;
+
+            lastSpeechTime = DateTime.Now;
         }
 
         public void Pause() => isPaused = true;
@@ -111,6 +128,7 @@ namespace Vados
 
         public async Task<string> Stop()
         {
+            //MessageBox.Show("parou");
             if(!isRunning)
                 return string.Empty;
 
@@ -118,6 +136,7 @@ namespace Vados
             waveIn.StopRecording();
             waveIn.Dispose();
             waveIn = null;
+            //MessageBox.Show("null");
 
             audioBuffer.Position = 0;
             waveWriter?.Flush();
@@ -143,6 +162,7 @@ namespace Vados
         private void OnDataAvailable(object sender, WaveInEventArgs e)
         {
             if (isPaused) return;
+            if (waveIn == null) return;
 
             //Volume do áudio recebido
             float sum = 0;
@@ -160,6 +180,20 @@ namespace Vados
 
             Global.decibeis = db.ToString();
             audioWaveBars.Add(db);
+
+
+            //Parar comando se detectar silêncio
+            if (db > silenceDecibels)
+            {
+                lastSpeechTime = DateTime.Now;
+            }
+            else if ((DateTime.Now - lastSpeechTime).TotalMilliseconds > speechTimeoutMs)
+            {
+                //Silêncio detectado
+                _OnSilence?.Invoke(this, EventArgs.Empty);
+                //Stop();
+            }
+
 
             //Escrever bytes de áudio para o buffer
             waveWriter?.Write(e.Buffer, 0, e.BytesRecorded);

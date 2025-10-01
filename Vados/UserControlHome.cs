@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -11,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
+//using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
 {
@@ -23,13 +25,18 @@ namespace Vados
         //Botões de pausar e parar comando de voz
         PictureBox btnPause;
         PictureBox btnStop;
+        Image pauseIcon;
+        Image playIcon;
 
         bool hasTranscribedAudio = false;
+        System.Windows.Forms.Timer audioTimer;
+        int audioSeconds = 0;
 
         //Variáveis do botão do microfone
         Image inactiveMicIcon;
         Image activeMicIcon;
         Image loadingMicIcon;
+        Image pausedMicIcon;
         Image micIcon;
         float circleSizeDefaultMax = 325;
         float circleSizeCurrent = 325;
@@ -90,9 +97,15 @@ namespace Vados
             timer.Tick += Timer_Tick;
             timer.Start();
 
+            //Timer do comando falado
+            audioTimer = new System.Windows.Forms.Timer();
+            audioTimer.Interval = 1000;
+            audioTimer.Tick += audioTimer_Tick;
+
             //Variáveis do botão de microfone
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
             activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
+            pausedMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pausedMicIcon.png"));
             loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
             micIcon = inactiveMicIcon;
             ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
@@ -103,12 +116,14 @@ namespace Vados
             //Inicializar botões de pausar e parar comando de voz
             btnPause = new PictureBox();
             btnStop = new PictureBox();
+            pauseIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
+            playIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
 
             btnPause.Click += btnPause_Click;
             btnPause.Visible = false;
             btnPause.Enabled = false;
             btnPause.SizeMode = PictureBoxSizeMode.Zoom;
-            btnPause.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
+            btnPause.Image = pauseIcon;
             btnPause.Cursor = Cursors.Hand;
             pnlBottom.Controls.Add(btnPause);
 
@@ -116,7 +131,7 @@ namespace Vados
             btnStop.Visible = false;
             btnStop.Enabled = false;
             btnStop.SizeMode = PictureBoxSizeMode.Zoom;
-            btnStop.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopListeningIcon.png"));
+            btnStop.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopRecordingIcon.png"));
             btnStop.Cursor = Cursors.Hand;
             pnlBottom.Controls.Add(btnStop);
 
@@ -159,7 +174,7 @@ namespace Vados
         }
 
 
-        //Começa a escutar o comando falado
+        //Começa a escutar o comando de voz
         public void StartListening()
         {
             hasTranscribedAudio = false;
@@ -177,32 +192,78 @@ namespace Vados
             btnPause.Enabled = true;
             btnPause.Visible = true;
 
+            //Começar timer
+            audioTimer.Enabled = true;
+            audioTimer.Start();
 
             TextBoxReset("Escutando...");
         }
         
-        //Para de escutar o comando falado
+        //Para de escutar o comando de voz
         public async void StopListening()
         {
             micIcon = loadingMicIcon;
             btnStop.Enabled = false;
             btnPause.Enabled = false;
 
-            TextBoxReset("Transcrevendo...");
-            string result = await Global.VoiceRecognizer.Stop();
-            Comandos.CleanText(result);
-            TextBoxWrite(result);
+            audioTimer.Stop();  //Parar timer
 
+            //Transcrever audio
+            TextBoxReset("Transcrevendo...");
+
+            string result = await Global.VoiceRecognizer.Stop();
+            result = Comandos.CleanText(result);
+
+            TextBoxWrite(result);
             hasTranscribedAudio = true;
+
+            //Resetar botão do microfone
             micIcon = inactiveMicIcon;
             circleColor = Colors.grayPrimary;
+
 
             //Desativar os botões de pausar e parar
             btnStop.Visible = false;
             btnPause.Visible = false;
 
+            //Resetar timer
+            audioSeconds = 0;
+
             //Retornar o botão do microfone para a posição e tamanho padrões
             CorrectMicButton(true);
+        }
+
+        //Pausar comando de voz
+        public async void PauseListening()
+        {
+            btnPause.Image = playIcon;
+            micIcon = pausedMicIcon;
+
+            //Pausar timer
+            audioTimer.Enabled = false;
+
+            ////Mostrar texto parcial
+            //TextBoxReset("Transcrevendo...");
+            //string result = await Global.VoiceRecognizer.Stop();
+            //result = Comandos.CleanText(result);
+            //TextBoxWrite(result);
+
+            Global.VoiceRecognizer.Pause();
+            hasTranscribedAudio = true;
+        }
+
+
+        //Continuar comando de voz
+        public async void ResumeListening()
+        {
+            hasTranscribedAudio = false;
+            Global.VoiceRecognizer.Resume();
+
+            //Continuar timer
+            audioTimer.Enabled = true;
+
+            micIcon = activeMicIcon;
+            btnPause.Image = pauseIcon;
         }
 
 
@@ -223,6 +284,7 @@ namespace Vados
         }
 
 
+        //Corrige as variáveis do botão de microfone
         public void CorrectMicButton(bool setOnlyTargets = false)
         {
             //Corrigir tamanho
@@ -274,24 +336,29 @@ namespace Vados
             circleY = circleTargetY;
         }
 
+        //Corrige as variáveis da onda de áudio
         public void CorrectAudioWave()
         {
-            waveAreaLeft = circleX + circleSize / 2 + waveAreaMargin;
-            waveAreaTop = circleY - circleSizeListening / 2;
             waveAreaRight = (txtAreaX + txtAreaWidth + txtAreaOutSize);
-            waveAreaWidth = waveAreaRight - (circleX + circleSize / 2 + waveAreaMargin);
+            waveAreaWidth = waveAreaRight - (circleX + circleSizeListening / 2 + waveAreaMargin);
             waveAreaHeight = circleSizeListening;
-            maxBars = (int)(waveAreaWidth / (barWidth + barMargin));
+
+            float barSpace = barWidth + barMargin;
+            maxBars = (int)(waveAreaWidth / barSpace);
+            float barsLeftoverWidth = waveAreaWidth - maxBars * barSpace;
+
+            waveAreaLeft = circleX + circleSizeListening / 2 + waveAreaMargin + barsLeftoverWidth;
+            waveAreaTop = circleY - circleSizeListening / 2;
         }
 
         public void CorrectVoiceButtons()
         {
             //Definir posições dos botões
             float fixedLeft = circleX + circleSizeListening / 2 + waveAreaMargin;
-            float buttonLeftMargin = 30;
-            int buttonSize = 40;
+            float buttonLeftMargin = 20;
+            int buttonSize = 54;
             int buttonDistance = 30 + buttonSize;
-            int buttonTopMargin = 15;
+            int buttonTopMargin = 8;
             float buttonTop = waveAreaTop + waveAreaHeight / 2 + barHeight / 2 + buttonTopMargin;
 
             //Botão de parar
@@ -431,8 +498,8 @@ namespace Vados
                 for (int i = start; i < bars.Count; i++)
                 {
                     double height = bars[i];
-                    //height = barHeight - (height / -100 * barHeight);
-                    height = barHeight;
+                    height = barHeight - (height / -100 * barHeight);
+                    //height = barHeight;
                     int distance = barWidth + barMargin;
                     float barX = waveAreaLeft + distance * i;
                     barX -= distance * start;
@@ -446,6 +513,27 @@ namespace Vados
 
             #endregion
 
+
+            #region TEMPO DE ÁUDIO
+
+            if (Global.VoiceRecognizer.isRunning)
+            {
+                //Variáveis
+                TimeSpan time = TimeSpan.FromSeconds(audioSeconds);
+                string timerText = time.ToString(@"mm\:ss");
+                System.Drawing.Font timerFont = new System.Drawing.Font("Segoe UI", 15f);
+                Size timerSize = TextRenderer.MeasureText("Teste", timerFont);
+                int timerHeight = timerSize.Height;
+                int timerLeft = btnStop.Right + 25;
+                int timerTop = btnStop.Top + btnStop.Height / 2 - timerHeight / 2;
+
+                //Desenhar texto
+                Brush textBrush = new SolidBrush(Color.Black);
+                e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+                e.Graphics.DrawString(timerText, timerFont, textBrush, timerLeft, timerTop);
+            }
+
+            #endregion
 
             #region CAIXA DE TEXTO
 
@@ -493,16 +581,10 @@ namespace Vados
 
             #region BOTÃO DE MICROFONE
 
-            //MessageBox.Show(circleHovering);
-
+            //Iniciar comando de voz
             if (circleHovering)
             {
-                //Ativar microfone
-                if (Global.VoiceRecognizer.isRunning)
-                {
-                    StopListening();
-                }
-                else
+                if (!Global.VoiceRecognizer.isRunning)
                 {
                     StartListening();
                 }
@@ -693,15 +775,31 @@ namespace Vados
         }
 
 
+        //Timer do comando falado
+        private void audioTimer_Tick(object? sender, EventArgs e)
+        {
+            audioSeconds += 1;
+        }
+
+
         //Botões do comando falado
         private void btnStop_Click(object sender, EventArgs e)
         {
-
+            StopListening();
         }
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-
+            if (Global.VoiceRecognizer.isPaused)
+            {
+                //Despausar
+                ResumeListening();
+            }
+            else
+            {
+                //Pausar
+                PauseListening();
+            }
         }
     }
 }

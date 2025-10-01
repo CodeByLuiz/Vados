@@ -21,6 +21,7 @@ namespace Vados
         private Panel panelContent = null;
         private Panel imageWrapper = null;
 
+        private TableLayoutPanel tableLayoutContent;
 
 
 
@@ -127,22 +128,54 @@ namespace Vados
             }
         }
 
-        
 
+
+
+
+
+
+
+        private void SetupContentArea()
+        {
+            panelContent = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(223, 223, 223)
+            };
+
+            tableLayoutContent = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true,
+                ColumnCount = 1,
+                RowCount = 0,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(20)
+            };
+
+            panelContent.Controls.Add(tableLayoutContent);
+            this.Controls.Add(panelContent);
+        }
 
         private void AddTitleToContent(string Title)
         {
             Label title = new Label
             {
                 Text = Title,
-                Font = Fonts.GetFont(Fonts.DarkerExtraBold,42f),
-                ForeColor = Color.FromArgb(48 ,61 ,99),
-                Dock = DockStyle.Top,
-                Padding = new Padding(10),
+                Font = Fonts.GetFont(Fonts.DarkerExtraBold, 42f),
+                ForeColor = Color.FromArgb(48, 61, 99),
+                Dock = DockStyle.Fill,
+                Padding = new Padding(60, 20, 0, 0),
                 AutoSize = true,
             };
-            panelContent.Controls.Add(title);
+
+            // Adiciona uma nova linha no TableLayoutPanel para o título
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutContent.Controls.Add(title, 0, tableLayoutContent.RowCount - 1);
         }
+
         private void AddDescriptionToContent(string description)
         {
             Label descriptionLabel = new Label
@@ -150,36 +183,82 @@ namespace Vados
                 Text = description,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
-                Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.TopLeft,
-                Padding = new Padding(10),
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.TopLeft,
+                Padding = new Padding(65, 10, 10, 30),
                 AutoSize = true,
                 MaximumSize = new Size(panelContent.Width - 40, 0)
             };
-            panelContent.Controls.Add(descriptionLabel);
+
+            // Adiciona uma nova linha no TableLayoutPanel para a descrição
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutContent.Controls.Add(descriptionLabel, 0, tableLayoutContent.RowCount - 1);
+        }
+
+        private void AddImageToContent(string caminhoimagem)
+        {
+            if (System.IO.File.Exists(caminhoimagem))
+            {
+                Panel imageWrapper = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(0, 60, 0, 10),
+                    Height = 400,
+                    Width = 600,
+                    AutoSize = false
+                };
+
+                PictureBox picture = new PictureBox
+                {
+                    Image = Image.FromFile(caminhoimagem),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Dock = DockStyle.Fill,
+                };
+
+                imageWrapper.Controls.Add(picture);
+
+                // Adiciona uma nova linha no TableLayoutPanel para a imagem
+                tableLayoutContent.RowCount++;
+                tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.Absolute, 400));
+                tableLayoutContent.Controls.Add(imageWrapper, 0, tableLayoutContent.RowCount - 1);
+
+                picture.BringToFront();
+            }
         }
 
         private void AddExampleBox(string texto)
         {
-
             Panel examplePanel = new Panel
             {
-                BackColor = Color.FromArgb(231,231, 231), 
-                //Dock = DockStyle.Top,
+                BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
-                Height = 40,
-                Location = new Point(panelContent.Location.X + 20,  panelContent.Location.Y  ) , 
+                Height = 200,
                 Margin = new Padding(10, 5, 10, 5),
-                MaximumSize = new Size(panelContent.Width - 80, 40),
+                AutoSize = false
             };
-            
 
+            // Aqui você pode adicionar um Label ou outro controle dentro do examplePanel com o texto, se quiser
+            Label exampleLabel = new Label
+            {
+                Text = texto,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10),
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
+            };
 
-        
-           
-            panelContent.Controls.Add(examplePanel);
+            examplePanel.Controls.Add(exampleLabel);
+
+            // Adiciona uma nova linha no TableLayoutPanel para o examplePanel
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
+            tableLayoutContent.Controls.Add(examplePanel, 0, tableLayoutContent.RowCount - 1);
+
             examplePanel.BringToFront();
         }
+
 
 
 
@@ -239,18 +318,7 @@ namespace Vados
             AddSection(flow, "Sistema ", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
         }
 
-        private void SetupContentArea()
-        {
-            panelContent = new Panel
-            {
-                
-               Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(223, 223 ,223)
-            };
-            this.Controls.Add(panelContent);
-        }
-
-        
+       
 
         private void AddSection(FlowLayoutPanel flow, string sectionTitle, string[] commands)
         {
@@ -319,28 +387,7 @@ namespace Vados
         }
 
 
-        private void AddImageToContent(string caminhoimagem)
-        {
-            if (System.IO.File.Exists(caminhoimagem))
-            {
-                 imageWrapper = new Panel
-                {
-                    Dock = DockStyle.Top,
-                    Padding = new Padding(0, 60, 0, 10),
-                    Height = 400,
-                    Width = 600,
-                };
-                PictureBox picture = new PictureBox
-                {
-                    Image = Image.FromFile(caminhoimagem),
-                    SizeMode = PictureBoxSizeMode.Zoom,
-                    Dock = DockStyle.Fill,
-                };
-                imageWrapper.Controls.Add(picture);
-                panelContent.Controls.Add(imageWrapper);
-                picture.BringToFront(); 
-            }
-        }
+       
         
         private void NavButton_Click(object sender, EventArgs e)
         {
@@ -361,23 +408,53 @@ namespace Vados
             LoadContentBasedOnSelection(selectedButton.Text);
 
         }
-       
+
         private void LoadContentBasedOnSelection(string buttonText)
         {
             panelContent.Controls.Clear(); // Limpa o conteúdo atual
 
-            if (buttonText == "Criar uma pasta")
+        
+            tableLayoutContent.Controls.Clear();
+            tableLayoutContent.RowStyles.Clear();
+            tableLayoutContent.RowCount = 0;
+
+     
+  
+
+
+            switch (buttonText)
             {
-                AddExampleBox("lalalalalalalalalalalaq");
-                AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-                AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
-              
-                AddTitleToContent("Criar Pasta");
+                case "Criar uma pasta":
+                    LoadCriarPastaContent();
+                    break;
+                case "Abrir uma pasta":
+                    LoadAbrirPastaContent();
+                    break;
                 
             }
-            
+        }
+
+         private void LoadCriarPastaContent()
+        {
+            AddExampleBox("lalalalalalalalalalalaq");
+            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+            AddTitleToContent("Criar Pasta");
+        }
+
+        private void LoadAbrirPastaContent()
+        {
+            AddExampleBox("lalalalalalalalalalalaq");
+            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+            AddTitleToContent("Criar Pasta");
         }
 
 
+
+
     }
-}
+
+
+    }
+

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static System.Windows.Forms.AxHost;
 using static Vados.BancoDeDados;
 
 
@@ -31,11 +32,11 @@ namespace Vados
         {
             InitializeComponent();
 
-            
+
 
             historyPanel = new Panel
             {
-                Dock = DockStyle.Fill,
+                Size = new Size(this.ClientSize.Width, this.ClientSize.Height ),
                 AutoScroll = true,
                 Padding = new Padding(20),
                 BackColor = Color.White
@@ -50,6 +51,8 @@ namespace Vados
             timer.Interval = 16;
             timer.Tick += Timer_Tick;
             timer.Start();
+
+
 
             LoadCommands();
         }
@@ -69,28 +72,37 @@ namespace Vados
             int margin = 10;
             
             int rectangleHeight = 115;
-            int rectangleWidth = historyPanel.ClientSize.Width - 30;
+            int rectangleWidth = historyPanel.ClientSize.Width - 35;
             int spacing = ((historyPanel.ClientSize.Width- rectangleWidth)/2);
             int startY = spacing ;
             Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
+
+
 
 
             Label title = new Label
             {
                 Text = "Histórico de comandos",
                 AutoSize = true,
+               
                 TextAlign = ContentAlignment.MiddleCenter,
                 // BackColor = Color.Blue,
                 Font = new Font("Segoe UI", 20, FontStyle.Bold),
-                ForeColor = Colors.bluePrimary
+                ForeColor = Colors.bluePrimary,
+                
 
 
             }; 
-            historyPanel.Controls.Add(title);
+            this.Controls.Add(title);
+            title.BringToFront();
             title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);// Deixa ele nomeio
+
+
+            historyPanel.Top = title.Bottom;
             
 
-            startY += title.Height + spacing;
+            //startY += title.Height + spacing;
+
             foreach (var entry in entradas)
             {
                 int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
@@ -108,9 +120,6 @@ namespace Vados
                     
                    
                 };
-
-                
-
                 
                 Label lbltitle = new Label
                 {
@@ -223,6 +232,7 @@ namespace Vados
                 }
                 void EditEntry(object sender, EventArgs e)
                 {
+
                     
 
                     Global.userControlHome.TxtComandoEditar = entry.Comando;
@@ -249,7 +259,8 @@ namespace Vados
             Panel footer = new Panel
             {
                 Location = new Point(0, startY-margin),
-                Size = new Size(rectangleWidth, spacing)
+                Size = new Size(rectangleWidth, spacing),
+                ForeColor = Color.Red
             };
 
             historyPanel.Controls.Add(footer);

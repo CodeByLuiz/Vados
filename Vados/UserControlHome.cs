@@ -120,7 +120,12 @@ namespace Vados
         {
             
             get { return txtComando.Text; }
-            set { txtComando.Text = value; }
+            set 
+            { 
+                txtComando.Text = value;
+                txtComando.ForeColor=Color.Black;
+                FocusCommand();
+            }
 
         }
         private void txtComando_LostFocus(object sender, EventArgs e)

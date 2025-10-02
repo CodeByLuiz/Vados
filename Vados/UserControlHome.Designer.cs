@@ -79,6 +79,8 @@
             btnHistorico.TabIndex = 10;
             btnHistorico.TabStop = false;
             btnHistorico.Click += btnHistorico_Click;
+            //btnHistorico.MouseEnter += btnHistorico_MouseEnter;
+            //btnHistorico.MouseLeave += btnHistorico_MouseLeave;
             // 
             // lblText
             // 
@@ -115,6 +117,8 @@
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
             btnManual.Click += btnManual_Click;
+            btnManual.MouseEnter += btnManual_MouseEnter;
+            btnManual.MouseLeave += btnManual_MouseLeave;
             // 
             // btnConfigs
             // 
@@ -129,6 +133,8 @@
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
             btnConfigs.Click += btnConfigs_Click;
+            btnConfigs.MouseEnter += btnConfigs_MouseEnter;
+            btnConfigs.MouseLeave += btnConfigs_MouseLeave;
             // 
             // imgLogo
             // 

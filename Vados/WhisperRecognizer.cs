@@ -102,8 +102,6 @@ namespace Vados
             if (isRunning)
                 return;
 
-            MessageBox.Show("start listening");
-
             //Resetar ondas de áudio
             audioWaveBars.Clear();
 
@@ -141,7 +139,6 @@ namespace Vados
 
         public async Task<string> Stop()
         {
-            //MessageBox.Show("parou");
             if(!isRunning)
                 return string.Empty;
 
@@ -149,7 +146,6 @@ namespace Vados
             waveIn.StopRecording();
             waveIn.Dispose();
             waveIn = null;
-            //MessageBox.Show("null");
 
             audioBuffer.Position = 0;
             waveWriter?.Flush();

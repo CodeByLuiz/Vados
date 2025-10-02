@@ -176,6 +176,52 @@ namespace Vados
         }
 
 
+        public static Image ChangeImageBrightness(Image image, float correctionFactor)
+        {
+            //Normalizar brilho
+            float brightness = Math.Clamp(correctionFactor, -1f, 1f);
+
+            Bitmap newImage = new Bitmap(image.Width, image.Height);
+
+            using (Graphics g = Graphics.FromImage(newImage))
+            {
+                float scale = 1f;
+                float offset = 0f;
+
+                //Escurecer
+                if (brightness < 0)
+                {
+                    scale = 1f + brightness;    //Reduzir intensidade
+                    offset = 0f;
+                }
+                //Clarear
+                else if (brightness > 0)
+                {
+                    scale = 1f - brightness;    //Reduzir contraste
+                    offset = brightness * 255f;
+                }
+
+                //Definir cor nova
+                float[][] ptsArray = {
+                    new float[] { scale, 0,     0,     0, 0 },   //Vermelho
+                    new float[] { 0,     scale, 0,     0, 0 },   //Verde
+                    new float[] { 0,     0,     scale, 0, 0 },   //Azul
+                    new float[] { 0,     0,     0,     1, 0 },   //Transparência (é mantida)
+                    new float[] { offset / 255f, offset / 255f, offset / 255f, 0, 1 }
+                };
+
+                var matrix = new System.Drawing.Imaging.ColorMatrix(ptsArray);
+                var attributes = new System.Drawing.Imaging.ImageAttributes();
+                attributes.SetColorMatrix(matrix);
+
+                //Desenhar imagem
+                g.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
+            }
+
+            return newImage;
+        }
+
+
         //Adiciona texto simples a uma RichTextBox
         public static void AppendPlainText(RichTextBox textBox, string text)
         {

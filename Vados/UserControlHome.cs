@@ -22,11 +22,25 @@ namespace Vados
 
         System.Windows.Forms.Timer timer;
 
+        //Imagens dos botões da interface
+        Image btnHistoryImage;
+        Image btnHistoryImageHover;
+        Image btnManualImage;
+        Image btnManualImageHover;
+        Image btnConfigsImage;
+        Image btnConfigsImageHover;
+        Image btnSendImage;
+        Image btnSendImageHover;
+        Image btnPauseImage;
+        Image btnPauseImageHover;
+        Image btnStopImage;
+        Image btnStopImageHover;
+        Image btnPlayImage;
+        Image btnPlayImageHover;
+
         //Botões de pausar e parar comando de voz
         PictureBox btnPause;
         PictureBox btnStop;
-        Image pauseIcon;
-        Image playIcon;
 
         bool hasTranscribedAudio = true;
         System.Windows.Forms.Timer audioTimer;
@@ -84,6 +98,8 @@ namespace Vados
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
         bool textboxActive = false;
+        bool btnSendHovering = false;
+        Image btnSendCurrentImage;
 
 
         public UserControlHome()
@@ -91,43 +107,77 @@ namespace Vados
             InitializeComponent();
             Console.ReadLine();
 
+            #region TIMERS
+
             //Timer para pintar tela a 60 FPS
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 16;
             timer.Tick += Timer_Tick;
             timer.Start();
 
-            //Timer do comando falado
+            //Timer do comando de voz
             audioTimer = new System.Windows.Forms.Timer();
             audioTimer.Interval = 1000;
             audioTimer.Tick += audioTimer_Tick;
 
-            //Variáveis do botão de microfone
+            #endregion
+
+
+            #region IMAGENS
+
+            float brightnessChange = -0.5f;
+
+            //Botões da interface
+            btnConfigsImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\configIcon.png"));
+            btnConfigsImageHover = Global.ChangeImageBrightness(btnConfigsImage, brightnessChange);
+            btnManualImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\manualIcon.png"));
+            btnManualImageHover = Global.ChangeImageBrightness(btnManualImage, brightnessChange);
+            //btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
+            //btnHistoryImageHover = Global.ChangeImageBrightness(btnHistoryImage, brightnessChange);
+
+            //Botões do comando de voz
+            btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
+            btnPauseImageHover = Global.ChangeImageBrightness(btnPauseImage, -0.25f);
+            btnPlayImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
+            btnPlayImageHover = Global.ChangeImageBrightness(btnPlayImage, -0.25f);
+            btnStopImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopRecordingIcon.png"));
+            btnStopImageHover = Global.ChangeImageBrightness(btnStopImage, -0.25f);
+
+            //Botões da textbox
+            btnSendImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
+            btnSendImageHover = Global.ChangeImageBrightness(btnSendImage, brightnessChange);
+            btnSendCurrentImage = btnSendImage;
+
+            //Botão do microfone
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
             activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
             pausedMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pausedMicIcon.png"));
             loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
-            micIcon = inactiveMicIcon;
             ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
+            micIcon = inactiveMicIcon;
 
-            txtComando.Select(0, 0);
+            #endregion
 
 
             //Inicializar botões de pausar e parar comando de voz
             btnPause = new PictureBox();
             btnStop = new PictureBox();
-            pauseIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
-            playIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
+            btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
+            btnPlayImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
 
             btnPause.Click += btnPause_Click;
+            btnPause.MouseEnter += btnPause_MouseEnter;
+            btnPause.MouseLeave += btnPause_MouseLeave;
             btnPause.Visible = false;
             btnPause.Enabled = false;
             btnPause.SizeMode = PictureBoxSizeMode.Zoom;
-            btnPause.Image = pauseIcon;
+            btnPause.Image = btnPauseImage;
             btnPause.Cursor = Cursors.Hand;
             pnlBottom.Controls.Add(btnPause);
 
             btnStop.Click += btnStop_Click;
+            btnStop.MouseEnter += btnStop_MouseEnter;
+            btnStop.MouseLeave += btnStop_MouseLeave;
             btnStop.Visible = false;
             btnStop.Enabled = false;
             btnStop.SizeMode = PictureBoxSizeMode.Zoom;
@@ -135,6 +185,8 @@ namespace Vados
             btnStop.Cursor = Cursors.Hand;
             pnlBottom.Controls.Add(btnStop);
 
+
+            txtComando.Select(0, 0);
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -243,7 +295,7 @@ namespace Vados
         //Pausar comando de voz
         public async void PauseListening()
         {
-            btnPause.Image = playIcon;
+            btnPause.Image = btnPlayImage;
             micIcon = pausedMicIcon;
 
             //Pausar timer
@@ -270,7 +322,7 @@ namespace Vados
             audioTimer.Enabled = true;
 
             micIcon = activeMicIcon;
-            btnPause.Image = pauseIcon;
+            btnPause.Image = btnPauseImage;
         }
 
 
@@ -543,6 +595,7 @@ namespace Vados
 
             #endregion
 
+
             #region CAIXA DE TEXTO
 
             //Contorno
@@ -571,9 +624,7 @@ namespace Vados
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
 
-            string sendimgPath = Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png");
-            Image sendIcon = Image.FromFile(sendimgPath);
-            e.Graphics.DrawImage(sendIcon, txtIconX, txtIconY, txtIconSize, txtIconSize);
+            e.Graphics.DrawImage(btnSendCurrentImage, txtIconX, txtIconY, txtIconSize, txtIconSize);
 
             #endregion
         }
@@ -603,12 +654,8 @@ namespace Vados
 
             #region BOTÃO DE ENVIAR COMANDO
 
-            float sendButtonX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
-            float sendButtonY = txtAreaY + txtIconMarginH;
-            RectangleF rect = new RectangleF(sendButtonX, sendButtonY, txtIconSize, txtIconSize);
-
             //Checar se o mouse está em dentro do botão
-            if (Global.InsideRectangle(mousePos, rect) == true)
+            if (btnSendHovering)
             {
                 PerformCommand(txtComando.Text);
             }
@@ -706,7 +753,10 @@ namespace Vados
 
                 //Diminuir tamanho do círculo
                 if (Global.VoiceRecognizer.isRunning == false)
+                {
                     circleSizeTarget = circleSizeCurrent * 0.9f;
+                    pnlBottom.Cursor = Cursors.Hand;
+                }
             }
 
             #endregion
@@ -714,16 +764,18 @@ namespace Vados
 
             #region BOTÃO DE ENVIAR COMANDO
 
+            btnSendHovering = false;
+            btnSendCurrentImage = btnSendImage;
+
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
             RectangleF rect = new RectangleF(txtIconX, txtIconY, txtIconSize, txtIconSize);
 
-            //lblDebug.Text = rect.Width.ToString() + ", " + rect.Height.ToString() + " - " + rect.X.ToString() + ", " + rect.Y.ToString() + " - " + mouseX.ToString() + ", " + mouseY.ToString();
-
             //Checar se o mouse está em dentro do botão
             if (Global.InsideRectangle(mousePos, rect) == true)
             {
-                //Trocar imagem do mouse
+                btnSendHovering = true;
+                btnSendCurrentImage = btnSendImageHover;
                 pnlBottom.Cursor = Cursors.Hand;
             }
 
@@ -764,37 +816,42 @@ namespace Vados
             pnlBottom.Invalidate();
         }
 
-        
-        //Botões da interface
-        private void btnManual_Click(object sender, EventArgs e)
-        {
-            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
-        }
 
-        private void btnConfigs_Click(object sender, EventArgs e)
-        {
-            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        }
-
-        private void btnHistorico_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-        //Timer do comando falado
+        //Timer do comando de voz
         private void audioTimer_Tick(object? sender, EventArgs e)
         {
             audioSeconds += 1;
         }
 
-
-        //Botões do comando falado
-        private void btnStop_Click(object sender, EventArgs e)
+        //Acontece quando há silêncio por determinado tempo no comando de voz
+        private async void OnSilence(object sender, EventArgs e)
         {
-            StopListening();
+            Invoke((MethodInvoker)(() => StopListening()));
         }
 
+
+
+        //Botão do manual
+        private void btnManual_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
+        private void btnManual_MouseEnter(object sender, EventArgs e) => btnManual.Image = btnManualImageHover;
+        private void btnManual_MouseLeave(object sender, EventArgs e) => btnManual.Image = btnManualImage;
+
+        //Botão das configurações
+        private void btnConfigs_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
+        private void btnConfigs_MouseEnter(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImageHover;
+        private void btnConfigs_MouseLeave(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImage;
+
+        //Botão do histórico
+        private void btnHistorico_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //private void btnHistorico_MouseEnter(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImageHover;
+        //private void btnHistorico_MouseLeave(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImage;
+
+
+        //Botão de pausar comando de voz
         private void btnPause_Click(object sender, EventArgs e)
         {
             if (Global.VoiceRecognizer.isPaused)
@@ -809,10 +866,30 @@ namespace Vados
             }
         }
 
-
-        private async void OnSilence(object sender, EventArgs e)
+        private void btnPause_MouseEnter(object sender, EventArgs e)
         {
-            Invoke((MethodInvoker)(() => StopListening()));
+            btnPause.Image = btnPauseImageHover;
+
+            if (Global.VoiceRecognizer.isPaused)
+                btnPause.Image = btnPlayImageHover;
         }
+
+        private void btnPause_MouseLeave(object sender, EventArgs e)
+        {
+            btnPause.Image = btnPauseImage;
+
+            if (Global.VoiceRecognizer.isPaused)
+                btnPause.Image = btnPlayImage;
+        }
+
+
+        //Botão de parar comando de voz
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            StopListening();
+        }
+
+        private void btnStop_MouseEnter(object sender, EventArgs e) => btnStop.Image = btnStopImageHover;
+        private void btnStop_MouseLeave(object sender, EventArgs e) => btnStop.Image = btnStopImage;
     }
 }

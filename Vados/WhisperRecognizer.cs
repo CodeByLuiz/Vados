@@ -27,9 +27,12 @@ namespace Vados
         public List<string> hints;
         public List<double> audioWaveBars = new List<double>();
 
+        private bool hasSpoken = false;
         private DateTime lastSpeechTime;
-        private int speechTimeoutMs = 2500;
-        private double silenceDecibels = -90;   //A partir desse número de decibeis é considerado silêncio
+        private DateTime pauseStartTime;
+        private double pausedTime = 0;
+        private int speechTimeoutMs = 1500;
+        private double silenceDecibels = -60;   //Menor que esse número de decibeis é considerado silêncio
         public event EventHandler _OnSilence;
         public event EventHandler OnSilence
         {
@@ -119,12 +122,22 @@ namespace Vados
             isRunning = true;
             isPaused = false;
 
+            pausedTime = 0;
+            hasSpoken = false;
             lastSpeechTime = DateTime.Now;
         }
 
-        public void Pause() => isPaused = true;
+        public void Pause()
+        {
+            isPaused = true;
+            pauseStartTime = DateTime.Now;
+        }
 
-        public void Resume() => isPaused = false;
+        public void Resume()
+        {
+            isPaused = false;
+            pausedTime += (DateTime.Now - pauseStartTime).TotalMilliseconds;
+        }
 
         public async Task<string> Stop()
         {
@@ -185,13 +198,13 @@ namespace Vados
             //Parar comando se detectar silêncio
             if (db > silenceDecibels)
             {
+                hasSpoken = true;
                 lastSpeechTime = DateTime.Now;
             }
-            else if ((DateTime.Now - lastSpeechTime).TotalMilliseconds > speechTimeoutMs)
+            else if ((DateTime.Now - lastSpeechTime).TotalMilliseconds - pausedTime > speechTimeoutMs && hasSpoken)
             {
                 //Silêncio detectado
                 _OnSilence?.Invoke(this, EventArgs.Empty);
-                //Stop();
             }
 
 

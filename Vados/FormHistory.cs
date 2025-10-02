@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
@@ -19,7 +20,8 @@ namespace Vados
         private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
         private Label title;
-        private OptmizedPanel footer;
+
+
 
         private int margin = 10;
         private int rectangleHeight = 115;
@@ -51,7 +53,9 @@ namespace Vados
                      ControlStyles.UserPaint |
                      ControlStyles.AllPaintingInWmPaint, true);
 
-
+            this.Paint += new PaintEventHandler(FormHistory_Paint);
+            this.BackColor = Color.LimeGreen;
+            this.TransparencyKey = Color.LimeGreen;
 
             title = new Label
             {
@@ -59,7 +63,7 @@ namespace Vados
                 AutoSize = true,
 
                 TextAlign = ContentAlignment.MiddleCenter,
-                // BackColor = Color.Blue,
+                 BackColor = Color.White,
                 Font = new Font("Segoe UI", 20, FontStyle.Bold),
                 ForeColor = Colors.bluePrimary,
 
@@ -79,15 +83,14 @@ namespace Vados
 
             };
 
-            footer = new OptmizedPanel
-            {
 
-            };
+          
+            
             this.Controls.Add(historyPanel);
             this.Controls.Add(title);
-            historyPanel.Controls.Add(footer);
+            
             title.BringToFront();
-            footer.BringToFront();
+           
 
             
             
@@ -118,15 +121,16 @@ namespace Vados
 
             //tamanho
             
-            footer.Size = new Size(rectangleWidth, spacing);
-            historyPanel.Height = this.Height - (title.Location.Y + title.Height)-footer.Height;
+            
+            historyPanel.Height = this.Height - (title.Location.Y + title.Height)-spacing;
             
 
-            //local
+            //posição
             title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);
             historyPanel.Top = title.Bottom;
-            footer.Top = historyPanel.Bottom;
+            
 
+            //MessageBox.Show($"form {this.Height.ToString()} {this.Width.ToString()} \npanel {historyPanel.Height.ToString()} {historyPanel.Width.ToString()}");
             //historyPanel.ResumeLayout();
         }
 
@@ -231,7 +235,7 @@ namespace Vados
                 );
 
 
-                
+
                 historyPanel.Controls.Add(entryPanel);
                 entryPanel.Controls.Add(lbl);
                 entryPanel.Controls.Add(lbltitle);
@@ -239,9 +243,7 @@ namespace Vados
                 entryPanel.Controls.Add(btnEditar);
                 entryPanel.Controls.Add(btnExcluir);
 
-                //arredonda as bordas da entrada
-                entryPanel.SizeChanged += (s, e) => SetRoundedRegion(entryPanel, 15);
-
+                
                 //ajusta a posição dos elementos necessarios
                 btnEditar.Location = new Point(10,entryPanel.Height-btnEditar.Height-5);
                 btnEditar.BringToFront();
@@ -297,31 +299,64 @@ namespace Vados
                 startY += rectangleHeight + margin;
 
             }
-
+            
             historyPanel.ResumeLayout();
         }
 
-        // arredonda as bordas das entradas
-        private void SetRoundedRegion(Control control, int radius)
-        {
-            if (control.Width > 0 && control.Height > 0)
-            {
-                control.Region = Region.FromHrgn(
-                    CreateRoundRectRgn(0, 0, control.Width, control.Height, radius, radius)
-                );
-            }
-        }
 
         private void FormHistory_Resize_1(object sender, EventArgs e)
         {
             int roundValue = (int)(0.1 * Width);
+            PositionFix();
             //Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            //PositionFix();
+            PositionFix();
             historyPanel.Invalidate();
+        }
+        private GraphicsPath RectArc(Rectangle rect, int raio) // deixa a borda arredondada
+        {
+            GraphicsPath path = new GraphicsPath();
+
+            int diametro = raio * 2;
+
+            
+            path.AddArc(rect.X, rect.Y, diametro, diametro, 180, 90);
+            path.AddArc(rect.Right - diametro, rect.Y, diametro, diametro, 270, 90);
+            path.AddArc(rect.Right - diametro, rect.Bottom - diametro, diametro, diametro, 0, 90);
+            path.AddArc(rect.X, rect.Bottom - diametro, diametro, diametro, 90, 90); 
+
+            path.CloseFigure();
+            return path;
+        }
+
+        private void FormHistory_Paint(object sender, PaintEventArgs e)
+        {
+            //base.OnPaint(e);
+            int raio = 20;
+
+            Graphics g = e.Graphics;
+            Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
+
+
+           Color cor = Color.White;
+
+            using (GraphicsPath path = RectArc(rect, raio))
+            {
+
+                using (Brush brush = new SolidBrush(cor)) // preenchimento
+                {
+                    g.FillPath(brush, path);
+                }
+
+                
+                using (Pen pen = new Pen(cor, 2)) // borda coisada
+                {
+                    g.DrawPath(pen, path);
+                }
+            }
         }
     }
 }

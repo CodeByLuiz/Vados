@@ -138,7 +138,7 @@ namespace Vados
         {
             historyPanel.SuspendLayout();
 
-            //historyPanel.Controls.Clear(); 
+            historyPanel.Controls.Clear(); 
 
             using (var db = new BancoDeDados.DbConnection())
             {
@@ -148,7 +148,7 @@ namespace Vados
                              .ToList();
             }
 
-            
+            startY = spacing;
             foreach (var entry in entradas)
             {
                 int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;

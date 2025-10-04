@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,27 +42,27 @@ namespace Vados
 
 
 
-        public static string root = @"" + Comandos.driveverifica(null);
+        public static string driverPath = @"" + Comandos.DriveGetFirst();
 
         public static List<string> defaultPriorities = new List<string>
         {
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Favorites"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Desktop"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Documents"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Downloads"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Pictures"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Music"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Videos"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\OneDrive"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Searches"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Contacts"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Links"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\Saved Games"),
-            Path.Combine(root, @"Users\"+Environment.UserName+@"\3D Objects"),
-            //Path.Combine(root, @"Users\"+Environment.UserName+@""),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Favorites"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Desktop"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Documents"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Downloads"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Pictures"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Music"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Videos"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\OneDrive"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Searches"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Contacts"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Links"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Saved Games"),
+            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\3D Objects"),
+            //Path.Combine(driverPath, @"Users\"+Environment.UserName+@""),
 
-            Path.Combine(root),
+            Path.Combine(driverPath),
         };
 
         public static List<string> exePriorities = new List<string>
@@ -71,7 +72,7 @@ namespace Vados
             @"C:\Program Files",
             @"C:\Program Files (x86)",
 
-            //Path.Combine(root),
+            //Path.Combine(driverPath),
         };
 
         #endregion
@@ -111,6 +112,165 @@ namespace Vados
         }
 
 
+        //Desenhar sombra de qualquer formato
+        public static void DrawShadow(PaintEventArgs eventArgs, GraphicsPath path, Color shadowColor, PointF focusScales)
+        {
+            PathGradientBrush pathBrush = new PathGradientBrush(path);
+
+            pathBrush.CenterColor = Color.FromArgb(255, shadowColor);
+            pathBrush.SurroundColors = [Color.FromArgb(0, shadowColor)];
+            pathBrush.FocusScales = focusScales;
+
+            eventArgs.Graphics.FillPath(pathBrush, path);
+        }
+        
+        //Criar a sombra de uma imagem
+        public static Bitmap ImageCreateShadow(Image image, Color shadowColor, float opacity = 0.5f, int blurRadius = 10)
+        {
+            int width = image.Width;
+            int height = image.Height;
+
+            Bitmap shadowImage = new Bitmap(width, height);
+            Graphics g = Graphics.FromImage(shadowImage);
+            g.Clear(Color.Transparent);
+
+            //Pintar a imagem da cor da sombra
+            Bitmap alphaMask = new Bitmap(width, height);
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    Color pixel = ((Bitmap)image).GetPixel(x, y);
+                    alphaMask.SetPixel(x, y, Color.FromArgb(pixel.A, shadowColor.R, shadowColor.G, shadowColor.B));
+                }
+            }
+
+            //Definir transpar"encia
+            ImageAttributes attributes = new ImageAttributes();
+            ColorMatrix matrix = new ColorMatrix(new float[][]
+            {
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, opacity, 0],
+                [shadowColor.R / 255f, shadowColor.G / 255f, shadowColor.B / 255f, 0, 1]
+            });
+
+            attributes.SetColorMatrix(matrix);
+
+            //Desenhar imagem
+            g.DrawImage(alphaMask, new Rectangle(0, 0, shadowImage.Width, shadowImage.Height), 0, 0, shadowImage.Width, shadowImage.Height, GraphicsUnit.Pixel, attributes);
+
+            //Adicionar blur à imagem
+            return GaussianBlur(shadowImage, blurRadius);
+        }
+
+
+        //Criar uma imagem com blur
+        private static Bitmap GaussianBlur(Bitmap image, int radius)
+        {
+            if (radius < 1) return image;
+
+            Bitmap blurred = new Bitmap(image.Width, image.Height);
+            Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
+
+            // Lock bits
+            BitmapData srcData = image.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dstData = blurred.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            int bytes = srcData.Stride * srcData.Height;
+            byte[] pixelBuffer = new byte[bytes];
+            byte[] resultBuffer = new byte[bytes];
+
+            System.Runtime.InteropServices.Marshal.Copy(srcData.Scan0, pixelBuffer, 0, bytes);
+            image.UnlockBits(srcData);
+
+            int w = image.Width;
+            int h = image.Height;
+            int stride = srcData.Stride;
+            int[] kernel = CreateGaussianKernel(radius);
+            int kernelSum = 0;
+            foreach (int k in kernel) kernelSum += k;
+
+            // Horizontal pass
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int blue = 0, green = 0, red = 0, alpha = 0;
+                    for (int k = -radius; k <= radius; k++)
+                    {
+                        int offsetX = Math.Clamp(x + k, 0, w - 1);
+                        int index = y * stride + offsetX * 4;
+                        int weight = kernel[k + radius];
+
+                        blue += pixelBuffer[index] * weight;
+                        green += pixelBuffer[index + 1] * weight;
+                        red += pixelBuffer[index + 2] * weight;
+                        alpha += pixelBuffer[index + 3] * weight;
+                    }
+                    int i = y * stride + x * 4;
+                    resultBuffer[i] = (byte)(blue / kernelSum);
+                    resultBuffer[i + 1] = (byte)(green / kernelSum);
+                    resultBuffer[i + 2] = (byte)(red / kernelSum);
+                    resultBuffer[i + 3] = (byte)(alpha / kernelSum);
+                }
+            }
+
+            // Vertical pass
+            byte[] temp = (byte[])resultBuffer.Clone();
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int blue = 0, green = 0, red = 0, alpha = 0;
+                    for (int k = -radius; k <= radius; k++)
+                    {
+                        int offsetY = Math.Clamp(y + k, 0, h - 1);
+                        int index = offsetY * stride + x * 4;
+                        int weight = kernel[k + radius];
+
+                        blue += temp[index] * weight;
+                        green += temp[index + 1] * weight;
+                        red += temp[index + 2] * weight;
+                        alpha += temp[index + 3] * weight;
+                    }
+                    int i = y * stride + x * 4;
+                    resultBuffer[i] = (byte)(blue / kernelSum);
+                    resultBuffer[i + 1] = (byte)(green / kernelSum);
+                    resultBuffer[i + 2] = (byte)(red / kernelSum);
+                    resultBuffer[i + 3] = (byte)(alpha / kernelSum);
+                }
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(resultBuffer, 0, dstData.Scan0, bytes);
+            blurred.UnlockBits(dstData);
+
+            return blurred;
+        }
+
+        private static int[] CreateGaussianKernel(int radius)
+        {
+            int[] kernel = new int[radius * 2 + 1];
+            double sigma = radius / 2.0;
+            double sum = 0;
+
+            for (int i = -radius; i <= radius; i++)
+            {
+                double val = Math.Exp(-(i * i) / (2 * sigma * sigma));
+                kernel[i + radius] = (int)(val * 1000);
+                sum += val;
+            }
+
+            // Normalize
+            for (int i = 0; i < kernel.Length; i++)
+                kernel[i] = (int)(kernel[i] / sum * 1000);
+
+            return kernel;
+        }
+
+
         //Checar se um ponto está dentro de um determinado retângulo
         public static bool InsideRectangle(Point point, RectangleF rect)
         {
@@ -130,12 +290,9 @@ namespace Vados
 
             //Manter largura
             int width = textBox.Width - textBox.Padding.Horizontal;
-
-            using (Graphics g = textBox.CreateGraphics())
-            {
-                SizeF size = g.MeasureString(textBox.Text, textBox.Font, width);
-                textBox.Height = (int)Math.Ceiling(size.Height) + extraPadding + textBox.Padding.Vertical;
-            }
+            Graphics g = textBox.CreateGraphics();
+            SizeF size = g.MeasureString(textBox.Text, textBox.Font, width);
+            textBox.Height = (int)Math.Ceiling(size.Height) + extraPadding + textBox.Padding.Vertical;
         }
 
 
@@ -176,47 +333,45 @@ namespace Vados
         }
 
 
-        public static Image ChangeImageBrightness(Image image, float correctionFactor)
+        public static Image ImageChangeBrightness(Image image, float correctionFactor)
         {
             //Normalizar brilho
             float brightness = Math.Clamp(correctionFactor, -1f, 1f);
 
             Bitmap newImage = new Bitmap(image.Width, image.Height);
 
-            using (Graphics g = Graphics.FromImage(newImage))
+            Graphics g = Graphics.FromImage(newImage);
+            float scale = 1f;
+            float offset = 0f;
+
+            //Escurecer
+            if (brightness < 0)
             {
-                float scale = 1f;
-                float offset = 0f;
-
-                //Escurecer
-                if (brightness < 0)
-                {
-                    scale = 1f + brightness;    //Reduzir intensidade
-                    offset = 0f;
-                }
-                //Clarear
-                else if (brightness > 0)
-                {
-                    scale = 1f - brightness;    //Reduzir contraste
-                    offset = brightness * 255f;
-                }
-
-                //Definir cor nova
-                float[][] ptsArray = {
-                    new float[] { scale, 0,     0,     0, 0 },   //Vermelho
-                    new float[] { 0,     scale, 0,     0, 0 },   //Verde
-                    new float[] { 0,     0,     scale, 0, 0 },   //Azul
-                    new float[] { 0,     0,     0,     1, 0 },   //Transparência (é mantida)
-                    new float[] { offset / 255f, offset / 255f, offset / 255f, 0, 1 }
-                };
-
-                var matrix = new System.Drawing.Imaging.ColorMatrix(ptsArray);
-                var attributes = new System.Drawing.Imaging.ImageAttributes();
-                attributes.SetColorMatrix(matrix);
-
-                //Desenhar imagem
-                g.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
+                scale = 1f + brightness;    //Reduzir intensidade
+                offset = 0f;
             }
+            //Clarear
+            else if (brightness > 0)
+            {
+                scale = 1f - brightness;    //Reduzir contraste
+                offset = brightness * 255f;
+            }
+
+            //Definir cor nova
+            float[][] ptsArray = {
+                new float[] { scale, 0,     0,     0, 0 },   //Vermelho
+                new float[] { 0,     scale, 0,     0, 0 },   //Verde
+                new float[] { 0,     0,     scale, 0, 0 },   //Azul
+                new float[] { 0,     0,     0,     1, 0 },   //Transparência (é mantida)
+                new float[] { offset / 255f, offset / 255f, offset / 255f, 0, 1 }
+            };
+
+            var matrix = new System.Drawing.Imaging.ColorMatrix(ptsArray);
+            var attributes = new System.Drawing.Imaging.ImageAttributes();
+            attributes.SetColorMatrix(matrix);
+
+            //Desenhar imagem
+            g.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
 
             return newImage;
         }
@@ -255,29 +410,27 @@ namespace Vados
         //Muda apenas a fonte de um rtf (texto formatado)
         public static string RtfChangeFont(string rtf, Font newFont)
         {
-            using (var rtb = new RichTextBox())
+            var rtb = new RichTextBox();
+            rtb.Rtf = rtf;
+
+            //Mudar fonte de cada caractere
+            for (int i = 0; i < rtb.TextLength; i++)
             {
-                rtb.Rtf = rtf;
+                rtb.Select(i, 1);
+                var currentFont = rtb.SelectionFont;
 
-                //Mudar fonte de cada caractere
-                for (int i = 0; i < rtb.TextLength; i++)
+                if (currentFont != null)
                 {
-                    rtb.Select(i, 1);
-                    var currentFont = rtb.SelectionFont;
-
-                    if (currentFont != null)
-                    {
-                        rtb.SelectionFont = new Font(
-                            newFont.FontFamily,
-                            newFont.Size,
-                            currentFont.Style   //Manter negrito, itálico, etc
-                        );
-                    }
+                    rtb.SelectionFont = new Font(
+                        newFont.FontFamily,
+                        newFont.Size,
+                        currentFont.Style   //Manter negrito, itálico, etc
+                    );
                 }
-
-                rtb.Select(0, 0);
-                return rtb.Rtf;
             }
+
+            rtb.Select(0, 0);
+            return rtb.Rtf;
         }
     }
 }

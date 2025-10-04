@@ -52,6 +52,7 @@ namespace Vados
         Image loadingMicIcon;
         Image pausedMicIcon;
         Image micIcon;
+        Image micShadow;
         float circleSizeDefaultMax = 325;
         float circleSizeCurrent = 325;
         float circleSize = 325;
@@ -101,6 +102,7 @@ namespace Vados
         bool textboxCanClick = true;
         bool btnSendHovering = false;
         Image btnSendCurrentImage;
+        Image btnSendShadow;
 
 
         public UserControlHome()
@@ -130,23 +132,24 @@ namespace Vados
 
             //Botões da interface
             btnConfigsImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\configIcon.png"));
-            btnConfigsImageHover = Global.ChangeImageBrightness(btnConfigsImage, brightnessChange);
+            btnConfigsImageHover = Global.ImageChangeBrightness(btnConfigsImage, brightnessChange);
             btnManualImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\manualIcon.png"));
-            btnManualImageHover = Global.ChangeImageBrightness(btnManualImage, brightnessChange);
+            btnManualImageHover = Global.ImageChangeBrightness(btnManualImage, brightnessChange);
             //btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
-            //btnHistoryImageHover = Global.ChangeImageBrightness(btnHistoryImage, brightnessChange);
+            //btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
 
             //Botões do comando de voz
             btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
-            btnPauseImageHover = Global.ChangeImageBrightness(btnPauseImage, 0.25f);
+            btnPauseImageHover = Global.ImageChangeBrightness(btnPauseImage, 0.25f);
             btnPlayImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
-            btnPlayImageHover = Global.ChangeImageBrightness(btnPlayImage, 0.25f);
+            btnPlayImageHover = Global.ImageChangeBrightness(btnPlayImage, 0.25f);
             btnStopImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopRecordingIcon.png"));
-            btnStopImageHover = Global.ChangeImageBrightness(btnStopImage, 0.25f);
+            btnStopImageHover = Global.ImageChangeBrightness(btnStopImage, 0.25f);
 
             //Botões da textbox
             btnSendImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
-            btnSendImageHover = Global.ChangeImageBrightness(btnSendImage, brightnessChange);
+            btnSendImageHover = Global.ImageChangeBrightness(btnSendImage, brightnessChange);
+            btnSendShadow = Global.ImageCreateShadow(btnSendImage, Color.Black, 0.3f, 15);
             btnSendCurrentImage = btnSendImage;
 
             //Botão do microfone
@@ -154,6 +157,7 @@ namespace Vados
             activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
             pausedMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pausedMicIcon.png"));
             loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
+            micShadow = Global.ImageCreateShadow(inactiveMicIcon, Color.Black, 0.35f, 12);
             ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
             micIcon = inactiveMicIcon;
 
@@ -198,7 +202,7 @@ namespace Vados
         }
 
 
-        public void PerformCommand(string command)
+        public void PerformCommand(string command, bool isVoiceCommand)
         {
             //Escurecer tela
             var parentForm = FindForm() as Form1;
@@ -207,11 +211,23 @@ namespace Vados
                 parentForm.ToggleOverlay(true);
             }
 
+            #region---------ERRO: comando vazio---------
+
+            if (string.IsNullOrEmpty(command) && isVoiceCommand)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Áudio não identificado. ");
+                Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, FontStyle.Regular);
+                parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
+                return;
+            }
+
+            #endregion----------------------------------------
+
             //Extrair argumentos do comando
-            string commandText = txtComando.Text.Replace(",", "");
+            string commandText = command.Replace(",", "");
             commandText = commandText.Replace("!", "");
             commandText = commandText.Replace("?", "");
-            MessageBox.Show(commandText);
             var arguments = Comandos.CommandGetArguments(commandText);
 
             //Mostrar mensagem de confirmação
@@ -272,8 +288,10 @@ namespace Vados
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
-            //result = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
+            result = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
 
+            //Realizar comando
+            PerformCommand(result, true);
             TextBoxWrite(result);
             hasTranscribedAudio = true;
 
@@ -298,6 +316,7 @@ namespace Vados
         {
             btnPause.Image = btnPlayImage;
             micIcon = pausedMicIcon;
+            TextBoxReset("Comando de voz pausado...", false);
 
             //Pausar timer
             audioTimer.Enabled = false;
@@ -318,6 +337,7 @@ namespace Vados
         {
             hasTranscribedAudio = false;
             Global.VoiceRecognizer.Resume();
+            TextBoxReset("Escutando...", false);
 
             //Continuar timer
             audioTimer.Enabled = true;
@@ -444,9 +464,10 @@ namespace Vados
         //Realizar comando quando apertar enter
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Enter)
+            if (keyData == Keys.Enter && ActiveControl == txtComando && txtComando.Text != "")
             {
-                PerformCommand(txtComando.Text);
+                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
+                PerformCommand(command, false);
                 return true;
             }
 
@@ -468,16 +489,11 @@ namespace Vados
 
 
             //Sombra do círculo
-            int shadowOffset = 25;
+            int shadowOffset = 15;
 
             GraphicsPath path = new GraphicsPath();
             path.AddEllipse(circleLeft, circleTop + shadowOffset, circleSize, circleSize);
-
-            PathGradientBrush pathBrush = new PathGradientBrush(path);
-
-            pathBrush.CenterColor = Color.FromArgb(100, Color.Black);
-            pathBrush.SurroundColors = new[] { Color.FromArgb(2, Color.Black) };
-            e.Graphics.FillPath(pathBrush, path);
+            Global.DrawShadow(e, path, Color.Black, new PointF(0.65f, 0.65f));
 
 
             //Contorno do círculo
@@ -522,6 +538,13 @@ namespace Vados
 
             float drawX = innerX + (innerD - drawW) / 2f;
             float drawY = innerY + (innerD - drawH) / 2f;
+
+            //Desenhar sombra
+            if (micIcon != loadingMicIcon)
+            { 
+                shadowOffset = 4;
+                e.Graphics.DrawImage(micShadow, drawX, drawY + shadowOffset, drawW, drawH);
+            }
 
             //Desenhar ícone
             e.Graphics.DrawImage(micIcon, drawX, drawY, drawW, drawH);
@@ -584,20 +607,28 @@ namespace Vados
 
             #region CAIXA DE TEXTO
 
-            //Contorno
+            //-----Contorno-----
             Color outlineColor = Colors.bluePrimary;
             int outWidth = txtAreaWidth + txtAreaOutSize * 2;
             int outHeight = txtAreaHeight + txtAreaOutSize * 2;
             int outX = txtAreaX - txtAreaOutSize;
             int outY = txtAreaY - txtAreaOutSize;
 
-            brush = new SolidBrush(outlineColor);
             rect = new RectangleF(outX, outY, outWidth, outHeight);
             GraphicsPath roundedRectPath = Global.RoundedRectangle(rect, (float)(outHeight * 0.33));
+
+            //Desenhar sombra
+            shadowOffset = 8;
+            RectangleF shadowRect = new RectangleF(outX, outY + shadowOffset, outWidth, outHeight);
+            GraphicsPath shadowPath = Global.RoundedRectangle(shadowRect, (float)(outHeight * 0.33));
+            Global.DrawShadow(e, shadowPath, Color.Black, new PointF(1f, 0.1f));
+
+            //Desenhar contorno
+            brush = new SolidBrush(outlineColor);
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
-            //Fundo
+            //-----Fundo-----
             Color backColor = txtComando.BackColor;
 
             brush = new SolidBrush(backColor);
@@ -606,10 +637,16 @@ namespace Vados
             e.Graphics.FillPath(brush, roundedRectPath);
 
 
-            //Botão de enviar comando
+            //-----Botão de enviar comando-----
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
 
+
+            //Desenhar sombra
+            shadowOffset = 3;
+            e.Graphics.DrawImage(btnSendShadow, txtIconX, txtIconY + shadowOffset, txtIconSize, txtIconSize);
+
+            //Desenhar ícone
             e.Graphics.DrawImage(btnSendCurrentImage, txtIconX, txtIconY, txtIconSize, txtIconSize);
 
             #endregion
@@ -643,7 +680,8 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (btnSendHovering)
             {
-                PerformCommand(txtComando.Text);
+                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
+                PerformCommand(command, false);
             }
 
             #endregion

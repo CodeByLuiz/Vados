@@ -14,6 +14,7 @@ namespace Vados
 {
     public class CommandCriteria
     {
+        public int ActionPos = 0;          //Posição da string onde se encontra o tipo de comando
         public string Action = "";          //Tipo de comando
         public string ObjectType = "";      //Tipo de objeto (arquivo / pasta)
         public string ObjectName = "";      //Nome do objeto
@@ -98,24 +99,21 @@ namespace Vados
     //Extrai o tipo de comando
     public class ActionExtractor : CriteriaExtractor
     {
-        List<string> greetings;
         List<string> actions;
-        List<string> starts;
 
-        public ActionExtractor(List<string> greetings_, List<string> starts_, List<string> actions_)
+        public ActionExtractor(List<string> actions_)
         {
-            greetings = greetings_;
-            starts = starts_;
             actions = actions_;
         }
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
             command = command.ToLower();
-            string patternGreetings = string.Join("|", greetings.Select(Regex.Escape));
-            string patternStarts = string.Join("|", starts.Select(Regex.Escape));
+            //string patternGreetings = string.Join("|", greetings.Select(Regex.Escape));
+            //string patternStarts = string.Join("|", starts.Select(Regex.Escape));
             string patternAction = string.Join("|", actions.Select(Regex.Escape));
-            string pattern = $@"^(({patternGreetings})\s+)?(({patternStarts})\s+)?({patternAction})";
+            //string pattern = $@"^(({patternGreetings})\s+)?(({patternStarts})\s+)?({patternAction})";
+            string pattern = $@"({patternAction})";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -123,9 +121,10 @@ namespace Vados
             //Extrair comando
             if (match.Success)
             {
-                string action = match.Groups[5].Value;
+                string action = match.Groups[1].Value;
                 string correctAction = Comandos.WordGetSynonym(action);
                 criteria.Action = correctAction;
+                criteria.ActionPos = match.Index;
             }
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -147,7 +146,7 @@ namespace Vados
 
         public ObjectExtractor((List<string> v, bool r) amount_, (List<string> v, bool r)  objects_, (List<string> v, bool r)  extensions_, (List<string> v, bool r)  nominators_, bool nameIsRequired_, List<string> stopWords_ = null, bool required_ = false)
         {
-            //amount_ = (lista, é obrigatório)
+            //amount_ = (lista, é obrigatório) --> isso para todos
             amount = new Pattern(amount_.v, amount_.r);
             objects = new Pattern(objects_.v, objects_.r);
             extensions = new Pattern(extensions_.v, extensions_.r);
@@ -160,7 +159,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower();
+            command = command.ToLower().Substring(criteria.ActionPos);
             //string patternObject = string.Join("|", objects.v.Select(Regex.Escape));
             //string patternAmount = string.Join("|", amount.v.Select(Regex.Escape));
             //string patternExtension = string.Join("|", extensions.v.Select(Regex.Escape));
@@ -220,7 +219,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower();
+            command = command.ToLower().Substring(criteria.ActionPos);
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
             string pattern = $@"\b(\s+(para|pra)\s+({patternName}))";
 
@@ -260,7 +259,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower();
+            command = command.ToLower().Substring(criteria.ActionPos);
             string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -303,7 +302,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower();
+            command = command.ToLower().Substring(criteria.ActionPos);
             string patternInside = string.Join("|", insideIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -346,7 +345,7 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower();
+            command = command.ToLower().Substring(criteria.ActionPos);
             string patternIndicator = string.Join("|", sizeIndicators.Select(Regex.Escape));
             string patternModifier = string.Join("|", sizeModifiers.Select(Regex.Escape));
             string patternUnit = string.Join("|", sizeUnits.Select(Regex.Escape));

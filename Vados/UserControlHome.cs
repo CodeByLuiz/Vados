@@ -98,6 +98,7 @@ namespace Vados
         int txtboxWidthOffset;
         bool setTextboxWidth = false;
         bool textboxActive = false;
+        bool textboxCanClick = true;
         bool btnSendHovering = false;
         Image btnSendCurrentImage;
 
@@ -125,7 +126,7 @@ namespace Vados
 
             #region IMAGENS
 
-            float brightnessChange = -0.5f;
+            float brightnessChange = 0.1f;
 
             //Botões da interface
             btnConfigsImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\configIcon.png"));
@@ -137,11 +138,11 @@ namespace Vados
 
             //Botões do comando de voz
             btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
-            btnPauseImageHover = Global.ChangeImageBrightness(btnPauseImage, -0.25f);
+            btnPauseImageHover = Global.ChangeImageBrightness(btnPauseImage, 0.25f);
             btnPlayImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\playIcon.png"));
-            btnPlayImageHover = Global.ChangeImageBrightness(btnPlayImage, -0.25f);
+            btnPlayImageHover = Global.ChangeImageBrightness(btnPlayImage, 0.25f);
             btnStopImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\stopRecordingIcon.png"));
-            btnStopImageHover = Global.ChangeImageBrightness(btnStopImage, -0.25f);
+            btnStopImageHover = Global.ChangeImageBrightness(btnStopImage, 0.25f);
 
             //Botões da textbox
             btnSendImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
@@ -229,7 +230,6 @@ namespace Vados
         //Começa a escutar o comando de voz
         public void StartListening()
         {
-            //Box.Show("start");
             //Definir evento que acontece quando houver silêncio
             if (Global.VoiceRecognizer.HasSubscribers == false)
             {
@@ -255,9 +255,9 @@ namespace Vados
             audioTimer.Enabled = true;
             audioTimer.Start();
 
-            TextBoxReset("Escutando...");
+            TextBoxReset("Escutando...", false);
         }
-        
+
         //Para de escutar o comando de voz
         public async Task StopListening()
         {
@@ -269,9 +269,10 @@ namespace Vados
 
 
             //Transcrever audio
-            TextBoxReset("Transcrevendo...");
+            TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
+            //result = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
 
             TextBoxWrite(result);
             hasTranscribedAudio = true;
@@ -328,11 +329,16 @@ namespace Vados
 
         public void TextBoxReset(string text, bool canClick = true)
         {
-            //MessageBox.Show("textbox");
             txtComando.Text = text;
             txtComando.ForeColor = Colors.blueSecondary;
             textboxActive = false;
-            //textboxCanClick = canClick;
+            textboxCanClick = canClick;
+
+            //Desfocar textbox
+            if (!canClick)
+            {
+                ActiveControl = imgLogo;
+            }
         }
 
         public void TextBoxWrite(string text)
@@ -340,7 +346,7 @@ namespace Vados
             txtComando.Text = text;
             txtComando.ForeColor = Color.Black;
             textboxActive = true;
-            //textboxCanClick = true;
+            textboxCanClick = true;
         }
 
 
@@ -448,26 +454,6 @@ namespace Vados
         }
 
 
-        
-        //Eventos da textbox
-        private void txtComando_Click(object sender, EventArgs e)
-        {
-            //Apagar texto temporário
-            if (textboxActive == false)
-            {
-                TextBoxWrite("");
-            }
-        }
-
-        private void txtComando_LostFocus(object sender, EventArgs e)
-        {
-            //Retornar texto temporário
-            if (textboxActive == true && txtComando.Text == "")
-            {
-                TextBoxReset("Escreva um comando...");
-            }
-        }
-
 
         //Eventos do painel (onde tudo está e é desenhado)
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
@@ -521,7 +507,7 @@ namespace Vados
             float targetBox = innerD * 0.60f; // ocupa 60% do círculo interno
             float ratio = (float)micIcon.Width / micIcon.Height;
             float drawW, drawH;
-            
+
             //Definir tamanhos correto
             if (ratio >= 1f)
             {
@@ -713,7 +699,7 @@ namespace Vados
             #region AJUSTAR BOTÃO DO MICROFONE
 
             if (Global.VoiceRecognizer != null)
-            { 
+            {
                 CorrectMicButton();
                 CorrectAudioWave();
             }
@@ -782,7 +768,51 @@ namespace Vados
             #endregion
         }
 
-        
+
+        //Eventos da textbox
+        private void txtComando_Click(object sender, EventArgs e)
+        {
+            if (textboxCanClick == false)
+            {
+                ActiveControl = imgLogo;
+                return;
+            }
+
+            //Apagar texto temporário
+            if (textboxActive == false)
+            {
+                TextBoxWrite("");
+            }
+        }
+
+        private void txtComando_LostFocus(object sender, EventArgs e)
+        {
+            //Retornar texto temporário
+            if (textboxActive == true && txtComando.Text == "")
+            {
+                TextBoxReset("Escreva um comando...");
+            }
+        }
+
+        private void txtComando_Enter(object sender, EventArgs e)
+        {
+            //Desfoca a textbox se ela não puder ser clicada
+            if (textboxCanClick == false)
+            {
+                ActiveControl = imgLogo;
+            }
+        }
+
+        private void txtComando_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //Evita que o usuário escreva enquanto no texto for temporário (cor azul)
+            if (txtComando.ForeColor != Color.Black)
+            {
+                TextBoxWrite("");
+            }
+        }
+
+
         //Evento que acontece todo frame
         private async void Timer_Tick(object? sender, EventArgs e)
         {

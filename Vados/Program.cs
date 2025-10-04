@@ -25,10 +25,7 @@ namespace Vados
             #region RECONHECEDOR DE VOZ
 
             //Definir caminho do modelo do reconhecimento de voz
-            //Global.VoiceRecognitionFolder = (await Comandos.SearchPaths("vosk-model-small-pt-0.3", true).ConfigureAwait(false)).FirstOrDefault();
-
             Global.VoiceRecognitionFolder = Path.Combine(Application.StartupPath, "Models", "ggml-base.bin");
-            MessageBox.Show(Global.VoiceRecognitionFolder);
 
             //Definir palavras priorizadas
             List<string> hints = new List<string>() { };
@@ -37,15 +34,15 @@ namespace Vados
             hints = hints.Concat(Comandos.allCommands)
                         .Concat(Comandos.allObjects)
                         //.Concat(Comandos.allSizeUnitWords)
-                        .Concat(Comandos.allSizeModifierWords)
+                        //.Concat(Comandos.allSizeModifierWords)
                         .Concat(Comandos.allExtensionsWords)
-                        .Concat(Comandos.sizeWords)
-                        .Concat(Comandos.startWords)
-                        .Concat(Comandos.insideWords)
-                        .Concat(Comandos.fromWords)
-                        .Concat(Comandos.namingWords)
-                        .Concat(Comandos.amountWords)
-                        .Concat(Comandos.extraSpeechWords)
+                        //.Concat(Comandos.sizeWords)
+                        //.Concat(Comandos.startWords)
+                        //.Concat(Comandos.insideWords)
+                        //.Concat(Comandos.fromWords)
+                        //.Concat(Comandos.namingWords)
+                        //.Concat(Comandos.amountWords)
+                        //.Concat(Comandos.extraSpeechWords)
                         .ToList();
 
 

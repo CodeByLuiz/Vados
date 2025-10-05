@@ -11,7 +11,7 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
+//using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Vados
@@ -21,6 +21,10 @@ namespace Vados
         CommandCriteria criteria;
         bool isErrorMessage = false;
         public UserControl userControl;
+
+        Image btnCloseImage;
+        Image btnCloseImageHover;
+
 
         //Bordas arredondadas
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
@@ -35,12 +39,104 @@ namespace Vados
         );
 
 
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "")
+        {
+            InitializeComponent();
+            criteria = criteria_;
+            isErrorMessage = isErrorMessage_;
+
+            //Imagens
+            btnCloseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeIcon.png"));
+            btnCloseImageHover = Global.ImageChangeBrightness(btnCloseImage, 0.25f);
+
+            //Definir mensagem
+            var messageFont = new Font("Segoe UI", 11f);
+            txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
+
+            //Otimizar pintura
+            this.DoubleBuffered = true;
+            this.ResizeRedraw = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.UserPaint |
+                     ControlStyles.AllPaintingInWmPaint, true);
+        }
+
+
+        //Configurar mensagem
+        private void FormMessage_Load(object sender, EventArgs e)
+        {
+            Form1 parentForm = (Form1)Owner;
+
+            //Mensagem de erro
+            if (isErrorMessage)
+            {
+                //Definir título
+                lblTitle.Text = "Erro de comando";
+                lblTitle.ForeColor = Colors.redErrorDark;
+                Global.LabelFitWidth(lblTitle);
+
+                //Definir ícone
+                imgTitleIcon.Image = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\warningIcon.png"));
+
+                //Definir botões
+                btnConfirm.Text = "Editar";
+                btnConfirm.BackColor = Colors.redErrorLight;
+
+                btnCancel.Text = "Descartar";
+                btnCancel.FlatAppearance.BorderColor = Colors.redErrorLight;
+
+                //Mensagem
+                if (txtMessage.Text == "")
+                {
+                    SetErrorMessage(txtMessage, criteria);
+                }
+            }
+            //Mensagem de confirmação
+            else
+            {
+                if (txtMessage.Text == "")
+                {
+                    SetConfirmationMessage(txtMessage, criteria);
+                }
+            }
+
+
+            //Ajustar tamanho do form para caber a mensagem
+            Global.TextBoxFitHeight(txtMessage);
+            int messageMarginBottom = 20;
+            int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
+            int actualDistance = btnConfirm.Top - txtMessage.Bottom;
+
+            this.Height += minDistance - actualDistance;
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            //Corrigir posição do ícone ao lado do título
+            Global.LabelFitWidth(lblTitle);
+            int iconDist = 0;
+            imgTitleIcon.Left = lblTitle.Right + iconDist;
+
+
+            //Definir variáveis dos botões
+            btnConfirm.BehindColor = BackColor;
+            btnConfirm.HoverLightenFactor = 0.2f;
+            btnConfirm.PressDarkenFactor = -0.1f;
+
+            btnCancel.BehindColor = BackColor;
+            btnCancel.HoverLightenFactor = 0.7f;
+            btnCancel.PressDarkenFactor = -0.1f;
+
+
+            //Corrigir posição da mensagem na tela
+            parentForm.CorrectMessageForm();
+        }
+
+
         private void ExitMessage()
         {
             Form1 form = (Form1)Owner;
             form.Focus();
             form.ToggleOverlay(false);
-            Hide();
+            Close();
         }
 
 
@@ -279,106 +375,14 @@ namespace Vados
         #endregion
 
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "")
-        {
-            InitializeComponent();
-            criteria = criteria_;
-            isErrorMessage = isErrorMessage_;
 
-            //Definir mensagem
-            var messageFont = new System.Drawing.Font("Segoe UI", 11f);
-            txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
-
-            //Otimizar pintura
-            this.DoubleBuffered = true;
-            this.ResizeRedraw = true;
-            SetStyle(ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.UserPaint |
-                     ControlStyles.AllPaintingInWmPaint, true);
-        }
-
-
-        //Configurar mensagem
-        private void FormMessage_Load(object sender, EventArgs e)
-        {
-            Form1 parentForm = (Form1)Owner;
-
-            //Mensagem de erro
-            if (isErrorMessage)
-            {
-                //Definir título
-                lblTitle.Text = "Erro de comando";
-                lblTitle.ForeColor = Colors.redErrorDark;
-                Global.LabelFitWidth(lblTitle);
-
-                //Definir ícone
-                imgTitleIcon.Image = System.Drawing.Image.FromFile(Path.Combine(System.Windows.Forms.Application.StartupPath, @"Images\Icons\warningIcon.png"));
-
-                //Definir botões
-                btnConfirm.Text = "Editar";
-                btnConfirm.BackColor = Colors.redErrorLight;
-
-                btnCancel.Text = "Descartar";
-                btnCancel.FlatAppearance.BorderColor = Colors.redErrorLight;
-
-                //Mensagem
-                if (txtMessage.Text == "")
-                {
-                    SetErrorMessage(txtMessage, criteria);
-                }
-            }
-            //Mensagem de confirmação
-            else
-            {
-                if (txtMessage.Text == "")
-                {
-                    SetConfirmationMessage(txtMessage, criteria);
-                }
-            }
-
-
-            //Ajustar tamanho do form para caber a mensagem
-            Global.TextBoxFitHeight(txtMessage);
-            int messageMarginBottom = 20;
-            int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
-            int actualDistance = btnConfirm.Top - txtMessage.Bottom;
-
-            this.Height += minDistance - actualDistance;
-            this.StartPosition = FormStartPosition.CenterScreen;
-
-            //Corrigir posição do ícone ao lado do título
-            Global.LabelFitWidth(lblTitle);
-            int iconDist = imgTitleIcon.Left - lblTitle.Right;
-            imgTitleIcon.Left = lblTitle.Right + iconDist;
-
-
-            //Definir variáveis dos botões
-            btnConfirm.BehindColor = BackColor;
-            btnConfirm.HoverLightenFactor = 0.2f;
-            btnConfirm.PressDarkenFactor = -0.1f;
-
-            btnCancel.BehindColor = BackColor;
-            btnCancel.HoverLightenFactor = 0.7f;
-            btnCancel.PressDarkenFactor = -0.1f;
-
-
-            //Corrigir posição da mensagem na tela
-            parentForm.CorrectMessageForm();
-        }
-
-
-        private void txtMessage_Enter(object sender, EventArgs e)
-        {
-            this.ActiveControl = null;
-        }
-
-
+        //Botões de confrmar e cancelar
         private void btnCancel_Click(object sender, EventArgs e)
         {
             ExitMessage();
 
             //Limpar textbox (descartar)
-            if (isErrorMessage == false)
+            if (isErrorMessage)
             {
                 FocusCommand(true);
             }
@@ -426,16 +430,24 @@ namespace Vados
         }
 
 
+        //Botão de fechar
+        private void btnClose_Click(object sender, EventArgs e) => ExitMessage();
+        private void btnClose_MouseEnter(object sender, EventArgs e) => btnClose.Image = btnCloseImageHover;
+        private void btnClose_MouseLeave(object sender, EventArgs e) => btnClose.Image = btnCloseImage;
+
+
+        //Impedir interação com a textbox da mensagem
+        private void txtMessage_Enter(object sender, EventArgs e)
+        {
+            this.ActiveControl = null;
+        }
+
+        //Corrigir bordas a
         private void FormMessage_Resize(object sender, EventArgs e)
         {
             //Definir arredondamento da janela
             int roundValue = (int)(0.2 * Height);
             Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, roundValue, roundValue));
-        }
-
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            ExitMessage();
         }
     }
 }

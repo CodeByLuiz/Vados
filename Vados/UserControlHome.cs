@@ -204,25 +204,25 @@ namespace Vados
 
         public void PerformCommand(string command, bool isVoiceCommand)
         {
-            //Escurecer tela
             var parentForm = FindForm() as Form1;
-            if (parentForm != null)
-            {
-                parentForm.ToggleOverlay(true);
-            }
 
-            #region---------ERRO: comando vazio---------
-
-            if (string.IsNullOrEmpty(command) && isVoiceCommand)
+            //Comando vazio
+            if (string.IsNullOrEmpty(command))
             {
-                var rtb = new RichTextBox();
-                Global.AppendPlainText(rtb, "Áudio não identificado. ");
-                Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, FontStyle.Regular);
-                parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
+                #region---------ERRO: comando de voz não identificado---------
+
+                if (isVoiceCommand)
+                {
+                    var rtb = new RichTextBox();
+                    Global.AppendPlainText(rtb, "Áudio não identificado. ");
+                    Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, FontStyle.Regular);
+                    parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
+                }
+
+                #endregion----------------------------------------
+
                 return;
             }
-
-            #endregion----------------------------------------
 
             //Extrair argumentos do comando
             string commandText = command.Replace(",", "");
@@ -231,15 +231,16 @@ namespace Vados
             var arguments = Comandos.CommandGetArguments(commandText);
 
             //Mostrar mensagem de confirmação
+            parentForm.ToggleOverlay(true);
             parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
         }
 
         public void FocusCommand(bool clear = false)
         {
+            if (clear) txtComando.Text = "";
+            txtComando.Focus();
             txtComando.SelectionLength = 0;
             txtComando.SelectionStart = txtComando.Text.Length;
-            txtComando.Focus();
-            if (clear) txtComando.Text = "";
         }
 
 
@@ -541,7 +542,7 @@ namespace Vados
 
             //Desenhar sombra
             if (micIcon != loadingMicIcon)
-            { 
+            {
                 shadowOffset = 4;
                 e.Graphics.DrawImage(micShadow, drawX, drawY + shadowOffset, drawW, drawH);
             }
@@ -678,7 +679,7 @@ namespace Vados
             #region BOTÃO DE ENVIAR COMANDO
 
             //Checar se o mouse está em dentro do botão
-            if (btnSendHovering)
+            if (btnSendHovering && txtComando.ForeColor == Color.Black)
             {
                 string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
                 PerformCommand(command, false);
@@ -843,7 +844,7 @@ namespace Vados
 
         private void txtComando_KeyPress(object sender, KeyPressEventArgs e)
         {
-            //Evita que o usuário escreva enquanto no texto for temporário (cor azul)
+            //Remove o texto temporário assim que o usuário escrever
             if (txtComando.ForeColor != Color.Black)
             {
                 TextBoxWrite("");

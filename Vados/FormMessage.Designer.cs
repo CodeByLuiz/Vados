@@ -113,6 +113,9 @@
             btnClose.TabIndex = 4;
             btnClose.TabStop = false;
             btnClose.Click += btnClose_Click;
+            btnClose.MouseEnter += btnClose_MouseEnter;
+            btnClose.MouseLeave += btnClose_MouseLeave;
+
             // 
             // imgTitleIcon
             // 

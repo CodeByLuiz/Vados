@@ -128,7 +128,7 @@ namespace Vados
             }
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Comando -> " + actionStr);
+            //MessageBox.Show("Comando -> " + actionStr);
             return match.Success;
         }
     }

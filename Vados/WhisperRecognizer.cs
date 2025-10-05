@@ -80,14 +80,6 @@ namespace Vados
                 await EnsureModel();
                 model = WhisperFactory.FromPath(modelPath);
                 processor = model.CreateBuilder().WithLanguage("pt").Build();
-
-                //Barras de audio aleatorias
-                for(int i = 0; i < 100; i++)
-                {
-                    //audioWaveBars.Add(new Random().NextDouble() * 100);
-                }
-
-                MessageBox.Show("Modelo inicializo corretamente");
             }
 
             catch (Exception ex)

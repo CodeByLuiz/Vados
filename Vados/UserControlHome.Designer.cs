@@ -99,6 +99,7 @@
             lblDebug.Size = new Size(42, 15);
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
+            lblDebug.Visible = false;
             // 
             // btnManual
             // 

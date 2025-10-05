@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.Sqlite;
@@ -20,19 +20,13 @@ namespace Vados
             [Key] public int Id { get; set; }
             public Guid ComputadorId { get; set; }  
             public DateTime Data { get; set; }
-             
+            public string Comandotitle { get; set; }
             public string Comando { get; set; }
 
-            public string PastasJson { get; set; }  // Armazenado no BD pq o sqlite n aceita lista normal :(
-            [NotMapped]
-            public List<string> Pastas
+            
+            public HistoryEntry() // pega automaticamente a data e o guid
             {
-                get => JsonSerializer.Deserialize<List<string>>(PastasJson ?? "[]")!;
-                set => PastasJson = JsonSerializer.Serialize(value);
-            }
-            public HistoryEntry()
-            {
-                Data = DateTime.Now;
+                Data = DateTime.Now; 
                 ComputadorId = ObterComputadorId();
             }
         }
@@ -41,25 +35,25 @@ namespace Vados
         {
             public DbSet<HistoryEntry> Historico { get; set; }
 
-            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) // define que sqlite sera usado para criar o banco
             {
                 optionsBuilder.UseSqlite("Data Source=historico.db");
             }
 
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            protected override void OnModelCreating(ModelBuilder modelBuilder) // "modela" o banco de dados
             {
                 modelBuilder.Entity<HistoryEntry>()
-                    .HasKey(h => h.Id);
+                    .HasKey(h => h.Id); //define id como chave primaria
 
                 modelBuilder.Entity<HistoryEntry>()
                     .Property(h => h.Id)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd(); // gera valor automaticamente
 
                 modelBuilder.Entity<HistoryEntry>()
                     .Property(h => h.ComputadorId)
                     .HasConversion(
-                        v => v.ToString(),
-                        v => Guid.Parse(v)
+                        v => v.ToString(), // salvando banco como string
+                        v => Guid.Parse(v) // converte de volta para guid
                     );
             }
 
@@ -73,13 +67,12 @@ namespace Vados
                     return guid;
             }
 
-            // Se não existe ou é inválido, cria novo e salva
             var novoGuid = Guid.NewGuid();
             File.WriteAllText(UUIDComando, novoGuid.ToString());
             return novoGuid;
         }
 
-        public static void AdicionarEntrada(string comando, List<string> pastas)
+        public static void AdicionarEntrada(string comando, string titulo)
         {
             using (var db = new DbConnection())
             {
@@ -91,14 +84,15 @@ namespace Vados
                 {
                     //Data = data,
                     Comando = comando,
-                    Pastas = pastas,
+                    Comandotitle = titulo
+                    
                     
                 };
 
                 db.Historico.Add(novaEntrada);
                 db.SaveChanges();
 
-                MessageBox.Show($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
+                Console.WriteLine($"Entrada adicionada com id={novaEntrada.Id} e ComputadorId={novaEntrada.ComputadorId}");
 
 
 
@@ -131,14 +125,27 @@ namespace Vados
                    // MessageBox.Show($"ComputadorId: {entrada.ComputadorId}");
                     //MessageBox.Show($"Data: {entrada.Data}");
                     //MessageBox.Show($"Comando: {entrada.Comando}");
-                    //MessageBox.Show($"Pastas:");
-                    foreach (var pasta in entrada.Pastas)
-                    {
-                        MessageBox.Show($"  - {pasta}\n");
-                    }
+                   
                 }
             }
         }
+
+        public static void DeleteEntryID(int id)
+        {
+            using (var db = new DbConnection())
+            {
+                db.Database.EnsureCreated();
+
+                var entrada = db.Historico.FirstOrDefault(e => e.Id == id);
+                if (entrada == null)
+                {                    return;
+                }
+
+                db.Historico.Remove(entrada);
+                db.SaveChanges();
+            }
+        }
+
 
     }
 }

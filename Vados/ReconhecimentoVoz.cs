@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using NAudio.Wave;
 using Vosk;
 using Newtonsoft.Json.Linq;
-
 using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

@@ -52,11 +52,11 @@ namespace Vados
 
 
         //Ativar mensagem
-        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "")
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "",string Comandotxt="")
         {
             ToggleOverlay(true);
 
-            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf);
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf,txtbd:Comandotxt);
             message.Owner = form;
             message.userControl = userControl;
             message.Show();
@@ -80,16 +80,76 @@ namespace Vados
         public void CorrectMessageForm()
         {
             FormMessage messageForm = FindMessageForm();
-            if (messageForm == null) return;    //Parar se n�o encontrar form
+            if (messageForm == null) return;    //Parar se não encontrar form
 
-            //Corrigir posi��o
+            //Corrigir posição
             int newX = Width / 2 - messageForm.Width / 2;
             int newY = Height / 2 - messageForm.Height / 2;
             messageForm.Location =  PointToScreen(new Point(newX, newY));
         }
 
+         
 
-        //Trocar user control (p�gina)
+        public void ShowHistoryTab(Form form, UserControl userControl)
+        {
+            //ToggleOverlay(true);
+
+            var history = new FormHistory();
+            history.Owner = form;
+            //history.userControl= userControl;
+            history.Show();
+            CorrectHistoryForm();
+            Global.userControlHome.HistoryOpen = true;
+
+        }
+        public void CloseHistoryTab()
+        {
+            FormHistory historyForm = null;
+
+            
+            // Encontrar o formulário aberto do tipo FormHistory
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormHistory)
+                {
+                    historyForm = (FormHistory)openForm;
+                    break;
+                }
+            }
+
+            if (historyForm != null)
+            {
+                historyForm.Close();
+                Global.userControlHome.HistoryOpen = false;
+            }
+        }
+        public void CorrectHistoryForm()
+        {
+            FormHistory historyForm = null;
+
+            //Encontrar form
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormHistory)
+                {
+                    historyForm = (FormHistory)openForm;
+                    break;
+                }
+            }
+
+            if (historyForm == null) return;
+
+            int refX = (int)(this.Width - 35 );  
+            int refY = (int)(this.Height * 0.10);
+
+            int posX = refX - historyForm.Width;  
+            int posY = refY;
+
+            historyForm.Location = this.PointToScreen(new Point(posX, posY));
+            historyForm.Height = Height - (historyForm.Top - Top+20);
+            //historyForm.Size = new Size(newWidth, newHeight);
+        }
+        //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
         {
             panelContainer.Controls.Clear();
@@ -99,9 +159,14 @@ namespace Vados
         }
 
 
-        //Trocar de p�gina (user control) atrav�s dos eventos de outros user controls
+        //Trocar de página (user control) através dos eventos de outros user controls
         private void LoadPage(object sender, LoadPageEventArgs e)
         {
+
+            var parentForm = FindForm() as Form1;
+            parentForm.CloseHistoryTab();
+            
+
             LoadUserControl(e.userControl);
         }
 
@@ -114,14 +179,17 @@ namespace Vados
             Global.userControlManual = new UserControlManual();
 
 
-            //Carregar p�gina inicial
+            //Carregar página inicial
             LoadUserControl(Global.userControlHome);
 
-            //Eventos de mudar de p�gina (pra cada user control)
+            //Eventos de mudar de página (pra cada user control)
             Global.userControlHome.loadPage += LoadPage;
             Global.userControlSettings.loadPage += LoadPage;
-        }
 
+            
+            
+        }
+        
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -156,16 +224,16 @@ namespace Vados
         {
             //Corrigir tamanho da tela preta
             overlayForm.Bounds = RectangleToScreen(this.ClientRectangle);
-
+            CorrectHistoryForm();
             CorrectMessageForm();
         }
 
         private void Form1_LocationChanged(object sender, EventArgs e)
         {
-            //Corrigir posi��o da tela preta
+            //Corrigir posição da tela preta
             Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
             overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
-            
+            CorrectHistoryForm();
             CorrectMessageForm();
         }
 

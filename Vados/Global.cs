@@ -21,11 +21,6 @@ namespace Vados
 
         #region PRIORIDADES E EXCEÇÕES
 
-
-
-
-
-
         public static List<string> defaultExceptions = new List<string>
         {
             "$RECYCLE.BIN",
@@ -89,10 +84,7 @@ namespace Vados
         public static UserControlHome userControlHome;
         public static UserControlSettings userControlSettings;
         public static UserControlManual userControlManual;
-        //public static UserControlHome userControlHome = new UserControlHome();
-        //public static UserControlSettings userControlSettings = new UserControlSettings();
-        //public static UserControlManual userControlManual = new UserControlManual();
-
+      
 
         //Desenhar retângulo arredondado
         public static GraphicsPath RoundedRectangle(RectangleF rect, float radius)

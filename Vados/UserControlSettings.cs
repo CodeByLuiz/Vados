@@ -21,14 +21,15 @@ namespace Vados
     public partial class UserControlSettings : UserControl
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
-
         System.Windows.Forms.Timer timer;
-
         private bool estaPausado = false;
 
         public UserControlSettings()
         {
             InitializeComponent();
+            
+
+
         }
         private void UserControlSettings_Load(object sender, EventArgs e)
         {
@@ -57,16 +58,15 @@ namespace Vados
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
 
-
-
             Comandos.CriarPasta(nome, destino);
             List<string> nomecompleto = (await Comandos.SearchPaths(nome, true)).ToList();
             BancoDeDados.AdicionarEntrada(
                 comando: "Criar Pasta",
-                pastas: nomecompleto
+                titulo:""
+                
             );
 
-            BancoDeDados.ListarTodasEntradas();
+            //BancoDeDados.ListarTodasEntradas();
 
             //else
             //{
@@ -76,13 +76,13 @@ namespace Vados
             //    @"C:\Users\ETEC\Desktop\pasta teste\awddsa.txt",
             //    @"C:\Users\ETEC\Desktop\pasta teste\mhgfnbvbvxvcxvc cnv.txt"
 
-            //};
+                //};
 
-            //    foreach (string x in nomes)
-            //    {
-            //        Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
-            //    }
-            //}
+                //    foreach (string x in nomes)
+                //    {
+                //        Comandos.CriarArquivo(x, @"C:\Users\ETEC\Desktop\pasta teste");
+                //    }
+                //}
 
 
 
@@ -125,8 +125,7 @@ namespace Vados
             }
 
         }
-
-
+        
 
         private void btnAdm_Click(object sender, EventArgs e)
         {

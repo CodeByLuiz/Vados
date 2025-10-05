@@ -34,7 +34,8 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(500, 900);
+            BackColor = SystemColors.Control;
+            ClientSize = new Size(496, 788);
             ControlBox = false;
             FormBorderStyle = FormBorderStyle.None;
             MaximizeBox = false;
@@ -42,8 +43,7 @@
             ShowIcon = false;
             ShowInTaskbar = false;
             SizeGripStyle = SizeGripStyle.Hide;
-            Text = "FormHistory";
-            TopMost = true;
+            Resize += FormHistory_Resize_1;
             ResumeLayout(false);
         }
 

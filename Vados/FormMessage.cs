@@ -21,6 +21,7 @@ namespace Vados
         CommandCriteria criteria;
         bool isErrorMessage = false;
         public UserControl userControl;
+        private string ComandoBdTxt;
 
         Image btnCloseImage;
         Image btnCloseImageHover;
@@ -39,11 +40,13 @@ namespace Vados
         );
 
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "")
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string txtbd="")
         {
             InitializeComponent();
             criteria = criteria_;
             isErrorMessage = isErrorMessage_;
+
+            ComandoBdTxt = txtbd;
 
             //Imagens
             btnCloseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeIcon.png"));
@@ -374,7 +377,7 @@ namespace Vados
 
         #endregion
 
-
+        
 
         //Botões de confrmar e cancelar
         private void btnCancel_Click(object sender, EventArgs e)
@@ -409,7 +412,7 @@ namespace Vados
                     {
                         //Realizar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
-
+                       
                         //Mostrar mensagem de erro
                         if (errorMessage != "")
                         {
@@ -417,6 +420,14 @@ namespace Vados
                             {
                                 form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
                             }));
+                        }
+                        else if (!String.IsNullOrEmpty(ComandoBdTxt))
+                        {
+                            BancoDeDados.AdicionarEntrada(
+                             comando: ComandoBdTxt,
+                             titulo: $"{criteria.Action} {criteria.ObjectType} "
+                             
+                            );
                         }
                     }
                     catch (Exception ex)

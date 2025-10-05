@@ -18,6 +18,7 @@ namespace Vados
 {
     public partial class UserControlHome : UserControl
     {
+
         public event EventHandler<LoadPageEventArgs> loadPage;
 
 
@@ -236,7 +237,7 @@ namespace Vados
 
             //Mostrar mensagem de confirmação
             parentForm.ToggleOverlay(true);
-            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria);
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria,Comandotxt:txtComando.Text);
         }
 
         public void FocusCommand(bool clear = false)
@@ -373,7 +374,19 @@ namespace Vados
             textboxActive = true;
             textboxCanClick = true;
         }
+        public string TxtComandoEditar
+        {
+            
+            get { return txtComando.Text; }
+            set 
+            { 
+                txtComando.Text = value;
+                txtComando.ForeColor=Color.Black;
+                FocusCommand();
+            }
 
+        }
+        
 
         //Corrige as variáveis do botão de microfone
         public void CorrectMicButton(bool setOnlyTargets = false)
@@ -921,8 +934,29 @@ namespace Vados
         private void btnConfigs_MouseLeave(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImage;
 
         //Botão do histórico
+        private bool historyOpen = false;
+
+        public bool HistoryOpen
+        {
+            get { return historyOpen; }
+            set { historyOpen = value; } 
+        }
+
+
         private void btnHistorico_Click(object sender, EventArgs e)
         {
+            var parentForm = FindForm() as Form1;
+            if (!historyOpen)
+            {
+                //var parentForm = FindForm() as Form1;
+                parentForm.ShowHistoryTab(parentForm, this);
+                
+            }
+            else
+            {
+                parentForm.CloseHistoryTab();
+               
+            }
 
         }
 

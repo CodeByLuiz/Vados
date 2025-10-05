@@ -24,7 +24,6 @@ namespace Vados
         private RichTextBox exampleRichTextBox = null;
         private TableLayoutPanel tableLayoutContent;
 
-
         public UserControlManual()
         {
             InitializeComponent();

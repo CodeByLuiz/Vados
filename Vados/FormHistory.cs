@@ -96,10 +96,6 @@ namespace Vados
             rectangleWidth = historyPanel.ClientSize.Width - 35;
 
 
-
-
-
-            PositionFix();
             //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
 
             // Timer pra repintar 
@@ -108,14 +104,19 @@ namespace Vados
             timer.Tick += Timer_Tick;
 
             this.Resize += FormHistory_Resize_1;
+        }
 
+
+        public void FormHistory_Load(object sender, EventArgs e)
+        {
             LoadCommands();
         }
 
 
         private void PositionFix()
         {
-
+            if (historyPanel == null)
+                return;
             //historyPanel.SuspendLayout();
 
 
@@ -349,7 +350,6 @@ namespace Vados
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            PositionFix();
             historyPanel.Invalidate();
         }
         private GraphicsPath RectArc(Rectangle rect, int raio) // deixa a borda arredondada

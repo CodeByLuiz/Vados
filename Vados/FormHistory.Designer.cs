@@ -44,6 +44,7 @@
             ShowInTaskbar = false;
             SizeGripStyle = SizeGripStyle.Hide;
             Resize += FormHistory_Resize_1;
+            Load += FormHistory_Load;
             ResumeLayout(false);
         }
 

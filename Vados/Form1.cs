@@ -14,7 +14,10 @@ namespace Vados
 
         public Form1()
         {
+
+
             InitializeComponent();
+           
             KeyPreview = true;
 
             //Otimizar pintura

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,11 @@ namespace Vados
 
 
         #region PRIORIDADES E EXCEÇÕES
+
+
+
+
+
 
         public static List<string> defaultExceptions = new List<string>
         {

@@ -20,7 +20,11 @@ namespace Vados
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
 
+
+
+         
         System.Windows.Forms.Timer timer;
+        private Image sendIcon;
 
         //Imagens dos botões da interface
         Image btnHistoryImage;
@@ -151,6 +155,7 @@ namespace Vados
             btnSendImageHover = Global.ImageChangeBrightness(btnSendImage, brightnessChange);
             btnSendShadow = Global.ImageCreateShadow(btnSendImage, Color.Black, 0.3f, 15);
             btnSendCurrentImage = btnSendImage;
+            sendIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
 
             //Botão do microfone
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
@@ -642,7 +647,6 @@ namespace Vados
             float txtIconX = txtAreaX + txtAreaWidth - txtIconMarginW - txtIconSize;
             float txtIconY = txtAreaY + txtIconMarginH;
 
-
             //Desenhar sombra
             shadowOffset = 3;
             e.Graphics.DrawImage(btnSendShadow, txtIconX, txtIconY + shadowOffset, txtIconSize, txtIconSize);
@@ -651,6 +655,13 @@ namespace Vados
             e.Graphics.DrawImage(btnSendCurrentImage, txtIconX, txtIconY, txtIconSize, txtIconSize);
 
             #endregion
+
+
+
+            pathBrush.Dispose();
+            path.Dispose();
+            brush.Dispose();
+
         }
 
         private void pnlBottom_Click(object sender, EventArgs e)
@@ -686,7 +697,6 @@ namespace Vados
             }
 
             #endregion
-
         }
 
         private void pnlBottom_Resize(object sender, EventArgs e)
@@ -882,7 +892,7 @@ namespace Vados
             circleY += (circleTargetY - circleY) / 4;
 
             //Redesenhar tela
-            pnlBottom.Invalidate();
+            pnlBottom.Invalidate(new Rectangle((int)circleX, (int)circleY, (int)circleSize+ 20, (int)circleSize + 20));
         }
 
 

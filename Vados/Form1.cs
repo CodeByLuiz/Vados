@@ -31,6 +31,7 @@ namespace Vados
             overlayForm.ShowInTaskbar = false;
             overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
+            overlayForm.GotFocus += overlayForm_GotFocus;
         }
 
         public void ToggleOverlay(bool visible)
@@ -62,22 +63,23 @@ namespace Vados
         }
 
 
-        public void CorrectMessageForm()
+        public FormMessage FindMessageForm()
         {
-            FormMessage messageForm = null;
-
-            //Encontrar form
             foreach (Form openForm in Application.OpenForms)
             {
                 if (openForm is FormMessage)
                 {
-                    messageForm = (FormMessage)openForm;
-                    break;
+                    return (FormMessage)openForm;
                 }
             }
 
-            if (messageForm == null) return;    //Parar se não encontrar form
+            return null;
+        }
 
+        public void CorrectMessageForm()
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;    //Parar se não encontrar form
 
             //Corrigir posição
             int newX = Width / 2 - messageForm.Width / 2;
@@ -151,13 +153,21 @@ namespace Vados
             CorrectMessageForm();
         }
 
-        private void Form1_Move(object sender, EventArgs e)
+        private void Form1_LocationChanged(object sender, EventArgs e)
         {
             //Corrigir posição da tela preta
             Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
             overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
-
+            
             CorrectMessageForm();
+        }
+
+        private void overlayForm_GotFocus(object sender, EventArgs e)
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;
+            messageForm.BringToFront();
+            messageForm.Focus();
         }
     }
 }

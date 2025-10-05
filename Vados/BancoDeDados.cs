@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.Sqlite;
 
@@ -24,9 +21,9 @@ namespace Vados
             public string Comando { get; set; }
 
             
-            public HistoryEntry()
+            public HistoryEntry() // pega automaticamente a data e o guid
             {
-                Data = DateTime.Now;
+                Data = DateTime.Now; 
                 ComputadorId = ObterComputadorId();
             }
         }
@@ -35,25 +32,25 @@ namespace Vados
         {
             public DbSet<HistoryEntry> Historico { get; set; }
 
-            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) // define que sqlite sera usado para criar o banco
             {
                 optionsBuilder.UseSqlite("Data Source=historico.db");
             }
 
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            protected override void OnModelCreating(ModelBuilder modelBuilder) // "modela" o banco de dados
             {
                 modelBuilder.Entity<HistoryEntry>()
-                    .HasKey(h => h.Id);
+                    .HasKey(h => h.Id); //define id como chave primaria
 
                 modelBuilder.Entity<HistoryEntry>()
                     .Property(h => h.Id)
-                    .ValueGeneratedOnAdd();
+                    .ValueGeneratedOnAdd(); // gera valor automaticamente
 
                 modelBuilder.Entity<HistoryEntry>()
                     .Property(h => h.ComputadorId)
                     .HasConversion(
-                        v => v.ToString(),
-                        v => Guid.Parse(v)
+                        v => v.ToString(), // salvano banco como string
+                        v => Guid.Parse(v) // converte de volta para guid
                     );
             }
 
@@ -67,7 +64,6 @@ namespace Vados
                     return guid;
             }
 
-            // Se não existe ou é inválido, cria novo e salva
             var novoGuid = Guid.NewGuid();
             File.WriteAllText(UUIDComando, novoGuid.ToString());
             return novoGuid;

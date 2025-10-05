@@ -90,11 +90,12 @@ namespace Vados
             this.Controls.Add(title);
             
             title.BringToFront();
-           
 
-            
-            
-            
+            rectangleWidth = historyPanel.ClientSize.Width - 35;
+
+
+
+
 
             PositionFix();
             //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
@@ -115,13 +116,14 @@ namespace Vados
 
             //historyPanel.SuspendLayout();
 
-            rectangleWidth = historyPanel.ClientSize.Width - 35;
+
+
+            //tamanho
+
+            
             spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
             startY = spacing;
 
-            //tamanho
-            
-            
             historyPanel.Height = this.Height - (title.Location.Y + title.Height)-spacing;
             
 
@@ -136,7 +138,7 @@ namespace Vados
 
         private void LoadCommands()
         {
-            historyPanel.SuspendLayout();
+            
 
             historyPanel.Controls.Clear(); 
 
@@ -183,13 +185,11 @@ namespace Vados
                 Label lbl = new Label
                 {
                     Text = $"{entry.Comando}",
-                    Location = new Point(lbltitle.Location.X+2, lbltitle.Location.Y + lbltitle.Height+2),
+                    Location = new Point(lbltitle.Location.X + 2, lbltitle.Location.Y + lbltitle.Height + 2),
                     // AutoSize = false,
-                    Width = rectangleWidth - 10,
-                    Height = rectangleHeight,
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 12, FontStyle.Regular),
-                    
+                    //BackColor = Color.Red
 
 
 
@@ -254,7 +254,9 @@ namespace Vados
                 lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
 
 
-
+                //ajusta o tamanho de elementos necessarios
+                lbl.Width = rectangleWidth - lbl.Location.X - 10;
+                lbl.Height =rectangleHeight-( rectangleHeight-btnEditar.Location.Y) - (lbltitle.Location.Y+lbltitle.Height);
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e) 
@@ -270,6 +272,27 @@ namespace Vados
                     //lbl.ForeColor = Colors.bluePrimary;
                 }
 
+                void DeleteHoverEnter(object sender, EventArgs e)
+                {
+                    btnExcluir.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\deleteiconhover.png"));
+                }
+
+                void DeleteHoverLeave(object sender, EventArgs e)
+                {
+                    btnExcluir.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\deleteicon.png"));
+                }
+
+                void EditHoverEnter(object sender, EventArgs e)
+                {
+                    btnEditar.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\editiconhover.png"));
+                    
+                }
+
+                void EditHoverLeave(object sender, EventArgs e)
+                {
+                    btnEditar.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\editicon.png"));
+                }
+
                 void DeleteEntry(object sender, EventArgs e)
                 {
                     BancoDeDados.DeleteEntryID(entry.Id);
@@ -277,21 +300,31 @@ namespace Vados
                 }
                 void EditEntry(object sender, EventArgs e)
                 {
-
-                    
-
                     Global.userControlHome.TxtComandoEditar = entry.Comando;
                     Global.userControlHome.HistoryOpen = false;
                     this.Close();
                 }
 
-                // Adiciona os eventos tanto ao painel quanto a label
+                // Adiciona os eventos aos elementos
                 entryPanel.MouseEnter += HoverEnter;
                 entryPanel.MouseLeave += HoverLeave;
                 lbl.MouseEnter += HoverEnter;
                 lbl.MouseLeave += HoverLeave;
+                lbltitle.MouseEnter += HoverEnter;
+                lbltitle.MouseLeave += HoverLeave;
+                lblData.MouseEnter += HoverEnter;
+                lblData.MouseLeave += HoverLeave;
+
                 btnExcluir.MouseEnter += HoverEnter;
-                btnExcluir.MouseLeave += HoverEnter;
+                btnExcluir.MouseLeave += HoverLeave;
+                btnEditar.MouseEnter += HoverEnter;
+                btnEditar.MouseLeave += HoverLeave;
+
+                btnExcluir.MouseEnter += DeleteHoverEnter;
+                btnExcluir.MouseLeave += DeleteHoverLeave;
+                btnEditar.MouseEnter += EditHoverEnter;
+                btnEditar.MouseLeave += EditHoverLeave;
+
 
                 btnExcluir.Click += DeleteEntry;
                 btnEditar.Click += EditEntry;
@@ -299,8 +332,9 @@ namespace Vados
                 startY += rectangleHeight + margin;
 
             }
-            
-            historyPanel.ResumeLayout();
+
+
+            PositionFix();
         }
 
 

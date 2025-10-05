@@ -21,7 +21,7 @@ namespace Vados
         private FlowLayoutPanel flow;
         private Panel panelContent = null;
         private Panel imageWrapper = null;
-
+        private RichTextBox exampleRichTextBox = null;
         private TableLayoutPanel tableLayoutContent;
 
 
@@ -131,19 +131,17 @@ namespace Vados
 
 
 
-      private void UserControlManual_Resize(Object sender,EventArgs e ) {
-
+        private void UserControlManual_Resize(object sender, EventArgs e)
+        {
             foreach (Control control in tableLayoutContent.Controls)
             {
-                if (control is Label label && label.Tag?.ToString() == "descrição")
+                if (control is RichTextBox box && box.Tag?.ToString() == "descrição")
                 {
-                    label.MaximumSize = new Size(panelContent.Width - 60, 0);
+                    ResizeDescriptionBox(box);
                 }
             }
-
-
-
         }
+
 
 
 
@@ -187,27 +185,61 @@ namespace Vados
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(title, 0, tableLayoutContent.RowCount - 1);
         }
-
         private void AddDescriptionToContent(string description)
         {
-            Label descriptionLabel = new Label
+            RichTextBox descriptionBox = new RichTextBox
             {
                 Text = description,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.TopLeft,
-                Padding = new Padding(65, 10, 10, 30),
-                AutoSize = true,
-                MaximumSize = new Size(panelContent.Width - 40, 0),
+                BackColor = Color.FromArgb(223, 223, 223),
+                BorderStyle = BorderStyle.None,
+                ReadOnly = true,
+                ScrollBars = RichTextBoxScrollBars.None,
+                DetectUrls = false,
+                TabStop = false,
+                WordWrap = true,
+                Dock = DockStyle.None,
+                Margin = new Padding(65, 10, 40, 30), // margem externa
                 Tag = "descrição"
             };
 
-         
+            // Bloqueia seleção/foco
+            descriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
+            descriptionBox.MouseDown += (s, e) => descriptionBox.SelectionLength = 0;
+            descriptionBox.SelectionChanged += (s, e) => descriptionBox.SelectionLength = 0;
+
+            // Adiciona margem interna para o texto
+            descriptionBox.SelectionIndent = 0;           // recuo à esquerda
+            descriptionBox.SelectionRightIndent = 20;    // recuo à direita
+
+            ResizeDescriptionBox(descriptionBox);
+
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tableLayoutContent.Controls.Add(descriptionLabel, 0, tableLayoutContent.RowCount - 1);
+            tableLayoutContent.Controls.Add(descriptionBox, 0, tableLayoutContent.RowCount - 1);
         }
+
+
+        private void ResizeDescriptionBox(RichTextBox box)
+        {
+            int horizontalPadding = box.Margin.Left + box.Margin.Right + 20; 
+            int maxWidth = panelContent.Width - horizontalPadding;
+
+            box.MaximumSize = new Size(maxWidth, 0);
+
+            Size textSize = TextRenderer.MeasureText(
+                box.Text,
+                box.Font,
+                new Size(maxWidth, int.MaxValue),
+                TextFormatFlags.WordBreak
+            );
+
+            box.Width = maxWidth;
+            box.Height = textSize.Height + 10;
+        }
+
+
 
         private void AddImageToContent(string caminhoimagem)
         {
@@ -239,40 +271,75 @@ namespace Vados
             }
         }
 
-        private void AddExampleBox(string texto)
+       
+        
+            private void AddExampleBox(string texto)
         {
+          
+            Label exampleLabel = new Label
+            {
+                Text = "Exemplos:",
+                Font = Fonts.GetFont(Fonts.DarkerExtraBold, 20f),
+                ForeColor = Color.FromArgb(48, 61, 99),
+                AutoSize = true,
+                TextAlign = ContentAlignment.TopLeft,
+                Margin = new Padding(0, 0, 10, 0)
+            };
+
+            
             Panel examplePanel = new Panel
             {
                 BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
                 Height = 200,
-                Margin = new Padding(270, 40, 10, 5),
-                AutoSize = false
+                Margin = new Padding(5),
             };
 
-           
-            RichTextBox exampleRichTextBox = new RichTextBox { 
+            
+             exampleRichTextBox = new RichTextBox
+            {
                 Text = texto,
+                Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
                 BackColor = Color.FromArgb(231, 231, 231),
                 TabStop = false,
-                Cursor= Cursors.Arrow,     
-                Margin= new Padding(10,10,10,10)
-
+                Cursor = Cursors.Arrow,
+                Margin = new Padding(10),
+                
+                Width = examplePanel.Width - 20,
+                Height = examplePanel.Height - 20,
             };
+
             exampleRichTextBox.GotFocus += (s, e) => this.ActiveControl = null;
             exampleRichTextBox.MouseDown += (s, e) => exampleRichTextBox.SelectionLength = 0;
             exampleRichTextBox.SelectionChanged += (s, e) => exampleRichTextBox.SelectionLength = 0;
+
             examplePanel.Controls.Add(exampleRichTextBox);
 
-          
-            tableLayoutContent.RowCount++;
-            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.Absolute, 200));
-            tableLayoutContent.Controls.Add(examplePanel, 0, tableLayoutContent.RowCount - 1);
+           
+            FlowLayoutPanel container = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                WrapContents = false,
+                Margin = new Padding(60, 20, 0, 0),
+                Padding = new Padding(0),
+            };
 
-            examplePanel.BringToFront();
+           
+            container.Controls.Add(exampleLabel);
+            container.Controls.Add(examplePanel);
+
+           
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutContent.Controls.Add(container, 0, tableLayoutContent.RowCount - 1);
         }
+
+       
+
+        
 
 
 
@@ -318,7 +385,7 @@ namespace Vados
             {
                 Text = "Comandos",
                 ForeColor = Color.FromArgb(200, 219, 236),
-                Font = Fonts.GetFont(Fonts.DarkerExtraBold, 26f),
+                Font = Fonts.GetFont(Fonts.MavenMedium, 26f),
                 Height = 50,
                 Width = flow.Width,
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -328,46 +395,71 @@ namespace Vados
             flow.Controls.Add(lblTitle);
 
             // Categorias
-            AddSection(flow, "Pastas ", new[] { "Criar uma pasta", "Abrir uma pasta","Abrir pasta padrão","Renomear uma pasta","Excluir uma pasta","Mover uma pasta","Duplicar uma pasta" });
-            AddSection(flow, "Arquivos ", new[] { "Criar um arquivo", "Abrir um arquivo","Renomear um arquivo","Excluir um arquivo","Mover um arquivo","Duplicar um arquivo","Operar múltiplos arquivos " });
-            AddSection(flow, "Sistema ", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
+            AddSection(flow, "Pastas ", @"Images/Icons/pasta.png", new[] { "Criar uma pasta", "Abrir uma pasta","Abrir pasta padrão","Renomear uma pasta","Excluir uma pasta","Mover uma pasta","Duplicar uma pasta" });
+            AddSection(flow, "Arquivos ", @"Images/Icons/Arquivos.png", new[] { "Criar um arquivo", "Abrir um arquivo","Renomear um arquivo","Excluir um arquivo","Mover um arquivo","Duplicar um arquivo","Operar múltiplos arquivos " });
+            AddSection(flow, "Sistema ", @"Images/Icons/Sistema.png", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
         }
 
-       
 
-        private void AddSection(FlowLayoutPanel flow, string sectionTitle, string[] commands)
+        private void AddSection(FlowLayoutPanel flow, string sectionTitle, string iconPath, string[] commands)
         {
+            
+            FlowLayoutPanel sectionPanel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                WrapContents = false,
+                Margin = new Padding(10, 10, 10, 5),
+                Padding = new Padding(0)
+            };
+
+            
             Label lblSection = new Label
             {
                 Text = sectionTitle,
                 ForeColor = Color.FromArgb(200, 219, 236),
                 Font = Fonts.GetFont(Fonts.DarkerExtraBold, 18f),
-                Height = 30,
-                Width = flow.Width - 20,
-                Margin = new Padding(10, 10, 10, 5)
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleLeft
             };
-            flow.Controls.Add(lblSection);
+            sectionPanel.Controls.Add(lblSection);
 
+
+            PictureBox icon = new PictureBox
+            {
+                Image = Image.FromFile(iconPath),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Width = 24,
+                Height = 24,
+                Margin = new Padding(0, 3, 5, 0) 
+            };
+            sectionPanel.Controls.Add(icon);
+
+            // Adiciona ao FlowLayoutPanel principal
+            flow.Controls.Add(sectionPanel);
+
+            // Botões da seção
             foreach (var cmd in commands)
             {
                 RoundedButton btn = new RoundedButton
                 {
                     Text = cmd,
                     Height = 30,
-                    Width = flow.Width -20,
+                    Width = flow.Width - 20,
                     TextAlign = ContentAlignment.MiddleLeft,
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
                     Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                     Padding = new Padding(15, 0, 15, 0),
-                    Margin = new Padding(15, 3, 15, 3) 
+                    Margin = new Padding(15, 3, 15, 3)
                 };
                 btn.FlatAppearance.BorderSize = 0;
                 btn.Click += NavButton_Click;
                 flow.Controls.Add(btn);
             }
         }
+
         private void DrawTitleLines(object sender, PaintEventArgs e)
         {
             Label lbl = sender as Label;
@@ -387,7 +479,7 @@ namespace Vados
                 int centerY = lbl.Height / 2; 
                 int lineY = centerY; 
 
-                int padding = 5;
+                int padding = 1;
                 int lineLength = (lbl.Width - textWidth) / 2 - padding;
 
                 if (lineLength > 0)
@@ -424,6 +516,9 @@ namespace Vados
 
         }
 
+        
+
+
         private void LoadContentBasedOnSelection(string buttonText)
         {
           
@@ -454,16 +549,25 @@ namespace Vados
             AddTitleToContent("Criar Pasta");
             AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
             AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddExampleBox("lalalalalalalalalalalaq");
-            
+            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
+            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
+                "Crie uma pasta chamada 'Fotos'"+
+                "Crie uma pasta chamada 'Trabalhos'"
+                );
+
+  
+
         }
 
         private void LoadAbrirPastaContent()
         {
-            AddExampleBox("lalalalalalalalalalalaq");
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddTitleToContent("Abrir Pasta");
             AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
-            AddTitleToContent("Criar Pasta");
+            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
+            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
+                "Crie uma pasta chamada 'Fotos'" +
+                "Crie uma pasta chamada 'Trabalhos'");
         }
 
 

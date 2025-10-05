@@ -23,9 +23,12 @@
     <None Remove="Fonts\MavenPro-Medium.ttf" />
     <None Remove="Fonts\MavenPro-Regular.ttf" />
     <None Remove="Fonts\MavenPro-SemiBold.ttf" />
+    <None Remove="Images\Icons\Arquivos.png" />
     <None Remove="Images\Icons\configIcon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
+    <None Remove="Images\Icons\pasta.png" />
     <None Remove="Images\Icons\sendIcon.png" />
+    <None Remove="Images\Icons\Sistema.png" />
     <None Remove="Images\imagem-nao-encontrada.jpg" />
     <None Remove="Images\Logo.jpg" />
     <None Remove="Images\LogoAzul.png" />
@@ -85,6 +88,9 @@
     <Content Include="Fonts\MavenPro-SemiBold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\Icons\Arquivos.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Icons\configIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -94,7 +100,13 @@
     <Content Include="Images\Icons\micIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\Icons\pasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Icons\sendIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\Sistema.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\vados-icone.ico">

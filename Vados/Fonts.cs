@@ -24,7 +24,19 @@ namespace Vados
             DarkerMedium = LoadFont("Fonts\\DarkerGrotesque-Medium.ttf");
             DarkerBlack = LoadFont("Fonts\\DarkerGrotesque-Black.ttf");
 
-          
+
+
+
+
+           MavenRegular = LoadFont("Fonts/MavenPro-Regular.ttf");
+            MavenBold = LoadFont("Fonts\\MavenPro-Bold.ttf");
+            MavenExtraBold = LoadFont("Fonts\\MavenPro-ExtraBold.ttf");
+           // MavenLight = LoadFont("Fonts\\MavenPro-Light.ttf");
+            MavenSemiBold = LoadFont("Fonts\\MavenPro-SemiBold.ttf");
+            MavenMedium = LoadFont("Fonts\\MavenPro-Medium.ttf");
+            MavenBlack = LoadFont("Fonts\\MavenPro-Black.ttf");
+
+
         }
 
         public static FontFamily DarkerRegular { get; private set; }
@@ -39,7 +51,7 @@ namespace Vados
         public static FontFamily MavenRegular { get; private set; }
         public static FontFamily MavenBold { get; private set; }
         public static FontFamily MavenExtraBold { get; private set; }
-        public static FontFamily MavenLight { get; private set; }
+     //   public static FontFamily MavenLight { get; private set; }
         public static FontFamily MavenSemiBold { get; private set; }
         public static FontFamily MavenMedium { get; private set; }
         public static FontFamily MavenBlack { get; private set; }

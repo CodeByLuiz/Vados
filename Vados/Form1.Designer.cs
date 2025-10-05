@@ -53,6 +53,7 @@
             Text = "Vados";
             Load += Form1_Load;
             KeyDown += Form1_KeyDown;
+            LocationChanged += Form1_LocationChanged;
             Resize += Form1_Resize;
             ResumeLayout(false);
         }

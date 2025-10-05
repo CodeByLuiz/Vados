@@ -34,15 +34,18 @@ namespace Vados
             overlayForm.ShowInTaskbar = false;
             overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
+            overlayForm.GotFocus += overlayForm_GotFocus;
         }
 
         public void ToggleOverlay(bool visible)
         {
+            //Ativar tela escura
             if (visible)
             {
                 overlayForm.Show();
                 overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
             }
+            //Desativar
             else
             {
                 overlayForm.Hide();
@@ -50,8 +53,45 @@ namespace Vados
         }
 
 
+        //Ativar mensagem
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "")
+        {
+            ToggleOverlay(true);
 
-        //Função para trocar user control
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf);
+            message.Owner = form;
+            message.userControl = userControl;
+            message.Show();
+            CorrectMessageForm();
+        }
+
+
+        public FormMessage FindMessageForm()
+        {
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormMessage)
+                {
+                    return (FormMessage)openForm;
+                }
+            }
+
+            return null;
+        }
+
+        public void CorrectMessageForm()
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;    //Parar se não encontrar form
+
+            //Corrigir posição
+            int newX = Width / 2 - messageForm.Width / 2;
+            int newY = Height / 2 - messageForm.Height / 2;
+            messageForm.Location =  PointToScreen(new Point(newX, newY));
+        }
+
+
+        //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
         {
             panelContainer.Controls.Clear();
@@ -111,8 +151,26 @@ namespace Vados
         private void Form1_Resize(object sender, EventArgs e)
         {
             //Corrigir tamanho da tela preta
-            overlayForm.Bounds = this.Bounds;
-            overlayForm.Bounds = this.RectangleToScreen(this.ClientRectangle);
+            overlayForm.Bounds = RectangleToScreen(this.ClientRectangle);
+
+            CorrectMessageForm();
+        }
+
+        private void Form1_LocationChanged(object sender, EventArgs e)
+        {
+            //Corrigir posição da tela preta
+            Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
+            overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
+            
+            CorrectMessageForm();
+        }
+
+        private void overlayForm_GotFocus(object sender, EventArgs e)
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;
+            messageForm.BringToFront();
+            messageForm.Focus();
         }
     }
 }

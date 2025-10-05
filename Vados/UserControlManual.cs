@@ -25,10 +25,6 @@ namespace Vados
         private TableLayoutPanel tableLayoutContent;
 
 
-
-
-
-
         public UserControlManual()
         {
             InitializeComponent();
@@ -64,7 +60,6 @@ namespace Vados
 
             protected override void OnPaint(PaintEventArgs e)
             {
-
                 base.OnPaint(e);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -79,7 +74,6 @@ namespace Vados
                         e.Graphics.FillPath(brush, path);
                     }
                 }
-             
 
 
                 Rectangle textRect = new Rectangle(
@@ -127,8 +121,6 @@ namespace Vados
                 return path;
             }
         }
-
-
 
 
         private void UserControlManual_Resize(object sender, EventArgs e)
@@ -338,12 +330,6 @@ namespace Vados
         }
 
        
-
-        
-
-
-
-
         private void SetupNavBar()
         {
             panelNav = new Panel
@@ -391,6 +377,7 @@ namespace Vados
                 TextAlign = ContentAlignment.MiddleCenter,
                 Margin = new Padding(0, 10, 0, 10)
             };
+            
             lblTitle.Paint += DrawTitleLines;
             flow.Controls.Add(lblTitle);
 
@@ -576,5 +563,4 @@ namespace Vados
     }
 
 
-    }
-
+}

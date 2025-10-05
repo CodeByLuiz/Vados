@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserControlHome));
             pnlBottom = new OptmizedPanel();
+            btnHistorico = new PictureBox();
             lblText = new Label();
             lblDebug = new Label();
             btnManual = new PictureBox();
@@ -38,6 +39,7 @@
             textBox1 = new TextBox();
             txtComando = new TextBox();
             pnlBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).BeginInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).BeginInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).BeginInit();
@@ -45,6 +47,7 @@
             // 
             // pnlBottom
             // 
+            pnlBottom.Controls.Add(btnHistorico);
             pnlBottom.Controls.Add(lblText);
             pnlBottom.Controls.Add(lblDebug);
             pnlBottom.Controls.Add(btnManual);
@@ -61,6 +64,19 @@
             pnlBottom.Paint += pnlBottom_Paint;
             pnlBottom.MouseMove += pnlBottom_MouseMove;
             pnlBottom.Resize += pnlBottom_Resize;
+            // 
+            // btnHistorico
+            // 
+            btnHistorico.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnHistorico.Cursor = Cursors.Hand;
+            btnHistorico.Image = (Image)resources.GetObject("btnHistorico.Image");
+            btnHistorico.Location = new Point(1417, 18);
+            btnHistorico.Name = "btnHistorico";
+            btnHistorico.Size = new Size(73, 67);
+            btnHistorico.SizeMode = PictureBoxSizeMode.Zoom;
+            btnHistorico.TabIndex = 10;
+            btnHistorico.TabStop = false;
+            btnHistorico.Click += btnHistorico_Click;
             // 
             // lblText
             // 
@@ -83,6 +99,7 @@
             lblDebug.Size = new Size(42, 15);
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
+            lblDebug.Visible = false;
             // 
             // btnManual
             // 
@@ -96,6 +113,8 @@
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
             btnManual.Click += btnManual_Click;
+            btnManual.MouseEnter += btnManual_MouseEnter;
+            btnManual.MouseLeave += btnManual_MouseLeave;
             // 
             // btnConfigs
             // 
@@ -109,6 +128,8 @@
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
             btnConfigs.Click += btnConfigs_Click;
+            btnConfigs.MouseEnter += btnConfigs_MouseEnter;
+            btnConfigs.MouseLeave += btnConfigs_MouseLeave;
             // 
             // imgLogo
             // 
@@ -147,7 +168,8 @@
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
-            txtComando.TextChanged += txtComando_TextChanged;
+            txtComando.Enter += txtComando_Enter;
+            txtComando.KeyPress += txtComando_KeyPress;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
             // UserControlHome
@@ -159,9 +181,9 @@
             MinimumSize = new Size(360, 180);
             Name = "UserControlHome";
             Size = new Size(1680, 810);
-            KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)btnHistorico).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnManual).EndInit();
             ((System.ComponentModel.ISupportInitialize)btnConfigs).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgLogo).EndInit();
@@ -177,5 +199,6 @@
         private PictureBox btnConfigs;
         private PictureBox imgLogo;
         private Label lblText;
+        private PictureBox btnHistorico;
     }
 }

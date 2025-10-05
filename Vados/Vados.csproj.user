@@ -4,10 +4,16 @@
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FormMessage.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="OptmizedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="RoundedButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Update="UserControlHome.cs">
@@ -21,7 +27,19 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Form1.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="FormHistory.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="FormMessage.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="UserControlHome.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

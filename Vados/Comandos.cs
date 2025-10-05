@@ -18,11 +18,18 @@ using System.Globalization;
 using static System.Windows.Forms.DataFormats;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using Vosk;
+using Microsoft.VisualBasic;
+using NAudio.Wave;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Xml.Linq;
 
 namespace Vados
 {
     internal class Comandos
     {
+        Task<bool> commandSuccess;
+
         #region FUNÇÕES DO WINDOWS
 
         [DllImport("user32.dll")]
@@ -38,6 +45,56 @@ namespace Vados
 
         #region DICIONÁRIOS / LISTAS
 
+        //Nomes inválidos para arquivos / pastas
+        public static string[] reservedNames =
+        {
+            "CON", "PRN", "AUX", "NUL",
+            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+        };
+
+
+        #region RECONHECIMENTO DE VOZ
+
+        //Termos ignorados no reconhecimento de voz
+        public static List<string> speechIgnoreWords = new List<string>()
+        {
+            "[música]",
+            "[Música]",
+            "[MÚSICA]",
+            "[música de fundo]",
+            "[Música de fundo]",
+            "[MÚSICA DE FUNDO]",
+            "[aplausos]",
+            "[Aplausos]",
+            "[APLAUSOS]",
+            "[risos]",
+            "[Risos]",
+            "[RISOS]",
+            "[inaudível]",
+            "[Inaudível]",
+            "[INAUDÍVEL]",
+            "[inaudible]",
+            "[Inaudible]",
+            "[ruído]",
+            "[Ruído]",
+            "[RUÍDO]",
+            "[conversas]",
+            "[Conversas]",
+            "[CONVERSAS]",
+            "[som de fundo]",
+            "[Som de fundo]",
+            "[SOM DE FUNDO]",
+        };
+
+        //Palavras aceitas/esperadas no reconhecimento de voz que não estão em nenhuma outra lista
+        public static List<string> extraSpeechWords = new List<string>()
+        {
+            "para",
+        };
+
+        #endregion
+
         #region COMANDOS
 
         //Sinonimo chave de cada variação dos comandos
@@ -46,105 +103,205 @@ namespace Vados
             //Criar
             { "criar", "criar" },
             { "crie", "criar" },
+            { "criasse", "criar" },
+            { "criaria", "criar" },
             { "gerar", "criar" },
             { "gere", "criar" },
+            { "gerasse", "criar" },
+            { "geraria", "criar" },
             { "produzir", "criar" },
             { "produza", "criar" },
+            { "produzisse", "criar" },
+            { "produziria", "criar" },
             { "formar", "criar" },
             { "forme", "criar" },
+            { "formasse", "criar" },
+            { "formaria", "criar" },
             { "construir", "criar" },
             { "construa", "criar" },
+            { "construisse", "criar" },
+            { "construiria", "criar" },
             { "fazer", "criar" },
             { "faca", "criar" },
+            { "fizesse", "criar" },
+            { "faria", "criar" },
             { "inventar", "criar" },
             { "invente", "criar" },
+            { "inventasse", "criar" },
+            { "inventaria", "criar" },
             { "dar a luz", "criar" },
             { "de a luz", "criar" },
+            { "desse a luz", "criar" },
+            { "daria a luz", "criar" },
             { "originar", "criar" },
             { "origine", "criar" },
+            { "originasse", "criar" },
+            { "originaria", "criar" },
             //Renomear
             { "renomear", "renomear" },
             { "renomeie", "renomear" },
+            { "renomeasse", "renomear" },
+            { "renomearia", "renomear" },
             { "alterar o nome", "renomear" },
             { "altere o nome", "renomear" },
+            { "alterasse o nome", "renomear" },
+            { "alteraria o nome", "renomear" },
             { "rebatizar", "renomear" },
             { "rebatize", "renomear" },
+            { "rebatizasse", "renomear" },
+            { "rebatizaria", "renomear" },
             { "mudar o nome", "renomear" },
             { "mude o nome", "renomear" },
+            { "mudasse o nome", "renomear" },
+            { "mudaria o nome", "renomear" },
             { "trocar o nome", "renomear" },
             { "troque o nome", "renomear" },
+            { "trocasse o nome", "renomear" },
+            { "trocaria o nome", "renomear" },
             { "modificar o nome", "renomear" },
             { "modifique o nome", "renomear" },
+            { "modificasse o nome", "renomear" },
+            { "modificaria o nome", "renomear" },
             { "substituir o nome", "renomear" },
             { "substitua o nome", "renomear" },
+            { "substitisse o nome", "renomear" },
+            { "substituiria o nome", "renomear" },
             //Excluir
             { "excluir", "excluir" },
             { "exclua", "excluir" },
+            { "excluisse", "excluir" },
+            { "excluiria", "excluir" },
             { "deletar", "excluir" },
             { "delete", "excluir" },
+            { "deletasse", "excluir" },
+            { "deletaria", "excluir" },
             { "apagar", "excluir" },
             { "apague", "excluir" },
+            { "apagasse", "excluir" },
+            { "apagaria", "excluir" },
             { "remover", "excluir" },
             { "remova", "excluir" },
+            { "removesse", "excluir" },
+            { "removeria", "excluir" },
             { "eliminar", "excluir" },
             { "elimine", "excluir" },
+            { "eliminasse", "excluir" },
+            { "eliminaria", "excluir" },
             { "destruir", "excluir" },
             { "destrua", "excluir" },
+            { "destruisse", "excluir" },
+            { "destruiria", "excluir" },
             { "quebrar", "excluir" },
             { "quebre", "excluir" },
+            { "quebrasse", "excluir" },
+            { "quebraria", "excluir" },
             { "anular", "excluir" },
             { "anule", "excluir" },
+            { "anulasse", "excluir" },
+            { "anularia", "excluir" },
             { "desfazer", "excluir" },
             { "desfaca", "excluir" },
+            { "desfizesse", "excluir" },
+            { "desfaria", "excluir" },
             { "extinguir", "excluir" },
             { "extinga", "excluir" },
+            { "extinguisse", "excluir" },
+            { "extinguiria", "excluir" },
             { "obliterar", "excluir" },
             { "oblitere", "excluir" },
+            { "obliterasse", "excluir" },
+            { "obliteraria", "excluir" },
             //Mover
             { "mover", "mover" },
             { "mova", "mover" },
+            { "movesse", "mover" },
+            { "moveria", "mover" },
             { "transferir", "mover" },
             { "transfera", "mover" },
+            { "transferisse", "mover" },
+            { "transferiria", "mover" },
             { "realocar", "mover" },
             { "realoque", "mover" },
+            { "realocasse", "mover" },
+            { "realocaria", "mover" },
             { "colocar", "mover" },
             { "coloque", "mover" },
+            { "colocasse", "mover" },
+            { "colocaria", "mover" },
             { "deslocar", "mover" },
             { "desloque", "mover" },
+            { "deslocasse", "mover" },
+            { "deslocaria", "mover" },
             { "levar", "mover" },
             { "leve", "mover" },
+            { "levasse", "mover" },
+            { "levaria", "mover" },
             { "transportar", "mover" },
             { "transporte", "mover" },
+            { "transportasse", "mover" },
+            { "transportaria", "mover" },
             { "enviar", "mover" },
             { "envie", "mover" },
+            { "enviasse", "mover" },
+            { "enviaria", "mover" },
             { "movimentar", "mover" },
             { "movimente", "mover" },
+            { "movimentasse", "mover" },
+            { "movimentaria", "mover" },
             { "translocar", "mover" },
             { "transloque", "mover" },
+            { "translocasse", "mover" },
+            { "translocaria", "mover" },
+            { "separar", "mover" },
+            { "separe", "mover" },
+            { "separasse", "mover" },
+            { "separaria", "mover" },
             //Duplicar
             { "duplicar", "duplicar" },
             { "duplique", "duplicar" },
+            { "duplicasse", "duplicar" },
+            { "duplicaria", "duplicar" },
             { "copiar", "duplicar" },
             { "copie", "duplicar" },
+            { "copiasse", "duplicar" },
+            { "copiaria", "duplicar" },
             { "repetir", "duplicar" },
             { "repita", "duplicar" },
+            { "repetisse", "duplicar" },
+            { "repetiria", "duplicar" },
             { "reproduzir", "duplicar" },
             { "reproduza", "duplicar" },
+            { "reproduzisse", "duplicar" },
+            { "reproduziria", "duplicar" },
             { "imitar", "duplicar" },
             { "imite", "duplicar" },
+            { "imitasse", "duplicar" },
+            { "imitaria", "duplicar" },
             //Abrir
             { "abrir", "abrir" },
             { "abra", "abrir" },
+            { "abrisse", "abrir" },
+            { "abriria", "abrir" },
             { "iniciar", "abrir" },
             { "inicie", "abrir" },
+            { "iniciasse", "abrir" },
+            { "iniciaria", "abrir" },
             { "inicializar", "abrir" },
             { "inicialize", "abrir" },
+            { "inicializasse", "abrir" },
+            { "inicializaria", "abrir" },
             { "comecar", "abrir" },
             { "comece", "abrir" },
+            { "comecasse", "abrir" },
+            { "comecaria", "abrir" },
             { "despertar", "abrir" },
             { "desperte", "abrir" },
+            { "despertasse", "abrir" },
+            { "despertaria", "abrir" },
             { "acordar", "abrir" },
             { "acorde", "abrir" },
+            { "acordasse", "abrir" },
+            { "acordaria", "abrir" },
         };
 
         //Todas as variações dos comandos
@@ -171,10 +328,10 @@ namespace Vados
             { "arquivo", "arquivo" },
             { "documentos", "arquivo" },
             { "documento", "arquivo" },
-            { "programa", "programa" },
-            { "aplicativo", "programa" },
-            { "app", "programa" },
-            { "executavel", "programa" },
+            { "aplicativo", "aplicativo" },
+            { "programa", "aplicativo" },
+            { "app", "aplicativo" },
+            { "executavel", "aplicativo" },
         };
 
         //Todas as variações de objetos (pasta / arquivo)
@@ -187,27 +344,40 @@ namespace Vados
         //Variações das unidades de tamanho de arquivo
         static Dictionary<string, string> sizeUnitSynonyms = new Dictionary<string, string>()
         {
-            //Quantidade
+            //Bytes
             { "byte", "byte" },
             { "bytes", "byte" },
+            { "bite", "byte" },
+            { "bites", "byte" },
+            //Kilobytes
             { "kilo", "kilo" },
             { "kilos", "kilo" },
             { "kilobyte", "kilo" },
             { "kilobytes", "kilo" },
-            { "kb", "kilo" },
-            { "kbs", "kilo" },
+            { "kilobite", "kilo" },
+            { "kilobites", "kilo" },
             { "kbyte", "kilo" },
             { "kbytes", "kilo" },
+            { "kbite", "kilo" },
+            { "kbites", "kilo" },
+            { "kb", "kilo" },
+            { "kbs", "kilo" },
+            //Megabytes
             { "mega", "mega" },
             { "megas", "mega" },
             { "megabyte", "mega" },
             { "megabytes", "mega" },
+            { "megabite", "mega" },
+            { "megabites", "mega" },
             { "mb", "mega" },
             { "mbs", "mega" },
+            //Gigabytes
             { "giga", "giga" },
             { "gigas", "giga" },
             { "gigabyte", "giga" },
             { "gigabytes", "giga" },
+            { "gigabite", "giga" },
+            { "gigabites", "giga" },
             { "gbs", "giga" },
         };
 
@@ -287,6 +457,7 @@ namespace Vados
             //Quantidade
             { "todos", "todos" },
             { "todos os", "todos" },
+            { "cada", "todos" },
             { "metade dos", "metade" },
         };
 
@@ -317,20 +488,6 @@ namespace Vados
         #endregion
 
 
-        //Formas de começar o comando
-        public static List<string> startWords = new List<string>()
-        {
-            "quero",
-            "eu quero",
-            "quero que",
-            "eu quero que",
-            "quero que voce",
-            "eu quero que voce",
-            "por favor",
-            "por obsequio",
-            "por gentileza",
-        };
-
         //Formas de indicar a pasta de criação (comando criar)
         public static List<string> destinationWords = new List<string>()
         {
@@ -342,6 +499,8 @@ namespace Vados
             "com origem no",
             "com destino na",
             "com destino no",
+            "no interior da",
+            "no interior do",
         };
 
         //Formas de indicar a pasta de destino (comando mover)
@@ -357,8 +516,8 @@ namespace Vados
             "pra dentro do",
             "para dentro da",
             "para dentro do",
-            "pra o interior da",
-            "pra o interior do",
+            "pro interior da",
+            "pro interior do",
             "para o interior da",
             "para o interior do",
         };
@@ -386,24 +545,76 @@ namespace Vados
             "chamados",
             "chamada",
             "chamadas",
+            "que se chama",
+            "que se chamem",
             "nomeado",
             "nomeados",
             "nomeada",
             "nomeadas",
+            "que se nomea",
+            "que se nomeam",
             "denominado",
             "denominados",
             "denominada",
             "denominadas",
+            "que se denomina",
+            "que se denominam",
             "intitulado",
             "intitulados",
             "intitulada",
             "intituladas",
+            "que se intitula",
+            "que se intitulam",
             "de nome",
+            "de nomes",
             "de titulo",
+            "de titulos",
             "com nome",
+            "com nomes",
             "com titulo",
-            "com o nome",
-            "com o titulo",
+            "com titulos",
+            "que tenha o nome",
+            "que tenham o nome",
+            "que tenham os nomes",
+            "que tenha o titulo",
+            "que tenham o titulo",
+            "que tenham os titulos",
+            "que detenha o nome",
+            "que detenham o nome",
+            "que detenham os nomes",
+            "que detenha o titulo",
+            "que detenham o titulo",
+            "que detenham os titulos",
+            "que contenha o nome",
+            "que contenham o nome",
+            "que contenham os nomes",
+            "que contenha o titulo",
+            "que contenham o titulo",
+            "que contenham os titulos",
+            "que possua o nome",
+            "que possuam o nome",
+            "que possuam os nomes",
+            "que possua o titulo",
+            "que possuam o titulo",
+            "que possuam os titulos",
+            "que porta o nome",
+            "que portam o nome",
+            "que portam os nomes",
+            "que porta o titulo",
+            "que portam o titulo",
+            "que portam os titulos",
+            "que retenha o nome",
+            "que retenham o nome",
+            "que retenham os nomes",
+            "que retenha o titulo",
+            "que retenham o titulo",
+            "que retenham os titulos",
+            "que apresenta o nome",
+            "que apresentam o nome",
+            "que apresentam os nomes",
+            "que apresenta o titulo",
+            "que apresentam o titulo",
+            "que apresentam os titulos",
         };
 
         //Formas de indicar a quantidade de arquivos / pastas
@@ -412,6 +623,7 @@ namespace Vados
             "todos",
             "todos os",
             "metade dos",
+            "cada",
         };
 
 
@@ -442,12 +654,12 @@ namespace Vados
         #endregion
 
 
-        public static CommandCriteria CommandGetArguments(string command)
+        public static (CommandCriteria criteria, bool success) CommandGetArguments(string command)
         {
             CommandCriteria criteria = new CommandCriteria();
 
             //Definir tipo de comando
-            ActionExtractor actionExtractor = new ActionExtractor(startWords, allCommands);
+            ActionExtractor actionExtractor = new ActionExtractor(allCommands);
             actionExtractor.Extract(command, criteria);
 
 
@@ -458,73 +670,79 @@ namespace Vados
             {
                 case "criar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
-                            new DestinationExtractor(destinationWords, folderWords, namingWords)
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
+                        new DestinationExtractor(destinationWords, folderWords, namingWords)
+                    });
                     break;
 
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
-                            new NewNameExtractor(),
-                            new OriginExtractor(fromWords, folderWords, namingWords),
-                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
+                        new NewNameExtractor(),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                    });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
-                            new OriginExtractor(fromWords, folderWords, namingWords),
-                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                    });
                     break;
 
 
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords, fromWords),
-                            new OriginExtractor(fromWords, folderWords, namingWords),
-                            new DestinationExtractor(insideWords, folderWords, namingWords),
-                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
+                        new DestinationExtractor(insideWords, folderWords, namingWords, true),
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                    });
                     break;
 
 
                 case "duplicar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
-                            new OriginExtractor(fromWords, folderWords, namingWords),
-                            new DestinationExtractor(insideWords, folderWords, namingWords),
-                            new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
+                        new DestinationExtractor(insideWords, folderWords, namingWords),
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                    });
                     break;
 
                 case "abrir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
-                        {
-                            new ObjectExtractor(amountWords, allObjects, allExtensionsWords, namingWords),
-                            new OriginExtractor(fromWords, folderWords, namingWords),
-                        });
+                    {
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
+                    });
                     break;
+
+                //Comando não identificado
+                default:
+                    return (criteria, false);
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: --{arguments.Action}*\r\nObjeto: --{arguments.ObjectType}*\r\nFormato: --{arguments.ObjectFormat}\r\nQuantidade: --{arguments.ObjectAmount}\r\nNome: --{arguments.ObjectName}\r\nNovo nome: --{arguments.ObjectNewName}\r\nOrigem: --{arguments.Origin}\r\nDestino: --{arguments.Destination}\r\nTamanho: --{arguments.SizeModifier} {arguments.SizeAmount} {arguments.SizeUnit}");
+            //MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
+
             return arguments;
         }
 
 
         //Retorna os caminhos encontrados conforme os critérios
-        static async Task<List<string>> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
+        static async Task<(List<string> list, string errorMessage)> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
         {
             if (priorities == null) priorities = Global.defaultPriorities;
             if (exceptions == null) priorities = Global.defaultExceptions;
+
 
             #region TAMANHO
 
@@ -588,19 +806,41 @@ namespace Vados
                 //Retornar todos os arquivos de determinado formato (pode englobar mais de uma extensão)
                 foreach (string extension in Comandos.WordGetExtensions(format))
                 {
-                    //MessageBox.Show("extension: " + extension);
                     List<string> newPaths = (await SearchPaths(name + "." + extension, objectType == "pasta",
-                                                        rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions, priorities: priorities)).ToList();
+                                                        rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound,
+                                                        exceptions: exceptions, priorities: priorities).ConfigureAwait(false)).ToList();
                     paths.AddRange(newPaths);
                 }
             }
             else
             {
-                //Procura normal usando o nome
-                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound)).ToList();
+                //Procura normal usando o nome                
+                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ConfigureAwait(false)).ToList();
             }
 
-            if (paths.Count == 0) return paths;
+
+            //---------ERRO: arquivo / pasta não encontrada---------
+            if (paths.Count == 0)
+            {
+                var rtb = new RichTextBox();
+
+                string objectIndication = $"nenhum {objectType} chamado ";
+                if (objectType == "pasta") objectIndication = "nenhuma pasta chamada ";
+
+                Global.AppendPlainText(rtb, "Não foi possível encontrar " + objectIndication);
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                if (origin != "")
+                {
+                    Global.AppendPlainText(rtb, " dentro da pasta ");
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                }
+                Global.AppendPlainText(rtb, ".");
+
+                return (paths, rtb.Rtf);
+            }
+            //----------------------------------------
+
+
 
             //Corrigir quantidade de caminhos
             switch (amountModifier)
@@ -616,93 +856,191 @@ namespace Vados
                     break;
             }
 
-            MessageBox.Show("Terminou busca");
-            return paths;
+            return (paths, "");
         }
 
 
-        public static async void ExecuteCommand(CommandCriteria arguments)
+        public static async Task<string> ExecuteCommand(CommandCriteria arguments)    //Retorna uma possível mensagem de erro
         {
-            string commandType = arguments.Action;
-            string objectType = arguments.ObjectType;
-            string name = arguments.ObjectName;
-            string newName = arguments.ObjectNewName;
-            string format = arguments.ObjectFormat;
-            string origin = arguments.Origin;
-            string destination = arguments.Destination;
-            string amount = arguments.ObjectAmount;
-            string size = arguments.SizeAmount;
-            string sizeUnit = arguments.SizeUnit;
-            string sizeModifier = arguments.SizeModifier;
+            string
+            commandType = arguments.Action,
+            objectType = arguments.ObjectType,
+            name = arguments.ObjectName,
+            newName = arguments.ObjectNewName,
+            format = arguments.ObjectFormat,
+            origin = arguments.Origin,
+            destination = arguments.Destination,
+            amount = arguments.ObjectAmount,
+            size = arguments.SizeAmount,
+            sizeUnit = arguments.SizeUnit,
+            sizeModifier = arguments.SizeModifier;
 
 
             //Definições para arquivo executável (programa)
-            if (objectType == "programa")
+            if (objectType == "aplicativo")
             {
                 name.Replace(" ", "");
                 format = "executavel";
             }
 
-            //Caminho da pasta de origem e de destino
-            string destinationPath = "";
-            if (!string.IsNullOrEmpty(destination)) destinationPath = (await SearchPaths(destination, true)).FirstOrDefault();
-            string originPath = "";
-            if (!string.IsNullOrEmpty(origin)) originPath = (await SearchPaths(origin, true)).FirstOrDefault();
 
-            List<string> paths = new List<string>();
+            #region---------ERRO: nome inválido (nome, origem ou destino)---------
+
+            //Nome do arquivo inválido
+            if (objectType != "pasta" && !IsValidFileName(name))
+            {
+                var rtb = new RichTextBox();
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(rtb, " é um nome de " + objectType + " inválido.");
+                return rtb.Rtf;
+            }
+
+
+            //Nome da pasta (objeto, origem ou destino) inválido
+            char[] invalidPathChars = Path.GetInvalidPathChars();
+
+            if (objectType == "pasta") {
+                var rtb = new RichTextBox();
+
+                if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
+                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+
+                if (rtb.Text != "")
+                {
+                    Global.AppendPlainText(rtb, " é um nome de pasta inválido.");
+                    return rtb.Rtf;
+                }
+            }
+            
+            #endregion----------------------------------------
+
+
+            //Caminho da pasta de origem
+            string originPath = "";
+
+            if (!string.IsNullOrEmpty(origin))
+            {
+                originPath = (await SearchPaths(origin, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+
+                #region---------ERRO: pasta de origem não existe---------
+
+                if (string.IsNullOrEmpty(originPath))
+                {
+                    var rtb = new RichTextBox();
+                    Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de origem chamada ");
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ".");
+                    return rtb.Rtf;
+                }
+
+                #endregion----------------------------------------
+            }
+
+            //Caminho da pasta de destino
+            string destinationPath = "";
+
+            if (!string.IsNullOrEmpty(destination))
+            {
+                destinationPath = (await SearchPaths(destination, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+
+                #region---------ERRO: pasta de destino não existe---------
+
+                if (string.IsNullOrEmpty(destinationPath))
+                {
+                    var rtb = new RichTextBox();
+                    Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de destino chamada ");
+                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ".");
+                    return rtb.Rtf;
+                }
+
+                #endregion----------------------------------------
+            }
 
 
             //Realizar comando
+            (List<string> list, string errorMessage) paths = (new List<string>(), "");
+
             switch (commandType)
             {
                 //Criar
                 case "criar":
-                    if (objectType == "pasta") { CriarPasta(name, destination); }
-                    if (objectType == "arquivo") { CriarArquivo(name, destination); }
+                    if (objectType == "pasta") { return await CriarPasta(name, destinationPath); }
+                    if (objectType == "arquivo") { return await CriarArquivo(name, destinationPath); }
                     break;
+
 
                 //Renomear
                 case "renomear":
-                    if (objectType == "pasta") { RenomearPasta(name, newName, origin); }
-                    if (objectType == "arquivo") { RenomearArquivo(name, newName, origin); }
+                    if (objectType == "pasta") { return await RenomearPasta(name, newName, originPath); }
+                    if (objectType == "arquivo") { return await RenomearArquivo(name, newName, originPath); }
                     break;
 
+
+                //Excluir
                 case "excluir":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
-                    if (objectType == "pasta") { ExcluirPasta(paths); }
-                    if (objectType == "arquivo") { ExcluirArquivo(paths); }
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    //Erro na busca
+                    if (paths.errorMessage != "") return paths.errorMessage;
+
+                    if (objectType == "pasta") { return await ExcluirPasta(paths.list); }
+                    if (objectType == "arquivo") { return await ExcluirArquivo(paths.list); }
                     break;
 
 
+                //Mover
                 case "mover":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
-                    if (objectType == "pasta") { MoverPasta(paths, destinationPath); }
-                    if (objectType == "arquivo") { MoverArquivo(paths, destinationPath); }
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    //Erro na busca
+                    if (paths.errorMessage != "") return paths.errorMessage;
+
+                    if (objectType == "pasta") { return await MoverPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { return await MoverArquivo(paths.list, destinationPath); }
                     break;
 
+
+                //Duplicar
                 case "duplicar":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier);
-                    if (objectType == "pasta") { DuplicarPasta(paths, destinationPath); }
-                    if (objectType == "arquivo") { DuplicarArquivo(paths, destinationPath); }
+                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    //Erro na busca
+                    if (paths.errorMessage != "") return paths.errorMessage;
+
+                    if (objectType == "pasta") { return await DuplicarPasta(paths.list, destinationPath); }
+                    if (objectType == "arquivo") { return await DuplicarArquivo(paths.list, destinationPath); }
                     break;
 
-                case "abrir":
-                    if (objectType == "pasta") break;
 
+                //Abrir
+                case "abrir":
                     //Procurar caminhos mais eficientemente
-                    if (objectType == "arquivo")
+                    if (objectType == "arquivo" || objectType == "pasta")
                     {
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier);
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
                     } 
                     else
                     {
-                        //Prioridades e excessões para procurar programas
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions);
+                        //Prioridades e excessões para procurar aplicativos
+                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions).ConfigureAwait(false);
                     }
 
-                    ExecutarCaminho(paths.FirstOrDefault());
+                    //Erro na busca
+                    if (paths.errorMessage != "") return paths.errorMessage;
+
+
+                    if (objectType != "pasta")
+                        //Abrir arquivo / programa
+                        return await ExecutarCaminho(paths.list.FirstOrDefault());
+                    else
+                        //Abrir explorador de arquivos no caminho da pasta
+                        OpenFileExplorer(paths.list.FirstOrDefault(), true);
                     break;
             }
+
+            return "";
         }
 
 
@@ -723,6 +1061,176 @@ namespace Vados
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
+
+
+        //Checar se o nome do arquivo é valido
+        public static bool IsValidFileName(string fileName)
+        {
+            //Nome não pode ser vazio ou apenas espaços
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+
+            //Caracteres inválidos
+            if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                return false;
+
+            //Sem espaço ou ponto no final do nome
+            if (fileName.EndsWith(" ") || fileName.EndsWith("."))
+                return false;
+
+            //Nomes reservados para dispositivos
+            if (Array.Exists(reservedNames, r => string.Equals(r, fileName, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            return true;
+        }
+
+        //Checar se o nome da pasta é valido
+        public static bool IsValidFolderName(string name)
+        {
+            if (!IsValidFileName(name)) return false;
+
+            //Pastas não podem ter nome "." ou ".."
+            if (name == "." || name == "..")
+                return false;
+
+            return true;
+        }
+
+
+        #region RECONHECIMENTO DE VOZ
+
+        //Filtra palavras indesejadas no texto
+        public static string CleanText(string text)
+        {
+            //Deixar texto minúsculo e remover acentos
+            text = text.ToLower();
+
+            //Remover cada uma das palavras indesejadas
+            foreach(var word in Comandos.speechIgnoreWords)
+            {
+                text = text.Replace(word, "");
+            }
+
+            return text;
+        }
+
+
+        //Corrige o texto com as palavras mais parecidas
+        public static string CorrectText(string inputStr, List<string> hints, int maxDistance = 2)
+        {
+            inputStr = inputStr.ToLowerInvariant();
+            var words = inputStr.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();    //Separa a string em uma lista de palavras
+            var corrected = new List<string>();
+
+            //Para cada palavra da string
+            int i = 0;
+            while (i < words.Count)
+            {
+                string bestMatch = null;        //Correspondência mais parecida
+                int bestLen = 0;                //Número de palavras da possível correspondência
+                int bestDist = int.MaxValue;    //Número de edições da melhor correspondência (menor possível)
+
+                //Pular palavra se ela for muito pequena
+                if (words[i].Length < 5)
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                    continue;
+                }
+
+
+                //Pular palavra se a anterior for uma de nomeação (ex: chamado, de nome)
+                if (corrected.Count > 0 && Comandos.namingWords.Contains(corrected[i - 1]))
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                    continue;
+                }
+
+
+                //Para cada possivel correspondência
+                foreach (var hint in hints)
+                {
+                    var hintWords = hint.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    //Ignorar caso a correspondência tenha mais palavras que a string
+                    if (i + hintWords.Length > words.Count)
+                        continue;
+
+                    //Juntar palavras da string para ficar com a mesma quantidade da possível correspondência
+                    string segment = string.Join(" ", words.Skip(i).Take(hintWords.Length));
+                    int dist = LevenshteinDistance(segment, string.Join(" ", hintWords));   //Quantidade de edições
+
+                    if (dist <= maxDistance && dist < bestDist)
+                    {
+                        //Definir melhor correspondência
+                        bestMatch = hint;
+                        bestLen = hintWords.Length;
+                        bestDist = dist;
+                    }
+                }
+
+
+                //Adicionar correspondência
+                if (bestMatch != null)
+                {
+                    corrected.Add(bestMatch);
+                    i += bestLen;
+                }
+                //Manter palavra original se não encontrar nenhuma correspondência
+                else
+                {
+                    corrected.Add(words[i]);
+                    i++;
+                }
+            }
+
+
+            //Retornar frase modificada
+            return string.Join(" ", corrected);
+        }
+
+
+        //Retorna o número de edições para uma palavra se tornar a outra    (ex: caixa -> baixo  =  2 edições)
+        private static int LevenshteinDistance(string s, string t)
+        {
+            int[,] dp = new int[s.Length + 1, t.Length + 1];
+
+            for (int i = 0; i <= s.Length; i++)
+                dp[i, 0] = i;
+
+            for (int j = 0; j <= t.Length; j++)
+                dp[0, j] = j;
+
+            for (int i = 1; i <= s.Length; i++)
+            {
+                for (int j = 1; j <= t.Length; j++)
+                {
+                    int cost = (s[i - 1] == t[j - 1]) ? 0 : 1;
+                    dp[i, j] = Math.Min(
+                        Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                        dp[i - 1, j - 1] + cost
+                    );
+                }
+            }
+
+            return dp[s.Length, t.Length];
+        }
+
+
+        public static List<int> PopulateAudioDevices()
+        {
+            List<int> deviceIds = new List<int>(); ;
+
+            for (int i = 0; i < WaveIn.DeviceCount; i++)
+            {
+                var cap = WaveIn.GetCapabilities(i);
+                deviceIds.Add(i);
+            }
+
+            return deviceIds;
+        }
+
+        #endregion
 
         #endregion
 
@@ -801,10 +1309,9 @@ namespace Vados
 
         #region BUSCA 
 
-        // busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
+        //Busca recursivamente multiplas pastas ou arquivos, retornando o caminho do arquivo ou pasta encontrado, ou uma mensagem de erro se não encontrar nada
         public static async Task<HashSet<string>> SearchPaths(string searchName, bool isFolder, long sizeLowerBound = -1, long sizeUpperBound = -1, string rootFolder = "", int? pathAmount = 1, int[] dateStart = null, int[] dateEnd = null, List<string> exceptions = null, List<string> priorities = null)
         {
-
             // PRA QUE SERVE CADA PARÂMETRO:
 
             // searchName: o nome do arquivo ou pasta que você quer procurar
@@ -814,7 +1321,6 @@ namespace Vados
             // rootFolder: é a pasta aonde ele vai procurar, se for nulo, ele procura em todas as pastas do computador
             // pathAmount: é um controle de quantas pastas ou arquivos ele vai procurar, se for nulo, ele procura em todas as pastas ou arquivos
 
-            string root = driveverifica(null);
             var visitados = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var resultados = new HashSet<string>();
 
@@ -826,8 +1332,11 @@ namespace Vados
             int? maxLength = pathAmount;
 
             if (!string.IsNullOrEmpty(rootFolder)) {
+                //Procurar pasta de origem
                 rootFolder = (await SearchPaths(rootFolder, true)).FirstOrDefault();
-                if (string.IsNullOrEmpty(rootFolder)) return null;
+                if (string.IsNullOrEmpty(rootFolder))   //Retornar lista vazia se não encontrar a pasta de origem
+                    return resultados;
+
                 //Buscar apenas na pasta determinada
                 priorities = new List<string>() { rootFolder };
 
@@ -853,8 +1362,6 @@ namespace Vados
             {
                 pathAmount = int.MaxValue;  //Sem limite
             }
-
-            //MessageBox.Show("Máximo: " + pathAmount);
 
 
             //Adicionar prioridades à fila
@@ -888,14 +1395,13 @@ namespace Vados
                                 Console.WriteLine($"Acesso negado ao diretório: {atual}");
                                 return Array.Empty<string>();
                             }
-                        });
-                      
+                        }).ConfigureAwait(false);
+
                         //Percorrer todas as pastas dentro da pasta atual
                         foreach (var folderPath in subpasta)
                         {
-                            //Não continuar se o arquivo já tiver sido visitado
-                            if (!visitados.Add(folderPath))
-                                continue;
+                            //MessageBox.Show(folderPath);
+                            Console.WriteLine(folderPath);
 
                             //Checar se a pasta tem o nome correto
                             string actualName = Path.GetFileName(folderPath);
@@ -905,7 +1411,7 @@ namespace Vados
                             //Checar se está na pasta especificada
                             if (!string.IsNullOrEmpty(rootFolder) && !folderPath.Contains(rootFolder))
                                 continue;
-                          
+
 
                             FileInfo caminhoinfo = new FileInfo(folderPath);
 
@@ -929,7 +1435,9 @@ namespace Vados
 
                         //Retornar resultados ao chegar na quantidade necessária
                         if (pathAmount <= 0)
+                        {
                             return resultados;
+                        }
                     }
                   
 
@@ -949,8 +1457,6 @@ namespace Vados
                             }
                         });
 
-                        //MessageBox.Show("Pasta: " + atual + "\r\nArquivos: " + string.Join("|", files.Select(Regex.Escape)));
-
                         //Percorrer todos os arquivos da pasta atual
                         foreach (var filePath in files)
                         {
@@ -963,7 +1469,6 @@ namespace Vados
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
 
-                            //MessageBox.Show("Nome: " + actualName + "\r\nEsperado: " + searchName);
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
@@ -999,7 +1504,7 @@ namespace Vados
                         string nomePasta = Path.GetFileName(caminho);
 
                         //Ignorar pasta se ela for alguma das exceções
-                        if (exceptions.Any(ign => nomePasta.Equals(ign, StringComparison.OrdinalIgnoreCase)))
+                        if (exceptions.Any(expt => nomePasta.Equals(expt, StringComparison.OrdinalIgnoreCase)))
                             continue;
 
                         if (visitados.Add(caminho))
@@ -1008,22 +1513,21 @@ namespace Vados
                         }
                     }
                 }
+                //Pular pastas inacessíveis
                 catch (UnauthorizedAccessException)
                 {
-                    continue; // Skip inaccessible directories
+                    continue;
                 }
+
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erro capturado {ex.Message}");
+                    Console.WriteLine($"Erro: {ex.Message}");
                 }
                 
             }
-            if (resultados != null)
-            {
-                return resultados;
-            }
-            MessageBox.Show("Nenhum arquivo encontrado com o nome especificado.");
-            return null;
+
+            
+            return resultados;
         }
 
 
@@ -1140,7 +1644,14 @@ namespace Vados
         #endregion
 
 
-        public static string driveverifica(string[] args)
+        #region RECONHECIMENTO DE VOZ
+
+       // ainda to vendo alguma forma legal de fazer isso aqui dar certo :(
+
+        #endregion
+
+
+        public static string DriveGetFirst()
         {
             DriveInfo[] drives = DriveInfo.GetDrives();
 
@@ -1148,142 +1659,164 @@ namespace Vados
             {
                 if (drive.IsReady)
                 {
-
                     return drive.Name;
                 }
             }
+
             MessageBox.Show("Nenhum drive disponível encontrado.");
-            return null;
+            return "";
         }
 
 
         public static string CriarPastaPadrao()
         {
-
-            string caminhoPadrao = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-            //MessageBox.Show(caminhoPadrao);
+            string defaultFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
+            
             try
             {
-                if (!Directory.Exists(caminhoPadrao))
-                    Directory.CreateDirectory(caminhoPadrao);
+                if (!Directory.Exists(defaultFolderPath))
+                    Directory.CreateDirectory(defaultFolderPath);
 
-                return caminhoPadrao;
+                return defaultFolderPath;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao criar a pasta padrão: " + ex.Message);
-                return null;
+                return "";
             }
         }
 
 
-        public static async void CriarPasta(string nome, string path) // cria pasta
+        public static async Task<string> CriarPasta(string name, string destinationPath)
         {
             try
             {
-                if (string.IsNullOrEmpty(path)) 
+                //Definir pasta padrão como pasta de destino caso não seja especificada
+                if (string.IsNullOrEmpty(destinationPath)) 
                 {
-                    path = Path.Combine(Global.DefaultFolder, nome);
-                }
-                else
-                {
-                    path = Path.Combine((await SearchPaths(path, true)).FirstOrDefault(), nome);
+                    destinationPath = Global.DefaultFolder;
                 }
 
+                //Redefinir nome caso já exista um igual
+                string finalName = CriarNome(name, destinationPath);
+
+
+                string path = Path.Combine(destinationPath, finalName);
 
                 if (!File.Exists(path))
                 {
+                    //Criar a pasta
                     Directory.CreateDirectory(path);
-                    Console.WriteLine("Pasta" + nome + "Criada com sucesso");
                     OpenFileExplorer(path, false);
                 }
+                //---------ERRO: arquivo com mesmo nome---------
                 else
                 {
-                    MessageBox.Show("Erro, há um arquivo com o mesmo nome da sua pasta");
+                    var rtb = new RichTextBox();
+                    Global.AppendPlainText(rtb, "Não foi possível criar uma pasta chamada ");
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ", pois já existe um arquivo com esse nome.");
+                    return rtb.Rtf;
                 }
+                //----------------------------------------
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao criar pasta: " + ex.Message);
-
-
-
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível criar a pasta.\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
             }
+            //----------------------------------------
         }
 
-        public static async void CriarArquivo(string nome, string path) // cria arquivo
+
+        public static async Task<string> CriarArquivo(string name, string destinationPath)
         {
 
             try
             {
+                //Definir pasta padrão como pasta de destino caso não seja especificada
+                if (string.IsNullOrEmpty(destinationPath))
+                {
+                    destinationPath = Global.DefaultFolder;
+                }
+
                 //Redefinir nome caso já exista um igual
-                string nomefinal = CriarNome(nome, path);
-                string destination = Global.DefaultFolder;
+                string finalName = CriarNome(name, destinationPath);
 
-                //Definir pasta informada como destino
-                if (!string.IsNullOrEmpty(path))
+
+                string path = Path.Combine(destinationPath, finalName);
+
+                if (!Directory.Exists(path))
                 {
-                    destination = (await SearchPaths(path, true)).FirstOrDefault();
+                    //Criar arquivo
+                    FileStream fs = File.Create(path);
+                    OpenFileExplorer(path, false);
                 }
-
-                //Caminho a ser criado
-                string newPath = Path.Combine(destination, nomefinal);
-
-                using (FileStream fs = File.Create(newPath))
-                Console.WriteLine("Arquivo " + nomefinal + " criado com sucesso");
-
-                OpenFileExplorer(newPath, false);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao criar arquivo: " + ex.Message);
-            }
-        }
-
-
-        public static void ExcluirArquivo(List<string> paths) //exclui arquivo
-        {
-
-
-           try { 
-
-            //string path = SearchPaths(nome, false).FirstOrDefault();
-
-            foreach (string path in paths) {
-
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                    //Console.WriteLine("Arquivo" + nome + "Excluido com sucesso");
-                }
+                //---------ERRO: pasta com mesmo nome---------
                 else
                 {
-                    MessageBox.Show("esse arquivo não existe");
+                    var rtb = new RichTextBox();
+                    Global.AppendPlainText(rtb, "Não foi possível criar um arquivo chamado ");
+                    Global.AppendFormattedText(rtb, finalName, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendPlainText(rtb, ", pois já existe uma pasta com esse nome.");
+                    return rtb.Rtf;
                 }
+                //----------------------------------------
 
+                return "";
             }
-           }
-           catch (Exception ex){
-                MessageBox.Show("Não foi possivel excluir estes arquivos: "+ex.Message);
-           }
-            
 
-
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível criar o arquivo.\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
         }
 
-        public static void ExcluirPasta(List<string> paths) // exclui pasta
-        {
-            //string path = SearchPaths(nome, true).FirstOrDefault();
 
+        public static async Task<string> ExcluirArquivo(List<string> paths) //exclui arquivo
+        {
+            try { 
+                foreach (string path in paths) {
+
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                }
+
+                return "";
+            }
+
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
+        }
+
+        public static async Task<string> ExcluirPasta(List<string> paths) // exclui pasta
+        {
             try
             {
-
                 foreach (string path in paths)
                 {
-
                     if (Directory.Exists(path))
                     {
-
                         foreach (string arquivo in Directory.GetFiles(path))
                         {
                             File.Delete(arquivo);
@@ -1296,196 +1829,271 @@ namespace Vados
 
                         }
                         Directory.Delete(path);
-                        //Console.WriteLine("Pasta" + nome + "Excluida com sucesso");
-                    }
-                    else
-                    {
-                        MessageBox.Show("essa pasta não existe");
-
                     }
                 }
-            }
-            catch (Exception ex) {
-                MessageBox.Show("Não foi possivel excluir estas pastas: " + ex.Message);
+
+                return "";
             }
 
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
         }
 
 
-        public static async void RenomearArquivo(string nome, string novoNome, string pastaOrigem) // renomear arquivo(erro de logica, falta implementar o bagulho de procurar o arquivo o mesmo serve para o bagulho de excluir)
+        public static async Task<string> RenomearArquivo(string name, string newName, string originPath)
         {
-            string path = (await SearchPaths(nome, false, rootFolder: pastaOrigem)).FirstOrDefault();
-            if (path == null) return;
+            string path = (await SearchPaths(name, false, rootFolder: originPath)).FirstOrDefault();
 
-            string novoPath = Path.Combine(Path.GetDirectoryName(path), novoNome);
+            //---------ERRO: arquivo não encontrado---------
+            if (string.IsNullOrEmpty(path))
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível encontrar o arquivo chamado ");
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(rtb, ".");
+                return rtb.Rtf;
+            }
+            //----------------------------------------
 
+            string newPath = Path.Combine(Path.GetDirectoryName(path), newName);
+
+            //Renomear
             if (File.Exists(path))
             {
-                File.Move(path, novoPath);
-                Console.WriteLine("Arquivo " + nome + " renomeado para " + novoNome);
+                File.Move(path, newPath);
             }
-            else
-            {
-                MessageBox.Show("esse arquivo não existe");
-            }
+
+            return "";
         }
 
-        public static async void RenomearPasta(string nome, string novoNome, string pastaOrigem) // renomear pasta(mesmo erro de logica do renomear arquivo)
+
+        public static async Task<string> RenomearPasta(string name, string newName, string originPath)
         {
-            string path = (await SearchPaths(nome, true, rootFolder: pastaOrigem)).FirstOrDefault();
-            string novoPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + novoNome);
+            string path = (await SearchPaths(name, true, rootFolder: originPath)).FirstOrDefault();
+
+            //---------ERRO: pasta não encontrada---------
+            if (string.IsNullOrEmpty(path))
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta chamada ");
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendPlainText(rtb, ".");
+                return rtb.Rtf;
+            }
+            //----------------------------------------
+
+            string newPath = Path.Combine(Path.GetDirectoryName(path) + @"\" + newName);
 
             if (Directory.Exists(path))
             {
-                Directory.Move(path, novoPath);
-                Console.WriteLine("Pasta" + nome + "Renomeada para " + novoNome);
+                Directory.Move(path, newPath);
             }
-            else
-            {
-                MessageBox.Show("essa pasta não existe");
-            }
+
+            return "";
         }
 
 
-        public static void MoverPasta(List<string> Pathnomes, string destino)
+        public static async Task<string> MoverPasta(List<string> paths, string destination)
         {
             try
             {
-                foreach (string nome in Pathnomes)
+                foreach (string path in paths)
                 {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    //MessageBox.Show(destinoNovo);
+                    string newPath = Path.Combine(destination, Path.GetFileName(path));
 
-                    if (Directory.Exists(destinoNovo))
+                    //---------ERRO: pasta de mesmo nome já existe---------
+                    if (Directory.Exists(newPath))
                     {
-                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                        continue;
+                        var rtb = new RichTextBox();
+                        Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, " na pasta ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
                     }
+                    //----------------------------------------
 
-                    Directory.Move(nome, destinoNovo);
+                    Directory.Move(path, newPath);
                 }
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao mover pasta: " + ex.Message);
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível mover a(s) pasta(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
             }
+            //----------------------------------------
         }
 
-        public static void MoverArquivo(List<string> Pathnomes, string destino) 
-        {
-            foreach (string nome in Pathnomes)
-            {
-                try
-                {
-                    string destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-
-                    if (File.Exists(destinoNovo))
-                    {
-                        MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                        continue;
-                    }
-                    File.Move(nome, destinoNovo);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao mover arquivo: " + ex.Message);
-                }
-            }
-
-            return;
-        }
-
-
-        public static void DuplicarPasta(List<string> paths, string destino)
+        public static async Task<string> MoverArquivo(List<string> paths, string destination) 
         {
             try
             {
-                //nome = SearchPaths(nome, true).FirstOrDefault();
-                foreach (string nome in paths)
+                foreach (string path in paths)
                 {
-                    string destinoNovo;
-                    if (string.IsNullOrEmpty(destino))
+                    string newPath = Path.Combine(destination, Path.GetFileName(path));
+
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (File.Exists(newPath))
                     {
-                         destinoNovo = Path.Combine(Global.DefaultFolder, Path.GetFileName(nome));
+                        var rtb = new RichTextBox();
+                        Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, " na pasta ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
                     }
-                    else
-                    {
-                         destinoNovo = Path.Combine(destino, Path.GetFileName(nome));
-                    }
+                    //----------------------------------------
 
-
-                    //MessageBox.Show(destinoNovo + " negocio infernal que pode estar dando erro");
-                    if (Directory.Exists(destinoNovo))
-                    {
-                        MessageBox.Show("Já existe uma pasta com esse nome no destino.");
-                        return;
-                    }
-
-                    Directory.CreateDirectory(destinoNovo);
-                    foreach (string arquivo in Directory.GetFiles(nome))
-                    {
-
-
-                        string nomeArquivo = Path.GetFileName(arquivo);
-                        string destinoArquivo = Path.Combine(destinoNovo, nomeArquivo);
-                        File.Copy(arquivo, destinoArquivo, true);
-
-                    }
-                    foreach (string subPasta in Directory.GetDirectories(nome))
-                    {
-                        string nomeSubPasta = Path.GetFileName(subPasta);
-                        string destinoSubPasta = Path.Combine(destinoNovo, nomeSubPasta);
-                        //MessageBox.Show(destinoSubPasta);
-                        //MessageBox.Show(nomeSubPasta);
-                        var subpastas = new List<string>();
-                        subpastas.Add(subPasta);
-                        DuplicarPasta(subpastas, destinoNovo);
-                    }
+                    File.Move(path, newPath);
                 }
+
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao duplicar pasta: " + ex.Message);
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível mover o(s) arquivos(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
             }
+            //----------------------------------------
         }
 
-        public static void DuplicarArquivo(List<string> Pathnomes, string destination)
-        {
 
+        public static async Task<string> DuplicarPasta(List<string> paths, string destination)
+        {
             try
             {
-                string newDestination = "";
-
-                foreach (string nome in Pathnomes)
+                foreach (string path in paths)
                 {
-                    //Definir destino como a mesma pasta caso não seja informado
+                    //Definir mesma pasta como destino caso não seja especificada
                     if (string.IsNullOrEmpty(destination))
                     {
-                        destination = Path.GetDirectoryName(nome);
+                        destination = Path.GetDirectoryName(path);
                     }
 
-                    string fileName = CriarNome(Path.GetFileName(nome), destination);
-                    newDestination = Path.Combine(destination, fileName);
+                    //Definir nome da pasta
+                    string folderName = CriarNome(Path.GetFileName(path), destination);
+                    string folderPath = Path.Combine(destination, folderName);
 
-                    //if (File.Exists(destinoNovo))
-                    //{
-                    //    MessageBox.Show("Já existe um arquivo com esse nome no destino.");
-                    //}
-                    //MessageBox.Show("pasta: " + destination);
-                    //MessageBox.Show("destino novo: " + newDestination);
 
-                    File.Copy(nome, newDestination, false);
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (Directory.Exists(folderPath))
+                    {
+                        var rtb = new RichTextBox();
+                        Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, " na pasta ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
+                    }
+                    //----------------------------------------
+
+
+                    //Criar pasta na nova pasta
+                    Directory.CreateDirectory(folderPath);
+
+                    //Duplicar arquivos internos
+                    foreach (string file in Directory.GetFiles(path))
+                    {
+                        string fileName = Path.GetFileName(file);
+                        string fileNewPath = Path.Combine(folderPath, fileName);
+                        File.Copy(file, fileNewPath, true);
+                    }
+
+                    //Duplicar subpastas internas
+                    foreach (string subFolder in Directory.GetDirectories(path))
+                    {
+                        string subFolderName = Path.GetFileName(subFolder);
+                        string subFolderPath = Path.Combine(folderPath, subFolderName);
+                        var subpastas = new List<string>() { subFolder };
+                        DuplicarPasta(subpastas, subFolderPath);
+                    }
                 }
 
-                OpenFileExplorer(newDestination, false);
+                return "";
             }
+
+            //---------ERRO: erro não especificado---------
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao duplicar arquivo: " + ex.Message);
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível duplicar a(s) pasta(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
+        }
+
+        public static async Task<string> DuplicarArquivo(List<string> paths, string destination)
+        {
+
+            try
+            {
+                string newPath = "";
+
+                foreach (string path in paths)
+                {
+                    //Definir mesma pasta como destino caso não seja especificada
+                    if (string.IsNullOrEmpty(destination))
+                    {
+                        destination = Path.GetDirectoryName(path);
+                    }
+
+                    //Definir nome do arquivo
+                    string fileName = CriarNome(Path.GetFileName(path), destination);
+                    newPath = Path.Combine(destination, fileName);
+
+
+                    //---------ERRO: arquivo de mesmo nome já existe---------
+                    if (Directory.Exists(newPath))
+                    {
+                        var rtb = new RichTextBox();
+                        Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, " na pasta ");
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendPlainText(rtb, ".");
+                        return rtb.Rtf;
+                    }
+                    //----------------------------------------
+
+
+                    //Mover arquivo
+                    File.Copy(path, newPath, false);
+                }
+
+                OpenFileExplorer(newPath, false);
+                return "";
             }
 
-
-
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível duplicar o(s) arquivo(s).\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
         }
 
 
@@ -1508,7 +2116,6 @@ namespace Vados
             {
                 MessageBox.Show("O programa precisa de permissões de administrador para funcionar corretamente.", "Permissão negada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
         }
 
 
@@ -1545,35 +2152,41 @@ namespace Vados
 
         public static string CriarNome(string nome, string destination)
         {
-            int i = 1;
+            int i = 2;
             string newName = nome;
 
-            //MessageBox.Show(Path.Combine(destination, newName));
 
-            while (File.Exists(Path.Combine(destination, newName)))
+            while (Path.Exists(Path.Combine(destination, newName)))
             {
-                newName = $"{nome}({i})";
+                newName = $"{nome} ({i})";
                 i++;
             }
 
-            //MessageBox.Show("Nome: " + newName);
             return newName;
         }
         
-        public static void ExecutarCaminho(string caminho)
+        public static async Task<string> ExecutarCaminho(string caminho)
         {
             ProcessStartInfo processInfo = new ProcessStartInfo();
-            MessageBox.Show("caminho: " + caminho);
 
-            if (caminho == null)
+            try
             {
-                MessageBox.Show("Caminho não encontrado");
-                return;
+                processInfo.FileName = caminho;
+                processInfo.UseShellExecute = true;
+                Process.Start(processInfo);
             }
 
-            processInfo.FileName = caminho;
-            processInfo.UseShellExecute = true;
-            Process.Start(processInfo);
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível abrir o arquivo / programa.\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
+
+            return "";
         }
     }
 

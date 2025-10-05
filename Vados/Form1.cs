@@ -14,10 +14,8 @@ namespace Vados
 
         public Form1()
         {
-
-
             InitializeComponent();
-           
+
             KeyPreview = true;
 
             //Otimizar pintura
@@ -110,6 +108,12 @@ namespace Vados
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //Initialize user controls
+            Global.userControlHome = new UserControlHome();
+            Global.userControlSettings = new UserControlSettings();
+            Global.userControlManual = new UserControlManual();
+
+
             //Carregar página inicial
             LoadUserControl(Global.userControlHome);
 

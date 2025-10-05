@@ -112,7 +112,6 @@ namespace Vados
         public UserControlHome()
         {
             InitializeComponent();
-            Console.ReadLine();
 
             #region TIMERS
 
@@ -583,6 +582,7 @@ namespace Vados
                     Brush barBrush = new SolidBrush(Colors.bluePrimary);
                     RectangleF bar = new RectangleF(barX, barY, barWidth, (float)height);
                     e.Graphics.FillRectangle(barBrush, bar);
+                    barBrush.Dispose();
                 }
             }
 
@@ -606,6 +606,7 @@ namespace Vados
                 Brush textBrush = new SolidBrush(Color.Black);
                 e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
                 e.Graphics.DrawString(timerText, timerFont, textBrush, timerLeft, timerTop);
+                textBrush.Dispose();
             }
 
             #endregion
@@ -657,8 +658,6 @@ namespace Vados
             #endregion
 
 
-
-            pathBrush.Dispose();
             path.Dispose();
             brush.Dispose();
 
@@ -892,7 +891,8 @@ namespace Vados
             circleY += (circleTargetY - circleY) / 4;
 
             //Redesenhar tela
-            pnlBottom.Invalidate(new Rectangle((int)circleX, (int)circleY, (int)circleSize+ 20, (int)circleSize + 20));
+            //pnlBottom.Invalidate(new Rectangle((int)circleX, (int)circleY, (int)circleSize+ 20, (int)circleSize + 20));
+            pnlBottom.Invalidate();
         }
 
 

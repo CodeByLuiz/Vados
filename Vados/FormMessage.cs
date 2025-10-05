@@ -421,7 +421,7 @@ namespace Vados
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Erro ao executar comando: {ex.Message}");
+                        //Console.WriteLine($"Erro ao executar comando: {ex.Message}");
                     }
                 });
             }

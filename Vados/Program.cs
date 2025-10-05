@@ -19,8 +19,8 @@ namespace Vados
             ApplicationConfiguration.Initialize();
 
             //Criar pasta padrão para os comandos
-            Global.DefaultFolder = Comandos.CriarPastaPadrao();
-
+            string folderPath = Comandos.CriarPastaPadrao();
+            Global.DefaultFolder = folderPath;
 
             #region RECONHECEDOR DE VOZ
 
@@ -43,7 +43,6 @@ namespace Vados
                         .Concat(Comandos.namingWords)
                         .Concat(Comandos.amountWords)
                         .ToList();
-
 
             //Inicializar reconhecedor de voz
             Global.VoiceRecognizer = new WhisperRecognizer(Global.VoiceRecognitionFolder, hints);

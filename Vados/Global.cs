@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
 using System.IO;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Vados
 {
     //Variáveis que podem ser acessadas de qualquer lugar
-    public class Global
+    public static class Global
     {
         public static string DefaultFolder = "";            //Pasta padrão para os comandos
         public static string VoiceRecognitionFolder = "";   //Pasta do modelo de reconhecimento de voz
@@ -49,6 +49,7 @@ namespace Vados
 
 
         public static string driverPath = @"" + Comandos.DriveGetFirst();
+        //public static string driverPath = "";
 
         public static List<string> defaultPriorities = new List<string>
         {
@@ -85,11 +86,14 @@ namespace Vados
 
 
         //Inicializar user controls
-        public static UserControlHome userControlHome = new UserControlHome();
-        public static UserControlSettings userControlSettings = new UserControlSettings();
-        public static UserControlManual userControlManual = new UserControlManual();
+        public static UserControlHome userControlHome;
+        public static UserControlSettings userControlSettings;
+        public static UserControlManual userControlManual;
+        //public static UserControlHome userControlHome = new UserControlHome();
+        //public static UserControlSettings userControlSettings = new UserControlSettings();
+        //public static UserControlManual userControlManual = new UserControlManual();
 
-      
+
         //Desenhar retângulo arredondado
         public static GraphicsPath RoundedRectangle(RectangleF rect, float radius)
         {

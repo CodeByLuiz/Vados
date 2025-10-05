@@ -1392,7 +1392,7 @@ namespace Vados
                             }
                             catch (UnauthorizedAccessException)
                             {
-                                Console.WriteLine($"Acesso negado ao diretório: {atual}");
+                                //Console.WriteLine($"Acesso negado ao diretório: {atual}");
                                 return Array.Empty<string>();
                             }
                         }).ConfigureAwait(false);
@@ -1401,7 +1401,7 @@ namespace Vados
                         foreach (var folderPath in subpasta)
                         {
                             //MessageBox.Show(folderPath);
-                            Console.WriteLine(folderPath);
+                            //Console.WriteLine(folderPath);
 
                             //Checar se a pasta tem o nome correto
                             string actualName = Path.GetFileName(folderPath);
@@ -1452,7 +1452,7 @@ namespace Vados
                             }
                             catch (UnauthorizedAccessException)
                             {
-                                Console.WriteLine($"Acesso negado ao diretório: {atual}");
+                                //Console.WriteLine($"Acesso negado ao diretório: {atual}");
                                 return Array.Empty<string>();
                             }
                         });
@@ -1464,7 +1464,7 @@ namespace Vados
                             if (!visitados.Add(filePath)) 
                                continue;
 
-                            Console.WriteLine(filePath);
+                            //Console.WriteLine(filePath);
 
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
@@ -1521,7 +1521,7 @@ namespace Vados
 
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Erro: {ex.Message}");
+                    //Console.WriteLine($"Erro: {ex.Message}");
                 }
                 
             }

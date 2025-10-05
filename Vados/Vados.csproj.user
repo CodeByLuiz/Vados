@@ -30,7 +30,16 @@
     <EmbeddedResource Update="Form1.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Update="FormHistory.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="FormMessage.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="UserControlHome.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

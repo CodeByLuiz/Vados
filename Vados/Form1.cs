@@ -15,6 +15,7 @@ namespace Vados
         public Form1()
         {
             InitializeComponent();
+
             KeyPreview = true;
 
             //Otimizar pintura
@@ -31,6 +32,7 @@ namespace Vados
             overlayForm.ShowInTaskbar = false;
             overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
+            overlayForm.GotFocus += overlayForm_GotFocus;
         }
 
         public void ToggleOverlay(bool visible)
@@ -62,24 +64,25 @@ namespace Vados
         }
 
 
-        public void CorrectMessageForm()
+        public FormMessage FindMessageForm()
         {
-            FormMessage messageForm = null;
-
-            //Encontrar form
             foreach (Form openForm in Application.OpenForms)
             {
                 if (openForm is FormMessage)
                 {
-                    messageForm = (FormMessage)openForm;
-                    break;
+                    return (FormMessage)openForm;
                 }
             }
 
-            if (messageForm == null) return;    //Parar se não encontrar form
+            return null;
+        }
 
+        public void CorrectMessageForm()
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;    //Parar se nÃ£o encontrar form
 
-            //Corrigir posição
+            //Corrigir posiÃ§Ã£o
             int newX = Width / 2 - messageForm.Width / 2;
             int newY = Height / 2 - messageForm.Height / 2;
             messageForm.Location =  PointToScreen(new Point(newX, newY));
@@ -104,7 +107,7 @@ namespace Vados
             FormHistory historyForm = null;
 
             
-            // Encontrar o formulário aberto do tipo FormHistory
+            // Encontrar o formulÃ¡rio aberto do tipo FormHistory
             foreach (Form openForm in Application.OpenForms)
             {
                 if (openForm is FormHistory)
@@ -146,7 +149,7 @@ namespace Vados
             historyForm.Height = Height - (historyForm.Top - Top+20);
             //historyForm.Size = new Size(newWidth, newHeight);
         }
-        //Trocar user control (página)
+        //Trocar user control (pÃ¡gina)
         public void LoadUserControl(UserControl userControl)
         {
             panelContainer.Controls.Clear();
@@ -156,7 +159,7 @@ namespace Vados
         }
 
 
-        //Trocar de página (user control) através dos eventos de outros user controls
+        //Trocar de pÃ¡gina (user control) atravÃ©s dos eventos de outros user controls
         private void LoadPage(object sender, LoadPageEventArgs e)
         {
 
@@ -170,10 +173,16 @@ namespace Vados
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Carregar página inicial
+            //Initialize user controls
+            Global.userControlHome = new UserControlHome();
+            Global.userControlSettings = new UserControlSettings();
+            Global.userControlManual = new UserControlManual();
+
+
+            //Carregar pÃ¡gina inicial
             LoadUserControl(Global.userControlHome);
 
-            //Eventos de mudar de página (pra cada user control)
+            //Eventos de mudar de pÃ¡gina (pra cada user control)
             Global.userControlHome.loadPage += LoadPage;
             Global.userControlSettings.loadPage += LoadPage;
 
@@ -219,14 +228,21 @@ namespace Vados
             CorrectMessageForm();
         }
 
-        private void Form1_Move(object sender, EventArgs e)
+        private void Form1_LocationChanged(object sender, EventArgs e)
         {
-            //Corrigir posição da tela preta
+            //Corrigir posiÃ§Ã£o da tela preta
             Rectangle clientRect = RectangleToScreen(this.ClientRectangle);
             overlayForm.Location = new Point(clientRect.Left, clientRect.Top);
             CorrectHistoryForm();
             CorrectMessageForm();
         }
-        
+
+        private void overlayForm_GotFocus(object sender, EventArgs e)
+        {
+            FormMessage messageForm = FindMessageForm();
+            if (messageForm == null) return;
+            messageForm.BringToFront();
+            messageForm.Focus();
+        }
     }
 }

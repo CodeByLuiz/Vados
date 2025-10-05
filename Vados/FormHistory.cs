@@ -9,13 +9,15 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static System.Windows.Forms.AxHost;
 using static Vados.BancoDeDados;
-
+using System.ComponentModel;
+using System.Data;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Vados
 {
     public partial class FormHistory : Form
     {
-
         private OptmizedPanel historyPanel;
         private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;

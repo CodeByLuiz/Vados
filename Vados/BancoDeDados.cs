@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Threading.Tasks;
+using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.Sqlite;
 
@@ -17,7 +20,7 @@ namespace Vados
             [Key] public int Id { get; set; }
             public Guid ComputadorId { get; set; }  
             public DateTime Data { get; set; }
-             public string Comandotitle { get; set; }
+            public string Comandotitle { get; set; }
             public string Comando { get; set; }
 
             
@@ -49,7 +52,7 @@ namespace Vados
                 modelBuilder.Entity<HistoryEntry>()
                     .Property(h => h.ComputadorId)
                     .HasConversion(
-                        v => v.ToString(), // salvano banco como string
+                        v => v.ToString(), // salvando banco como string
                         v => Guid.Parse(v) // converte de volta para guid
                     );
             }

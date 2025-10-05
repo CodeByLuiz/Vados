@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 using Microsoft.VisualBasic.ApplicationServices;
 using NAudio.Wave;
 
@@ -19,8 +21,7 @@ namespace Vados
     public partial class UserControlSettings : UserControl
     {
         public event EventHandler<LoadPageEventArgs> loadPage;
-
-        private ReconhecimentoVoz reconhecedor;
+        System.Windows.Forms.Timer timer;
         private bool estaPausado = false;
 
         public UserControlSettings()
@@ -33,7 +34,13 @@ namespace Vados
         private void UserControlSettings_Load(object sender, EventArgs e)
         {
             PopularDispositivosAudio();
-           
+
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 16; //~60 FPS
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            MessageBox.Show("comecou timer");
         }
 
 
@@ -51,8 +58,6 @@ namespace Vados
             string nome = txtNome.Text;
             string destino = txtDestinatario.Text;
 
-
-           
             Comandos.CriarPasta(nome, destino);
             List<string> nomecompleto = (await Comandos.SearchPaths(nome, true)).ToList();
             BancoDeDados.AdicionarEntrada(
@@ -120,7 +125,6 @@ namespace Vados
             }
 
         }
-
         
 
         private void btnAdm_Click(object sender, EventArgs e)
@@ -155,7 +159,7 @@ namespace Vados
         {
             string SearchArquivo = txtSearch.Text;
 
-            foreach (var item in (await Comandos.SearchPaths(SearchArquivo, false, pathAmount: null)))
+            foreach (var item in (await Comandos.SearchPaths("vosk-model-small-pt-0.3", true).ConfigureAwait(false)))
             {
                 listateste.Items.Add(item);
             }
@@ -230,56 +234,57 @@ namespace Vados
 
         #region RECONHECIMENTO DE VOZ
 
-        private void ResultadoFinalRecebido(string texto)
-        {
-            Invoke(new Action(() =>
-            {
-                txtTranscriçãoTest.AppendText(texto + " ");
-            }));
-        }
+        //private void ResultadoFinalRecebido(string texto)
+        //{
+        //    Invoke(new Action(() =>
+        //    {
+        //        //Definir palavra correspondente
+        //        string match = Comandos.CorrectText(texto, Global.VoiceRecognizer.hints);
 
-        private void ResultadoParcialRecebido(string parcial)
-        {
-            // Você pode ignorar isso ou mostrar preview em algum label
-            Console.WriteLine($"Parcial: {parcial}");
-        }
+        //        MessageBox.Show(texto + " -> " + match);
+
+        //        txtTranscriçãoTest.AppendText(match + " ");
+        //    }));
+        //}
+
+        //private void ResultadoParcialRecebido(string parcial)
+        //{
+        //    // Você pode ignorar isso ou mostrar preview em algum label
+        //    Console.WriteLine($"Parcial: {parcial}");
+        //}
 
         private async void btnStartRecTest_Click(object sender, EventArgs e)
         {
-
-            if (reconhecedor == null) { 
-
-               string x = (await Comandos.SearchPaths("vosk-model-small-pt-0.3",true)).FirstOrDefault();
-
-                reconhecedor = new ReconhecimentoVoz(x);
-                reconhecedor.OnFinalResult += ResultadoFinalRecebido;
-                reconhecedor.OnPartialResult += ResultadoParcialRecebido;
-            }
-
-            reconhecedor.Start();
-            estaPausado = false;
+            Global.VoiceRecognizer.Start();
+            MessageBox.Show("comecou a ouvir");
             btnPauseTest.Text = "Pausar";
         }
 
         private void btnPauseTest_Click(object sender, EventArgs e)
         {
-            int selectedDeviceIndex = 0;
-            if (cbMicrofones.SelectedIndex >= 0)
-                selectedDeviceIndex = deviceIds[cbMicrofones.SelectedIndex];
+            //int selectedDeviceIndex = 0;
+            //if (cbMicrofones.SelectedIndex >= 0)
+            //    selectedDeviceIndex = deviceIds[cbMicrofones.SelectedIndex];
 
-            reconhecedor = new ReconhecimentoVoz(@"caminho\do\modelo", selectedDeviceIndex);
-            reconhecedor.OnFinalResult += ResultadoFinalRecebido;
-            reconhecedor.OnPartialResult += ResultadoParcialRecebido;
+            //Global.VoiceRecognizer = new ReconhecimentoVoz(Global.VoiceRecognitionFolder, selectedDeviceIndex);
+            //Global.VoiceRecognizer.OnFinalResult += ResultadoFinalRecebido;
+            //Global.VoiceRecognizer.OnPartialResult += ResultadoParcialRecebido;
 
-            reconhecedor.Start();
-            estaPausado = false;
-            btnPauseTest.Text = "Pausar";
+            //Global.VoiceRecognizer.Start();
+            //estaPausado = false;
+            //btnPauseTest.Text = "Pausar";
         }
 
-        private void btnStopRecTest_Click(object sender, EventArgs e)
+        private async void btnStopRecTest_Click(object sender, EventArgs e)
         {
-            reconhecedor.Stop();
-            estaPausado = false;
+            string result = await Global.VoiceRecognizer.Stop();
+
+            //Definir palavra correspondente
+            string corrected = Comandos.CleanText(result);
+            corrected = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
+
+            MessageBox.Show(result + " -> " + corrected);
+            txtTranscriçãoTest.AppendText(corrected + " ");
             btnPauseTest.Text = "Pausar";
         }
 
@@ -307,7 +312,44 @@ namespace Vados
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            reconhecedor?.Dispose();
+            Global.VoiceRecognizer?.Dispose();
+        }
+
+        private void listateste_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnStartRecTest_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            lblTest.Text = Global.decibeis.ToString();
+            Invalidate();
+        }
+
+        private void UserControlSettings_Paint(object sender, PaintEventArgs e)
+        {
+            int barHeight = 70;
+            int barWidth = 20;
+            int barStartX = lblTest.Left + 50;
+            int barStartY = lblTest.Bottom;
+
+            float barCurrentHeight = barHeight;
+
+            if (Global.decibeis != "nao iniciado")
+            {
+                barCurrentHeight = (float)(100 + Convert.ToDouble(Global.decibeis)) / 100 * barHeight;
+                lblTest.Text = barCurrentHeight.ToString();
+            }
+
+
+            Brush brush = new SolidBrush(Colors.greenHighlight);
+            RectangleF rect = new RectangleF(barStartX, barStartY + barHeight - barCurrentHeight, barWidth, barCurrentHeight);
+            e.Graphics.FillRectangle(brush, rect);
         }
     }
 }

@@ -77,7 +77,6 @@
             btnHistorico.TabIndex = 10;
             btnHistorico.TabStop = false;
             btnHistorico.Click += btnHistorico_Click;
-           
             // 
             // lblText
             // 
@@ -100,6 +99,7 @@
             lblDebug.Size = new Size(42, 15);
             lblDebug.TabIndex = 8;
             lblDebug.Text = "Debug";
+            lblDebug.Visible = false;
             // 
             // btnManual
             // 
@@ -113,6 +113,8 @@
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
             btnManual.Click += btnManual_Click;
+            btnManual.MouseEnter += btnManual_MouseEnter;
+            btnManual.MouseLeave += btnManual_MouseLeave;
             // 
             // btnConfigs
             // 
@@ -126,6 +128,8 @@
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
             btnConfigs.Click += btnConfigs_Click;
+            btnConfigs.MouseEnter += btnConfigs_MouseEnter;
+            btnConfigs.MouseLeave += btnConfigs_MouseLeave;
             // 
             // imgLogo
             // 
@@ -164,7 +168,8 @@
             txtComando.TabIndex = 2;
             txtComando.Text = "Escreva um comando...";
             txtComando.Click += txtComando_Click;
-            txtComando.TextChanged += txtComando_TextChanged;
+            txtComando.Enter += txtComando_Enter;
+            txtComando.KeyPress += txtComando_KeyPress;
             txtComando.LostFocus += txtComando_LostFocus;
             // 
             // UserControlHome
@@ -176,7 +181,6 @@
             MinimumSize = new Size(360, 180);
             Name = "UserControlHome";
             Size = new Size(1680, 810);
-            KeyDown += UserControlHome_KeyDown;
             pnlBottom.ResumeLayout(false);
             pnlBottom.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)btnHistorico).EndInit();

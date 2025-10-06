@@ -23,6 +23,8 @@ namespace Vados
         private Panel imageWrapper = null;
         private RichTextBox exampleRichTextBox = null;
         private TableLayoutPanel tableLayoutContent;
+        private RichTextBox descriptionBox = null;
+        private RichTextBox secundarydescriptionBox = null;
 
         public UserControlManual()
         {
@@ -176,11 +178,11 @@ namespace Vados
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(title, 0, tableLayoutContent.RowCount - 1);
         }
-        private void AddDescriptionToContent(string description)
+        private void AddDescriptionToContent()
         {
-            RichTextBox descriptionBox = new RichTextBox
+             descriptionBox = new RichTextBox
             {
-                Text = description,
+                Text = null,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
                 BackColor = Color.FromArgb(223, 223, 223),
@@ -211,6 +213,42 @@ namespace Vados
             tableLayoutContent.Controls.Add(descriptionBox, 0, tableLayoutContent.RowCount - 1);
         }
 
+        private void AddSecundaryDescriptionToContent()
+        {
+            secundarydescriptionBox = new RichTextBox
+            {
+                Text = null,
+                Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
+                ForeColor = Color.Black,
+                BackColor = Color.FromArgb(223, 223, 223),
+                BorderStyle = BorderStyle.None,
+                ReadOnly = true,
+                ScrollBars = RichTextBoxScrollBars.None,
+                DetectUrls = false,
+                TabStop = false,
+                WordWrap = true,
+                Dock = DockStyle.None,
+                Margin = new Padding(65, 10, 40, 30), // margem externa
+                Tag = "descrição"
+            };
+
+            // Bloqueia seleção/foco
+            secundarydescriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
+            secundarydescriptionBox.MouseDown += (s, e) => secundarydescriptionBox.SelectionLength = 0;
+            secundarydescriptionBox.SelectionChanged += (s, e) => secundarydescriptionBox.SelectionLength = 0;
+
+            // Adiciona margem interna para o texto
+            secundarydescriptionBox.SelectionIndent = 0;           // recuo à esquerda
+            secundarydescriptionBox.SelectionRightIndent = 20;    // recuo à direita
+
+            ResizeDescriptionBox(secundarydescriptionBox);
+
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutContent.Controls.Add(secundarydescriptionBox, 0, tableLayoutContent.RowCount - 1);
+        }
+
+
 
         private void ResizeDescriptionBox(RichTextBox box)
         {
@@ -227,7 +265,7 @@ namespace Vados
             );
 
             box.Width = maxWidth;
-            box.Height = textSize.Height + 10;
+            box.Height = textSize.Height + 25;
         }
 
 
@@ -533,9 +571,21 @@ namespace Vados
         private void LoadCriarPastaContent()
         {
             AddTitleToContent("Criar Pasta");
-            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para criar uma pasta, basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Criar Pasta",Colors.blueHighlight,FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". As pastas criadas são encontradas na pasta padrão do aplicativo, chamada \"Vados\". Caso uma pasta seja criada com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular,20f));
+
             AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
+
+            AddSecundaryDescriptionToContent();
+            Global.AppendPlainText(secundarydescriptionBox, "A execução desse comando depende de apenas um fator, o ");
+            Global.AppendFormattedText(secundarydescriptionBox,"nome da pasta.",Colors.greenHighlight,FontStyle.Bold);
+            secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
             AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
                 "Crie uma pasta chamada 'Fotos'"+
                 "Crie uma pasta chamada 'Trabalhos'"
@@ -547,13 +597,7 @@ namespace Vados
 
         private void LoadAbrirPastaContent()
         {
-            AddTitleToContent("Abrir Pasta");
-            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
-            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
-                "Crie uma pasta chamada 'Fotos'" +
-                "Crie uma pasta chamada 'Trabalhos'");
+         
         }
 
 

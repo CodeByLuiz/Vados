@@ -77,7 +77,7 @@ namespace Vados
         {
             try
             {
-                await EnsureModel();
+            //    await EnsureModel();
                 model = WhisperFactory.FromPath(modelPath);
                 processor = model.CreateBuilder().WithLanguage("pt").Build();
             }

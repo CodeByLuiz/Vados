@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
 {
@@ -393,6 +394,7 @@ namespace Vados
             //Adicionar texto
             textBox.AppendText(text);
         }
+
 
         //Adiciona texto formatado a uma RichTextBox
         public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)

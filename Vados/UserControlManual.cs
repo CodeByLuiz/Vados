@@ -196,6 +196,7 @@ namespace Vados
                 Margin = new Padding(65, 10, 40, 30), // margem externa
                 Tag = "descrição"
             };
+            Global.TextBoxFitHeight(exampleRichTextBox, 10);
 
             // Bloqueia seleção/foco
             descriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
@@ -231,6 +232,9 @@ namespace Vados
                 Margin = new Padding(65, 10, 40, 30), // margem externa
                 Tag = "descrição"
             };
+
+
+            Global.TextBoxFitHeight(secundarydescriptionBox, 10);
 
             // Bloqueia seleção/foco
             secundarydescriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
@@ -302,7 +306,7 @@ namespace Vados
 
        
         
-            private void AddExampleBox(string texto)
+            private void AddExampleBox()
         {
           
             Label exampleLabel = new Label
@@ -327,7 +331,6 @@ namespace Vados
             
              exampleRichTextBox = new RichTextBox
             {
-                Text = texto,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
@@ -336,7 +339,7 @@ namespace Vados
                 Cursor = Cursors.Arrow,
                 Margin = new Padding(10),
                 
-                Width = examplePanel.Width - 20,
+                Width = examplePanel.Width - 100,
                 Height = examplePanel.Height - 20,
             };
 
@@ -557,7 +560,7 @@ namespace Vados
 
 
             switch (buttonText)
-            {
+            {                   
                 case "Criar uma pasta":
                     LoadCriarPastaContent();
                     break;
@@ -586,12 +589,16 @@ namespace Vados
             secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
 
 
-            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
-                "Crie uma pasta chamada 'Fotos'"+
-                "Crie uma pasta chamada 'Trabalhos'"
-                );
+            AddExampleBox();
+            
+           
+            Global.AppendFormattedText(exampleRichTextBox, "crie uma pasta", Color.Black, FontStyle.Underline);
+            Global.AppendPlainText(exampleRichTextBox, " chamada ");
+            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta chamada 'Fotos'.", Color.LightGray, FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta com o nome 'Músicas'.", Color.LightGray, FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
-  
 
         }
 

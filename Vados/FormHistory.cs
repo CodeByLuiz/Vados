@@ -56,6 +56,7 @@ namespace Vados
                      ControlStyles.AllPaintingInWmPaint, true);
 
             this.Paint += new PaintEventHandler(FormHistory_Paint);
+            LostFocus += FormHistory_LostFocus;
             this.BackColor = Color.LimeGreen;
             this.TransparencyKey = Color.LimeGreen;
 
@@ -117,11 +118,6 @@ namespace Vados
         {
             if (historyPanel == null)
                 return;
-            //historyPanel.SuspendLayout();
-
-
-
-            //tamanho
 
             
             spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
@@ -133,10 +129,6 @@ namespace Vados
             //posição
             title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);
             historyPanel.Top = title.Bottom;
-            
-
-            //MessageBox.Show($"form {this.Height.ToString()} {this.Width.ToString()} \npanel {historyPanel.Height.ToString()} {historyPanel.Width.ToString()}");
-            //historyPanel.ResumeLayout();
         }
 
         private void LoadCommands()
@@ -393,6 +385,11 @@ namespace Vados
                     g.DrawPath(pen, path);
                 }
             }
+        }
+
+        private void FormHistory_LostFocus(object sender, EventArgs e)
+        {
+            //Close();
         }
     }
 }

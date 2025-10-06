@@ -77,6 +77,20 @@ namespace Vados
             return null;
         }
 
+
+        public FormHistory FindHistoryForm()
+        {
+            foreach (Form openForm in Application.OpenForms)
+            {
+                if (openForm is FormHistory)
+                {
+                    return (FormHistory)openForm;
+                }
+            }
+
+            return null;
+        }
+
         public void CorrectMessageForm()
         {
             FormMessage messageForm = FindMessageForm();
@@ -92,30 +106,20 @@ namespace Vados
 
         public void ShowHistoryTab(Form form, UserControl userControl)
         {
-            //ToggleOverlay(true);
+            ToggleOverlay(true);
 
             var history = new FormHistory();
             history.Owner = form;
             //history.userControl= userControl;
             history.Show();
+            history.Focus();
             CorrectHistoryForm();
             Global.userControlHome.HistoryOpen = true;
 
         }
         public void CloseHistoryTab()
         {
-            FormHistory historyForm = null;
-
-            
-            // Encontrar o formulário aberto do tipo FormHistory
-            foreach (Form openForm in Application.OpenForms)
-            {
-                if (openForm is FormHistory)
-                {
-                    historyForm = (FormHistory)openForm;
-                    break;
-                }
-            }
+            FormHistory historyForm = FindHistoryForm();
 
             if (historyForm != null)
             {
@@ -125,29 +129,20 @@ namespace Vados
         }
         public void CorrectHistoryForm()
         {
-            FormHistory historyForm = null;
-
-            //Encontrar form
-            foreach (Form openForm in Application.OpenForms)
-            {
-                if (openForm is FormHistory)
-                {
-                    historyForm = (FormHistory)openForm;
-                    break;
-                }
-            }
+            FormHistory historyForm = FindHistoryForm();
 
             if (historyForm == null) return;
 
-            int refX = (int)(this.Width - 35 );  
-            int refY = (int)(this.Height * 0.10);
 
-            int posX = refX - historyForm.Width;  
-            int posY = refY;
+            int historyRightMargin = 20;
+            int historyTopMargin = 110;
+            int historyBottomMargin = 20;
+
+            int posX = ClientRectangle.Right - historyRightMargin - historyForm.Width;  
+            int posY = historyTopMargin;
 
             historyForm.Location = this.PointToScreen(new Point(posX, posY));
-            historyForm.Height = Height - (historyForm.Top - Top+20);
-            //historyForm.Size = new Size(newWidth, newHeight);
+            historyForm.Height = ClientRectangle.Height - historyBottomMargin - historyTopMargin;
         }
         //Trocar user control (página)
         public void LoadUserControl(UserControl userControl)
@@ -239,10 +234,18 @@ namespace Vados
 
         private void overlayForm_GotFocus(object sender, EventArgs e)
         {
-            FormMessage messageForm = FindMessageForm();
-            if (messageForm == null) return;
-            messageForm.BringToFront();
-            messageForm.Focus();
+            //Focar form da mensagem de confirmação
+            Form form = FindMessageForm();
+
+            //Focar form do histórico
+            if (form == null)
+            {
+                form = FindHistoryForm();
+                if (form == null) return;
+            }
+
+            form.BringToFront();
+            form.Focus();
         }
     }
 }

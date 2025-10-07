@@ -70,13 +70,15 @@
             btnHistorico.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnHistorico.Cursor = Cursors.Hand;
             btnHistorico.Image = (Image)resources.GetObject("btnHistorico.Image");
-            btnHistorico.Location = new Point(1417, 18);
+            btnHistorico.Location = new Point(1438, 20);
             btnHistorico.Name = "btnHistorico";
-            btnHistorico.Size = new Size(73, 67);
+            btnHistorico.Size = new Size(60, 59);
             btnHistorico.SizeMode = PictureBoxSizeMode.Zoom;
             btnHistorico.TabIndex = 10;
             btnHistorico.TabStop = false;
             btnHistorico.Click += btnHistorico_Click;
+            btnHistorico.MouseEnter += btnHistorico_MouseEnter;
+            btnHistorico.MouseLeave += btnHistorico_MouseLeave;
             // 
             // lblText
             // 
@@ -106,9 +108,9 @@
             btnManual.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnManual.Cursor = Cursors.Hand;
             btnManual.Image = (Image)resources.GetObject("btnManual.Image");
-            btnManual.Location = new Point(1505, 25);
+            btnManual.Location = new Point(1530, 25);
             btnManual.Name = "btnManual";
-            btnManual.Size = new Size(69, 50);
+            btnManual.Size = new Size(50, 50);
             btnManual.SizeMode = PictureBoxSizeMode.Zoom;
             btnManual.TabIndex = 7;
             btnManual.TabStop = false;
@@ -121,9 +123,9 @@
             btnConfigs.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnConfigs.Cursor = Cursors.Hand;
             btnConfigs.Image = (Image)resources.GetObject("btnConfigs.Image");
-            btnConfigs.Location = new Point(1593, 25);
+            btnConfigs.Location = new Point(1605, 25);
             btnConfigs.Name = "btnConfigs";
-            btnConfigs.Size = new Size(65, 50);
+            btnConfigs.Size = new Size(50, 50);
             btnConfigs.SizeMode = PictureBoxSizeMode.Zoom;
             btnConfigs.TabIndex = 6;
             btnConfigs.TabStop = false;
@@ -150,6 +152,7 @@
             textBox1.Size = new Size(93, 16);
             textBox1.TabIndex = 2;
             textBox1.TabStop = false;
+            textBox1.Visible = false;
             // 
             // txtComando
             // 

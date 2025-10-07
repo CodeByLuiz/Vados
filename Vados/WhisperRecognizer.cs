@@ -55,7 +55,7 @@ namespace Vados
         {
             if (!File.Exists(modelPath))
             {
-                MessageBox.Show("Baixando modelo de reconhecimento de voz...");
+                MessageBox.Show("Instalando modelo de reconhecimento de voz...", "Aguarde");
 
                 //Link do arquivo
                 var url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin";
@@ -67,7 +67,7 @@ namespace Vados
                 Directory.CreateDirectory(Path.GetDirectoryName(modelPath)!);   //Criar pasta "Models"
                 await File.WriteAllBytesAsync(modelPath, data);
 
-                MessageBox.Show("Model downloaded successfully.");
+                MessageBox.Show("Modelo instalado com sucesso", "Finalizado");
             }
         }
 
@@ -84,7 +84,7 @@ namespace Vados
 
             catch (Exception ex)
             {
-                MessageBox.Show("Erro de inicialização: " + ex.Message);
+                //MessageBox.Show("Erro de inicialização: " + ex.Message);
             }
         }
 

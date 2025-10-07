@@ -194,13 +194,13 @@ namespace Vados
 
             if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
 
-            MessageBox.Show(objName);
-            MessageBox.Show(string.Join("|", stopWords));
+            //MessageBox.Show(objName);
+            //MessageBox.Show(string.Join("|", stopWords));
 
             //Checar se o nome não é uma das palavras de parada
             if (stopWords.Contains(objName.ToLower()))
             {
-                MessageBox.Show("mesmo nome");
+                //MessageBox.Show("mesmo nome");
                 if (nameIsRequired) return false;
                 return true;
             }
@@ -208,7 +208,7 @@ namespace Vados
             criteria.ObjectName = objName;
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Objeto -> " + objectStr);
+            //MessageBox.Show("Objeto -> " + objectStr);
             return match.Success;
         }
     }

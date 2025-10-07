@@ -110,8 +110,8 @@ namespace Vados
             int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
             int actualDistance = btnConfirm.Top - txtMessage.Bottom;
 
-            this.Height += minDistance - actualDistance;
-            this.StartPosition = FormStartPosition.CenterScreen;
+            Height += minDistance - actualDistance;
+            StartPosition = FormStartPosition.CenterScreen;
 
             //Corrigir posição do ícone ao lado do título
             Global.LabelFitWidth(lblTitle);

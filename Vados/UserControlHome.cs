@@ -139,8 +139,8 @@ namespace Vados
             btnConfigsImageHover = Global.ImageChangeBrightness(btnConfigsImage, brightnessChange);
             btnManualImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\manualIcon.png"));
             btnManualImageHover = Global.ImageChangeBrightness(btnManualImage, brightnessChange);
-            //btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
-            //btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
+            btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
+            btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
 
             //Botões do comando de voz
             btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
@@ -295,7 +295,7 @@ namespace Vados
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
-            result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
+            //result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
 
             //Realizar comando
             PerformCommand(result, true);
@@ -961,8 +961,8 @@ namespace Vados
 
         }
 
-        //private void btnHistorico_MouseEnter(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImageHover;
-        //private void btnHistorico_MouseLeave(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImage;
+        private void btnHistorico_MouseEnter(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImageHover;
+        private void btnHistorico_MouseLeave(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImage;
 
 
         //Botão de pausar comando de voz

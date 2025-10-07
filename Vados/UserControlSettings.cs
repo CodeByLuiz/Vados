@@ -40,7 +40,7 @@ namespace Vados
             timer.Tick += Timer_Tick;
             timer.Start();
 
-            MessageBox.Show("comecou timer");
+            //MessageBox.Show("comecou timer");
         }
 
 
@@ -149,7 +149,7 @@ namespace Vados
             }
             else
             {
-                MessageBox.Show("Selecione um idioma válido.");
+                //MessageBox.Show("Selecione um idioma válido.");
             }
 
 
@@ -256,7 +256,7 @@ namespace Vados
         private async void btnStartRecTest_Click(object sender, EventArgs e)
         {
             Global.VoiceRecognizer.Start();
-            MessageBox.Show("comecou a ouvir");
+            //MessageBox.Show("comecou a ouvir");
             btnPauseTest.Text = "Pausar";
         }
 
@@ -283,7 +283,7 @@ namespace Vados
             string corrected = Comandos.CleanText(result);
             corrected = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
 
-            MessageBox.Show(result + " -> " + corrected);
+            //MessageBox.Show(result + " -> " + corrected);
             txtTranscriçãoTest.AppendText(corrected + " ");
             btnPauseTest.Text = "Pausar";
         }
@@ -305,7 +305,9 @@ namespace Vados
             if (cbMicrofones.Items.Count > 0)
                 cbMicrofones.SelectedIndex = 0; // seleciona o primeiro por padrão
             else
-                MessageBox.Show("Nenhum microfone detectado.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            {
+                //MessageBox.Show("Nenhum microfone detectado.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         #endregion

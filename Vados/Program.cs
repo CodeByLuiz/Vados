@@ -26,7 +26,7 @@ namespace Vados
             #region RECONHECEDOR DE VOZ
 
             //Definir caminho do modelo do reconhecimento de voz
-            Global.VoiceRecognitionFolder = Path.Combine(Application.StartupPath, "Models", "ggml-base.bin");
+            Global.VoiceRecognitionFolder = Path.Combine(Application.StartupPath, "Models", "ggml-small.bin");
 
             //Definir palavras priorizadas
             List<string> hints = new List<string>() { };

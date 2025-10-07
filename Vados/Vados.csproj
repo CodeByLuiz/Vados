@@ -33,6 +33,7 @@
     <None Remove="Images\Icons\deleteiconhover.png" />
     <None Remove="Images\Icons\editicon.png" />
     <None Remove="Images\Icons\editiconhover.png" />
+    <None Remove="Images\Icons\historyIcon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
     <None Remove="Images\Icons\pasta.png" />
     <None Remove="Images\Icons\sendIcon.png" />
@@ -130,6 +131,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\editiconhover.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\historyIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\manualIcon.png">

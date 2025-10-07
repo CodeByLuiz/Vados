@@ -882,8 +882,6 @@ namespace Vados
             sizeUnit = arguments.SizeUnit,
             sizeModifier = arguments.SizeModifier;
 
-            MessageBox.Show(format);
-
 
             //Definições para arquivo executável (programa)
             if (objectType == "aplicativo")
@@ -1679,7 +1677,7 @@ namespace Vados
                 }
             }
 
-            MessageBox.Show("Nenhum drive disponível encontrado.");
+            //MessageBox.Show("Nenhum drive disponível encontrado.");
             return "";
         }
 
@@ -1697,7 +1695,7 @@ namespace Vados
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao criar a pasta padrão: " + ex.Message);
+                //MessageBox.Show("Erro ao criar a pasta padrão: " + ex.Message);
                 return "";
             }
         }
@@ -2130,7 +2128,7 @@ namespace Vados
             }
             catch
             {
-                MessageBox.Show("O programa precisa de permissões de administrador para funcionar corretamente.", "Permissão negada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //MessageBox.Show("O programa precisa de permissões de administrador para funcionar corretamente.", "Permissão negada", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -2151,7 +2149,7 @@ namespace Vados
 
             Process.Start(processo);
 
-            MessageBox.Show("O idioma da interface foi alterado. O computador será reiniciado em 5 segundos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show("O idioma da interface foi alterado. O computador será reiniciado em 5 segundos.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             //nao consigo testar isso aqui,meu pc só tem o idioma pt-BR e nao consigo mudar, mas deve funcionar, testem no de vcs se der 
 

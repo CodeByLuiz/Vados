@@ -114,13 +114,13 @@ namespace Vados
 
                 if (entradas.Count == 0)
                 {
-                    MessageBox.Show("Nenhuma entrada encontrada.");
+                    //MessageBox.Show("Nenhuma entrada encontrada.");
                     return;
                 }
 
                 foreach (var entrada in entradas)
                 {
-                    MessageBox.Show($"-----------\n ID: {entrada.Id}\n ComputadorId: {entrada.ComputadorId}\n Data: {entrada.Data}\n Comando: {entrada.Comando}\n Pastas:");
+                    //MessageBox.Show($"-----------\n ID: {entrada.Id}\n ComputadorId: {entrada.ComputadorId}\n Data: {entrada.Data}\n Comando: {entrada.Comando}\n Pastas:");
                     //MessageBox.Show($"ID: {entrada.Id}");
                    // MessageBox.Show($"ComputadorId: {entrada.ComputadorId}");
                     //MessageBox.Show($"Data: {entrada.Data}");

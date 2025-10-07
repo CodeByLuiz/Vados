@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Security.Principal;
 using System.Windows.Forms;
 using System.Text.Json;
+using NAudio.Wave;
 
 
 
@@ -45,7 +46,7 @@ namespace Vados
                         .ToList();
 
             //Inicializar reconhecedor de voz
-            Global.VoiceRecognizer = new WhisperRecognizer(Global.VoiceRecognitionFolder, hints);
+            Global.VoiceRecognizer = new WhisperRecognizer(Global.VoiceRecognitionFolder, hints, WaveIn.DeviceCount - 1);
             await Global.VoiceRecognizer.Initialize();
 
             #endregion

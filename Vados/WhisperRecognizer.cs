@@ -100,7 +100,8 @@ namespace Vados
             //Iniciar reconhecimento de voz
             waveIn = new WaveInEvent
             {
-                WaveFormat = new WaveFormat(16000, 1)
+                WaveFormat = new WaveFormat(16000, 1),
+                DeviceNumber = deviceNumber
             };
 
             audioBuffer = new MemoryStream();

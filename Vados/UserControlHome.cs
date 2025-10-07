@@ -231,6 +231,7 @@ namespace Vados
 
             //Extrair argumentos do comando
             string commandText = command.Replace(",", "");
+            commandText = commandText.Replace(".", "");
             commandText = commandText.Replace("!", "");
             commandText = commandText.Replace("?", "");
             var arguments = Comandos.CommandGetArguments(commandText);
@@ -290,11 +291,11 @@ namespace Vados
             audioTimer.Stop();  //Parar timer
 
 
-            //Transcrever audio
+            //Transcrever audioc
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
-            result = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
+            //result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
 
             //Realizar comando
             PerformCommand(result, true);
@@ -484,8 +485,8 @@ namespace Vados
         {
             if (keyData == Keys.Enter && ActiveControl == txtComando && txtComando.Text != "")
             {
-                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
-                PerformCommand(command, false);
+                //string command = Comandos.GetClosestMatch(txtComando.Text, Global.VoiceRecognizer.hints);
+                PerformCommand(txtComando.Text, false);
                 return true;
             }
 
@@ -704,7 +705,7 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (btnSendHovering && txtComando.ForeColor == Color.Black)
             {
-                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
+                string command = Comandos.GetClosestMatch(txtComando.Text, Global.VoiceRecognizer.hints);
                 PerformCommand(command, false);
             }
 

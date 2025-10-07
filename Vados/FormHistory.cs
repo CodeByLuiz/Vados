@@ -25,7 +25,8 @@ namespace Vados
 
 
 
-        private int margin = 10;
+        private int rectangleSideMargin = 15;
+        private int rectangleBottomMargin = 15;
         private int rectangleHeight = 115;
         private int rectangleWidth;
         private int spacing;
@@ -93,8 +94,8 @@ namespace Vados
             this.Controls.Add(title);
             
             title.BringToFront();
-
-            rectangleWidth = historyPanel.ClientSize.Width - 35;
+            int scrollBarWidth = 10;
+            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - scrollBarWidth;
 
 
             //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
@@ -120,15 +121,15 @@ namespace Vados
                 return;
 
             
-            spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
-            startY = spacing;
+            //spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
+            spacing = 30;
+            historyPanel.Height = this.Height - (title.Location.Y + title.Height) - spacing * 2;
 
-            historyPanel.Height = this.Height - (title.Location.Y + title.Height)-spacing;
-            
 
             //posição
-            title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);
-            historyPanel.Top = title.Bottom;
+            title.Left = (historyPanel.Width / 2) - (title.Width / 2);
+            title.Top = spacing;
+            historyPanel.Top = title.Bottom + spacing;
         }
 
         private void LoadCommands()
@@ -145,15 +146,16 @@ namespace Vados
                              .ToList();
             }
 
-            startY = spacing;
+            startY = 0;
+            int lastDrawnY = 0;
+
             foreach (var entry in entradas)
             {
-                int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
                 string HistoryTitle = char.ToUpper(entry.Comandotitle[0]) + entry.Comandotitle.Substring(1).ToLower(); // titulo com a primeira letra maiuscula
 
                 OptmizedPanel entryPanel = new OptmizedPanel
                 {
-                    Location = new Point(posX, startY),
+                    Location = new Point(rectangleSideMargin, startY),
 
                     Size = new Size(rectangleWidth, rectangleHeight),
                     BackColor = entryColor,
@@ -257,8 +259,7 @@ namespace Vados
                 void HoverEnter(object sender, EventArgs e) 
                 {
                    
-                    entryPanel.BackColor = Global.ChangeColorBrightness(entryColor,-0.1f);
-                   // lbl.ForeColor = Color.Black; 
+                    entryPanel.BackColor = Global.ChangeColorBrightness(entryColor, -0.1f);
                     
                 }
                 void HoverLeave(object sender, EventArgs e) 
@@ -324,11 +325,12 @@ namespace Vados
                 btnExcluir.Click += DeleteEntry;
                 btnEditar.Click += EditEntry;
 
-                startY += rectangleHeight + margin;
-
+                startY += rectangleHeight + rectangleBottomMargin;
+                lastDrawnY = entryPanel.Bottom + rectangleBottomMargin;
             }
 
-
+            //Margem adicional no final das entradas
+            //historyPanel.AutoScrollMinSize = new Size(0, lastDrawnY + rectangleBottomMargin);
             PositionFix();
         }
 
@@ -344,21 +346,6 @@ namespace Vados
         {
             historyPanel.Invalidate();
         }
-        private GraphicsPath RectArc(Rectangle rect, int raio) // deixa a borda arredondada
-        {
-            GraphicsPath path = new GraphicsPath();
-
-            int diametro = raio * 2;
-
-            
-            path.AddArc(rect.X, rect.Y, diametro, diametro, 180, 90);
-            path.AddArc(rect.Right - diametro, rect.Y, diametro, diametro, 270, 90);
-            path.AddArc(rect.Right - diametro, rect.Bottom - diametro, diametro, diametro, 0, 90);
-            path.AddArc(rect.X, rect.Bottom - diametro, diametro, diametro, 90, 90); 
-
-            path.CloseFigure();
-            return path;
-        }
 
         private void FormHistory_Paint(object sender, PaintEventArgs e)
         {
@@ -369,22 +356,10 @@ namespace Vados
             Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
 
 
-           Color cor = Color.White;
-
-            using (GraphicsPath path = RectArc(rect, raio))
-            {
-
-                using (Brush brush = new SolidBrush(cor)) // preenchimento
-                {
-                    g.FillPath(brush, path);
-                }
-
-                
-                using (Pen pen = new Pen(cor, 2)) // borda coisada
-                {
-                    g.DrawPath(pen, path);
-                }
-            }
+            //Desenhar fundo com bordas arredondadas
+            Brush brush = new SolidBrush(Color.White);
+            GraphicsPath area = Global.RoundedRectangle(new RectangleF(0, 0, Width, Height), 0.05f * Width);
+            e.Graphics.FillPath(brush, area);
         }
 
         private void FormHistory_LostFocus(object sender, EventArgs e)

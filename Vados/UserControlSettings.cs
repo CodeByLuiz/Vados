@@ -281,7 +281,7 @@ namespace Vados
 
             //Definir palavra correspondente
             string corrected = Comandos.CleanText(result);
-            corrected = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
+            corrected = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
 
             MessageBox.Show(result + " -> " + corrected);
             txtTranscriçãoTest.AppendText(corrected + " ");

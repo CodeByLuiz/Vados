@@ -546,25 +546,32 @@ namespace Vados
             "chamada",
             "chamadas",
             "que se chama",
+            "que se chame",
+            "que se chamam",
             "que se chamem",
             "nomeado",
             "nomeados",
             "nomeada",
             "nomeadas",
             "que se nomea",
+            "que se nomee",
             "que se nomeam",
             "denominado",
             "denominados",
             "denominada",
             "denominadas",
             "que se denomina",
+            "que se denomine",
             "que se denominam",
+            "que se denominem",
             "intitulado",
             "intitulados",
             "intitulada",
             "intituladas",
             "que se intitula",
+            "que se intitule",
             "que se intitulam",
+            "que se intitulem",
             "de nome",
             "de nomes",
             "de titulo",
@@ -1115,8 +1122,14 @@ namespace Vados
         }
 
 
+        //public static string CorrectCommonErrors()
+        //{
+
+        //}
+
+
         //Corrige o texto com as palavras mais parecidas
-        public static string CorrectText(string inputStr, List<string> hints, int maxDistance = 2)
+        public static string GetClosestMatch(string inputStr, List<string> hints, int maxDistance = 2)
         {
             inputStr = inputStr.ToLowerInvariant();
             var words = inputStr.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();    //Separa a string em uma lista de palavras

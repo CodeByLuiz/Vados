@@ -180,9 +180,10 @@ namespace Vados
             //Eventos de mudar de página (pra cada user control)
             Global.userControlHome.loadPage += LoadPage;
             Global.userControlSettings.loadPage += LoadPage;
+            Global.userControlManual.loadPage += LoadPage;
 
-            
-            
+
+
         }
         
 

@@ -23,6 +23,17 @@ namespace Vados
         private Panel imageWrapper = null;
         private RichTextBox exampleRichTextBox = null;
         private TableLayoutPanel tableLayoutContent;
+        private RichTextBox descriptionBox = null;
+        private RichTextBox secundarydescriptionBox = null;
+
+        private string pathreturnbutton = @"Images/Icons/closeicon.png"; 
+
+
+        private PictureBox btnReturn = null;
+
+
+
+        public event EventHandler<LoadPageEventArgs> loadPage;
 
         public UserControlManual()
         {
@@ -32,11 +43,22 @@ namespace Vados
             this.Controls.Add(panelContent);
             this.Resize += UserControlManual_Resize;
 
+
             SetupNavBar();
+
+            foreach (Control ctrl in flow.Controls)
+            {
+                if (ctrl is Button btn && btn.Text == "Criar uma pasta")
+                {
+                    NavButton_Click(btn, EventArgs.Empty);
+                    break;
+                }
+            }
+
             this.Controls.Add(panelNav);
 
-            LoadContentBasedOnSelection("Criar uma pasta");
-        } 
+            //  LoadContentBasedOnSelection("Criar uma pasta");
+        }
 
         PrivateFontCollection pfc = new PrivateFontCollection();
 
@@ -47,13 +69,13 @@ namespace Vados
 
             public RoundedButton()
             {
-                
+
                 this.DoubleBuffered = true;
                 this.ResizeRedraw = true;
                 this.FlatStyle = FlatStyle.Flat;
                 this.SetStyle(ControlStyles.Selectable, false);
-                this.FlatAppearance.MouseOverBackColor = Color.Transparent; 
-                this.FlatAppearance.MouseDownBackColor = Color.Transparent; 
+                this.FlatAppearance.MouseOverBackColor = Color.Transparent;
+                this.FlatAppearance.MouseDownBackColor = Color.Transparent;
                 this.TabStop = false;
             }
 
@@ -62,7 +84,7 @@ namespace Vados
                 base.OnPaint(e);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-               
+
                 Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
                 using (GraphicsPath path = GetRoundedPath(rect, BorderRadius))
                 {
@@ -82,7 +104,7 @@ namespace Vados
                     Math.Max(0, this.Height - this.Padding.Top - this.Padding.Bottom)
                 );
 
-               
+
                 TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis;
                 switch (this.TextAlign)
                 {
@@ -124,6 +146,11 @@ namespace Vados
 
         private void UserControlManual_Resize(object sender, EventArgs e)
         {
+
+
+
+
+
             foreach (Control control in tableLayoutContent.Controls)
             {
                 if (control is RichTextBox box && box.Tag?.ToString() == "descrição")
@@ -141,7 +168,7 @@ namespace Vados
             panelContent = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(223, 223, 223)
+                BackColor = Color.FromArgb(231, 231, 231)
             };
 
             tableLayoutContent = new TableLayoutPanel
@@ -155,9 +182,28 @@ namespace Vados
                 Padding = new Padding(20)
             };
 
+            btnReturn = new PictureBox
+            {
+                Location = new Point(panelContent.Width-70-20,20),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Width = 50,
+                Height = 50,
+                Margin = new Padding(10,10,10,10),
+                Image = Image.FromFile(pathreturnbutton),
+                SizeMode = PictureBoxSizeMode.Zoom
+
+            };
+
+            panelContent.Controls.Add(btnReturn);
+
+
             panelContent.Controls.Add(tableLayoutContent);
+
             this.Controls.Add(panelContent);
         }
+
+
+
 
         private void AddTitleToContent(string Title)
         {
@@ -171,19 +217,19 @@ namespace Vados
                 AutoSize = true,
             };
 
-          
+
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(title, 0, tableLayoutContent.RowCount - 1);
         }
-        private void AddDescriptionToContent(string description)
+        private void AddDescriptionToContent()
         {
-            RichTextBox descriptionBox = new RichTextBox
+            descriptionBox = new RichTextBox
             {
-                Text = description,
+                Text = null,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
-                BackColor = Color.FromArgb(223, 223, 223),
+                BackColor = Color.FromArgb(231, 231, 231),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
                 ScrollBars = RichTextBoxScrollBars.None,
@@ -194,6 +240,7 @@ namespace Vados
                 Margin = new Padding(65, 10, 40, 30), // margem externa
                 Tag = "descrição"
             };
+            Global.TextBoxFitHeight(exampleRichTextBox, 10);
 
             // Bloqueia seleção/foco
             descriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
@@ -209,12 +256,54 @@ namespace Vados
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(descriptionBox, 0, tableLayoutContent.RowCount - 1);
+
+
+
         }
+
+        private void AddSecundaryDescriptionToContent()
+        {
+            secundarydescriptionBox = new RichTextBox
+            {
+                Text = null,
+                Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
+                ForeColor = Color.Black,
+                BackColor = Color.FromArgb(231, 231, 231),
+                BorderStyle = BorderStyle.None,
+                ReadOnly = true,
+                ScrollBars = RichTextBoxScrollBars.None,
+                DetectUrls = false,
+                TabStop = false,
+                WordWrap = true,
+                Dock = DockStyle.None,
+                Margin = new Padding(65, 10, 40, 30), // margem externa
+                Tag = "descrição"
+            };
+
+
+            Global.TextBoxFitHeight(secundarydescriptionBox, 10);
+
+            // Bloqueia seleção/foco
+            secundarydescriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
+            secundarydescriptionBox.MouseDown += (s, e) => secundarydescriptionBox.SelectionLength = 0;
+            secundarydescriptionBox.SelectionChanged += (s, e) => secundarydescriptionBox.SelectionLength = 0;
+
+            // Adiciona margem interna para o texto
+            secundarydescriptionBox.SelectionIndent = 0;           // recuo à esquerda
+            secundarydescriptionBox.SelectionRightIndent = 20;    // recuo à direita
+
+            ResizeDescriptionBox(secundarydescriptionBox);
+
+            tableLayoutContent.RowCount++;
+            tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableLayoutContent.Controls.Add(secundarydescriptionBox, 0, tableLayoutContent.RowCount - 1);
+        }
+
 
 
         private void ResizeDescriptionBox(RichTextBox box)
         {
-            int horizontalPadding = box.Margin.Left + box.Margin.Right + 20; 
+            int horizontalPadding = box.Margin.Left + box.Margin.Right + 20;
             int maxWidth = panelContent.Width - horizontalPadding;
 
             box.MaximumSize = new Size(maxWidth, 0);
@@ -227,7 +316,7 @@ namespace Vados
             );
 
             box.Width = maxWidth;
-            box.Height = textSize.Height + 10;
+            box.Height = textSize.Height + 25;
         }
 
 
@@ -262,11 +351,11 @@ namespace Vados
             }
         }
 
-       
-        
-            private void AddExampleBox(string texto)
+
+
+        private void AddExampleBox()
         {
-          
+
             Label exampleLabel = new Label
             {
                 Text = "Exemplos:",
@@ -277,19 +366,20 @@ namespace Vados
                 Margin = new Padding(0, 0, 10, 0)
             };
 
-            
+
             Panel examplePanel = new Panel
             {
                 BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
                 Height = 200,
-                Margin = new Padding(5),
+                Margin = new Padding(5, 5, 5, 80),
+                Padding = new Padding(10),
+
             };
 
-            
-             exampleRichTextBox = new RichTextBox
+
+            exampleRichTextBox = new RichTextBox
             {
-                Text = texto,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
@@ -297,8 +387,8 @@ namespace Vados
                 TabStop = false,
                 Cursor = Cursors.Arrow,
                 Margin = new Padding(10),
-                
-                Width = examplePanel.Width - 20,
+                Dock = DockStyle.Fill,
+                Width = examplePanel.Width - 100,
                 Height = examplePanel.Height - 20,
             };
 
@@ -308,7 +398,7 @@ namespace Vados
 
             examplePanel.Controls.Add(exampleRichTextBox);
 
-           
+
             FlowLayoutPanel container = new FlowLayoutPanel
             {
                 FlowDirection = FlowDirection.LeftToRight,
@@ -318,17 +408,17 @@ namespace Vados
                 Padding = new Padding(0),
             };
 
-           
+
             container.Controls.Add(exampleLabel);
             container.Controls.Add(examplePanel);
 
-           
+
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(container, 0, tableLayoutContent.RowCount - 1);
         }
 
-       
+
         private void SetupNavBar()
         {
             panelNav = new Panel
@@ -336,7 +426,7 @@ namespace Vados
                 Dock = DockStyle.Left,
                 Width = 250,
                 BackColor = Color.FromArgb(48, 61, 99),
-               
+
 
             };
             this.Controls.Add(panelNav);
@@ -345,14 +435,14 @@ namespace Vados
             //panel que organiza os bagulho dentro do panel nav
             flow = new FlowLayoutPanel
             {
-               Dock = DockStyle.Fill,
+                Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 AutoScroll = false,
-              
+
             };
             panelNav.Controls.Add(flow);
-            
+
 
             PictureBox pictureLogo = new PictureBox
             {
@@ -376,20 +466,20 @@ namespace Vados
                 TextAlign = ContentAlignment.MiddleCenter,
                 Margin = new Padding(0, 10, 0, 10)
             };
-            
+
             lblTitle.Paint += DrawTitleLines;
             flow.Controls.Add(lblTitle);
 
             // Categorias
-            AddSection(flow, "Pastas ", @"Images/Icons/pasta.png", new[] { "Criar uma pasta", "Abrir uma pasta","Abrir pasta padrão","Renomear uma pasta","Excluir uma pasta","Mover uma pasta","Duplicar uma pasta" });
-            AddSection(flow, "Arquivos ", @"Images/Icons/Arquivos.png", new[] { "Criar um arquivo", "Abrir um arquivo","Renomear um arquivo","Excluir um arquivo","Mover um arquivo","Duplicar um arquivo","Operar múltiplos arquivos " });
-            AddSection(flow, "Sistema ", @"Images/Icons/Sistema.png", new[] { "Abrir software", "Alterar volume", "Alterar horário","Alterar brilho da tela", "Alterar idioma" });
+            AddSection(flow, "Pastas ", @"Images/Icons/pasta.png", new[] { "Criar uma pasta", "Abrir uma pasta", "Abrir pasta padrão", "Renomear uma pasta", "Excluir uma pasta", "Mover uma pasta", "Duplicar uma pasta" });
+            AddSection(flow, "Arquivos ", @"Images/Icons/Arquivos.png", new[] { "Criar um arquivo", "Abrir um arquivo", "Renomear um arquivo", "Excluir um arquivo", "Mover um arquivo", "Duplicar um arquivo", "Operar múltiplos arquivos " });
+            AddSection(flow, "Sistema ", @"Images/Icons/Sistema.png", new[] { "Abrir software", "Alterar volume", "Alterar horário", "Alterar brilho da tela", "Alterar idioma" });
         }
 
 
         private void AddSection(FlowLayoutPanel flow, string sectionTitle, string iconPath, string[] commands)
         {
-            
+
             FlowLayoutPanel sectionPanel = new FlowLayoutPanel
             {
                 FlowDirection = FlowDirection.LeftToRight,
@@ -399,7 +489,7 @@ namespace Vados
                 Padding = new Padding(0)
             };
 
-            
+
             Label lblSection = new Label
             {
                 Text = sectionTitle,
@@ -417,7 +507,7 @@ namespace Vados
                 SizeMode = PictureBoxSizeMode.Zoom,
                 Width = 24,
                 Height = 24,
-                Margin = new Padding(0, 3, 5, 0) 
+                Margin = new Padding(0, 3, 5, 0)
             };
             sectionPanel.Controls.Add(icon);
 
@@ -453,17 +543,17 @@ namespace Vados
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-            
-            using (Pen pen = new Pen(Color.FromArgb(200, 219, 236), 2)) 
+
+            using (Pen pen = new Pen(Color.FromArgb(200, 219, 236), 2))
             {
-             
+
                 SizeF textSize = e.Graphics.MeasureString(lbl.Text, lbl.Font);
 
                 int textWidth = (int)textSize.Width;
                 int textHeight = (int)textSize.Height;
 
-                int centerY = lbl.Height / 2; 
-                int lineY = centerY; 
+                int centerY = lbl.Height / 2;
+                int lineY = centerY;
 
                 int padding = 1;
                 int lineLength = (lbl.Width - textWidth) / 2 - padding;
@@ -480,8 +570,8 @@ namespace Vados
         }
 
 
-       
-        
+
+
         private void NavButton_Click(object sender, EventArgs e)
         {
 
@@ -502,20 +592,30 @@ namespace Vados
 
         }
 
-        
+
 
 
         private void LoadContentBasedOnSelection(string buttonText)
         {
-          
 
-        
+
+
             tableLayoutContent.Controls.Clear();
             tableLayoutContent.RowStyles.Clear();
             tableLayoutContent.RowCount = 0;
 
-     
-  
+            panelContent.Layout += (s, e) =>
+            {
+                foreach (Control control in tableLayoutContent.Controls)
+                {
+                    if (control is RichTextBox box && box.Tag?.ToString() == "descrição")
+                    {
+                        ResizeDescriptionBox(box);
+                    }
+                }
+            };
+
+
 
 
             switch (buttonText)
@@ -526,39 +626,149 @@ namespace Vados
                 case "Abrir uma pasta":
                     LoadAbrirPastaContent();
                     break;
-                
+                case "Renomear uma pasta":
+                    LoadRenomearPastaContent();
+                    break;
+                case "Excluir uma pasta":
+                    LoadExcluirPastaContent();
+                    break;
+
             }
         }
 
+
+        #region Métodos Load
         private void LoadCriarPastaContent()
         {
             AddTitleToContent("Criar Pasta");
-            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
-            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
-                "Crie uma pasta chamada 'Fotos'"+
-                "Crie uma pasta chamada 'Trabalhos'"
-                );
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para criar uma pasta, basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Criar Pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". As pastas criadas são encontradas na pasta padrão do aplicativo, chamada \"Vados\". Caso uma pasta seja criada com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
 
-  
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+
+            AddSecundaryDescriptionToContent();
+            Global.AppendPlainText(secundarydescriptionBox, "A execução desse comando depende de apenas um fator, o ");
+            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, FontStyle.Bold);
+            secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "crie uma pasta", Color.Black, FontStyle.Underline);
+            Global.AppendPlainText(exampleRichTextBox, " chamada ");
+            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta chamada 'Fotos'.\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta com o nome 'Músicas'.\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
 
         }
 
         private void LoadAbrirPastaContent()
         {
             AddTitleToContent("Abrir Pasta");
-            AddDescriptionToContent("Para criar uma pasta, basta utilizar o comando Criar pasta. As pastas criadas são encontradas na pasta padrão do aplicativo, chamada “vados”. Caso uma pasta seja criado com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para abrir uma pasta do computador, basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Abrir Pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". Caso a pasta esteja dentro da pasta padrão (chamada “vados”), ela terá prioridade na busca, e caso contrário, se não for encontrada, a busca será feita no resto do computador.");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
             AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
-            AddDescriptionToContent("Exemplo de como criar uma pasta chamada 'Documentos':");
-            AddExampleBox("Crie uma pasta chamada 'nome da pasta'" +
-                "Crie uma pasta chamada 'Fotos'" +
-                "Crie uma pasta chamada 'Trabalhos'");
+
+            AddSecundaryDescriptionToContent();
+            Global.AppendPlainText(secundarydescriptionBox, "Esse comando precisa de um único fator, o ");
+            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, FontStyle.Bold);
+            secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir a pasta ", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Abra a pasta ‘Fotos’.”\n“Abrir a pasta chamada ‘Músicas’.”\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
         }
 
+        private void LoadRenomearPastaContent()
+        {
+            AddTitleToContent("Renomear pasta");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para renomear uma pasta presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, " Renomear pasta.", Colors.blueHighlight, FontStyle.Bold);
 
 
 
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para executar esse comando, diga o ");
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, " e o ");
+            Global.AppendFormattedText(descriptionBox, "novo nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Renomeie a pasta ", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta' ", Color.Black, FontStyle.Bold);
+            Global.AppendPlainText(exampleRichTextBox, "para ");
+            Global.AppendFormattedText(exampleRichTextBox, "‘novo nome da pasta'\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie a pasta ‘Fotos’ para ‘Fotos 2025’.”\n“Renomeie a pasta chamada ‘Músicas’ para ‘Músicas Pop/Rock’.”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+        }
+
+        private void LoadExcluirPastaContent()
+        {
+            AddTitleToContent("Excluir uma Pasta");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para excluir uma pasta presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, " Excluir pasta.", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". As pastas excluídas podem ser encontradas na lixeira, e de lá podem ser recuperadas.");
+
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas de um fator, o ");
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, " a ser excluída.");
+
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Excluir a pasta", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, FontStyle.Bold);
+
+            Global.AppendFormattedText(exampleRichTextBox, "“Exclua a pasta chamada ‘Jogos’.”\r\n“Delete a pasta ‘Fotos 2017’.”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+        }
+        #endregion
+
+        private void btnReturn_Click(object sender, EventArgs e)
+        {
+
+            loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlHome));
+      
+    }
     }
 
 

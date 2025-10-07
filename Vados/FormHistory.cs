@@ -22,6 +22,7 @@ namespace Vados
         private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
         private Label title;
+       
 
 
 
@@ -32,7 +33,7 @@ namespace Vados
         private int spacing;
         private int startY;
         private Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
-
+        private Form1 parentForm;
 
 
 
@@ -46,7 +47,7 @@ namespace Vados
             int nHeightEllipse
         );
 
-        public FormHistory()
+        public FormHistory(Form1 parent)
         {
             InitializeComponent();
 
@@ -60,6 +61,8 @@ namespace Vados
             LostFocus += FormHistory_LostFocus;
             this.BackColor = Color.LimeGreen;
             this.TransparencyKey = Color.LimeGreen;
+
+            parentForm = parent;
 
             title = new Label
             {
@@ -87,16 +90,38 @@ namespace Vados
 
             };
 
+            PictureBox btnExit = new PictureBox
+            {
+                Size = new Size(25, 25),
+                Cursor = Cursors.Hand,
+                BackColor= Color.White,
+                BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeicon.png")),
+                BackgroundImageLayout = ImageLayout.Zoom,
+
+
+            };
+
 
           
             
             this.Controls.Add(historyPanel);
             this.Controls.Add(title);
+            this.Controls.Add(btnExit);
             
+            //ajustes de posicionamento e tamanho que só podem ser feitos após o negocio ja estar criado no form 😭
             title.BringToFront();
             int scrollBarWidth = 10;
-            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - scrollBarWidth;
+            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;//- scrollBarWidth;
+            btnExit.Location = new Point((this.Width - 20) - (btnExit.Width), 20);
 
+
+            void ExitForm(object sender, EventArgs e) 
+            {
+                parentForm.CloseHistoryTab();
+            }
+
+            btnExit.Click += ExitForm;
+            
 
             //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
 
@@ -148,6 +173,8 @@ namespace Vados
 
             startY = 0;
             int lastDrawnY = 0;
+
+            
 
             foreach (var entry in entradas)
             {
@@ -297,8 +324,8 @@ namespace Vados
                 void EditEntry(object sender, EventArgs e)
                 {
                     Global.userControlHome.TxtComandoEditar = entry.Comando;
-                    Global.userControlHome.HistoryOpen = false;
-                    this.Close();
+                   
+                    parentForm.CloseHistoryTab();
                 }
 
                 // Adiciona os eventos aos elementos

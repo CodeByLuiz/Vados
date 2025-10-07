@@ -108,7 +108,7 @@ namespace Vados
         {
             ToggleOverlay(true);
 
-            var history = new FormHistory();
+            var history = new FormHistory(this);
             history.Owner = form;
             //history.userControl= userControl;
             history.Show();
@@ -119,6 +119,7 @@ namespace Vados
         }
         public void CloseHistoryTab()
         {
+            ToggleOverlay(false);
             FormHistory historyForm = FindHistoryForm();
 
             if (historyForm != null)

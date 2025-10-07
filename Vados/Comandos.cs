@@ -882,6 +882,8 @@ namespace Vados
             sizeUnit = arguments.SizeUnit,
             sizeModifier = arguments.SizeModifier;
 
+            MessageBox.Show(format);
+
 
             //Definições para arquivo executável (programa)
             if (objectType == "aplicativo")
@@ -894,7 +896,7 @@ namespace Vados
             #region---------ERRO: nome inválido (nome, origem ou destino)---------
 
             //Nome do arquivo inválido
-            if (objectType != "pasta" && !IsValidFileName(name))
+            if (objectType != "pasta" && !string.IsNullOrEmpty(name) && !IsValidFileName(name))
             {
                 var rtb = new RichTextBox();
                 Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
@@ -976,7 +978,8 @@ namespace Vados
             {
                 //Criar
                 case "criar":
-                    if (objectType == "pasta") { return await CriarPasta(name, destinationPath); }
+                    string fileName = name + "." + WordGetExtensions(format).FirstOrDefault();
+                    if (objectType == "pasta") { return await CriarPasta(fileName, destinationPath); }
                     if (objectType == "arquivo") { return await CriarArquivo(name, destinationPath); }
                     break;
 
@@ -1683,8 +1686,8 @@ namespace Vados
 
         public static string CriarPastaPadrao()
         {
-            string defaultFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vados");
-            
+            string defaultFolderPath = DriveGetFirst() + @"Users\" + Environment.UserName + @"\Documents\Vados";
+
             try
             {
                 if (!Directory.Exists(defaultFolderPath))

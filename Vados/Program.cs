@@ -34,15 +34,15 @@ namespace Vados
             //Lista de palavras priorizadas
             hints = hints.Concat(Comandos.allCommands)
                         .Concat(Comandos.allObjects)
-                        .Concat(Comandos.allExtensionsWords)
-                        .Concat(Comandos.extraSpeechWords)
-                        .Concat(Comandos.allSizeUnitWords)
-                        .Concat(Comandos.allSizeModifierWords)
-                        .Concat(Comandos.sizeWords)
-                        .Concat(Comandos.insideWords)
-                        .Concat(Comandos.fromWords)
-                        .Concat(Comandos.namingWords)
-                        .Concat(Comandos.amountWords)
+                        //.Concat(Comandos.allExtensionsWords)
+                        //.Concat(Comandos.extraSpeechWords)
+                        //.Concat(Comandos.allSizeUnitWords)
+                        //.Concat(Comandos.allSizeModifierWords)
+                        //.Concat(Comandos.sizeWords)
+                        //.Concat(Comandos.insideWords)
+                        //.Concat(Comandos.fromWords)
+                        //.Concat(Comandos.namingWords)
+                        //.Concat(Comandos.amountWords)
                         .ToList();
 
             //Inicializar reconhecedor de voz

@@ -291,11 +291,11 @@ namespace Vados
             audioTimer.Stop();  //Parar timer
 
 
-            //Transcrever audioc
+            //Transcrever audio
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
             result = Comandos.CleanText(result);
-            //result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
+            result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
 
             //Realizar comando
             PerformCommand(result, true);

@@ -193,6 +193,8 @@ namespace Vados
                 SizeMode = PictureBoxSizeMode.Zoom
 
             };
+            btnReturn.Click += btnReturn_Click;
+            btnReturn.Cursor = Cursors.Hand;
 
             panelContent.Controls.Add(btnReturn);
 

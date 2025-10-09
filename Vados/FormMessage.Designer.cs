@@ -57,10 +57,11 @@
             txtMessage.BackColor = Color.FromArgb(231, 231, 231);
             txtMessage.BorderStyle = BorderStyle.None;
             txtMessage.Font = new Font("Segoe UI", 11F);
-            txtMessage.Location = new Point(24, 60);
+            txtMessage.Location = new Point(24, 56);
             txtMessage.Margin = new Padding(0);
             txtMessage.Name = "txtMessage";
             txtMessage.ReadOnly = true;
+            txtMessage.ScrollBars = RichTextBoxScrollBars.None;
             txtMessage.Size = new Size(352, 22);
             txtMessage.TabIndex = 1;
             txtMessage.Text = "Você deseja criar um arquivo chamado \"teste\"?";
@@ -115,7 +116,6 @@
             btnClose.Click += btnClose_Click;
             btnClose.MouseEnter += btnClose_MouseEnter;
             btnClose.MouseLeave += btnClose_MouseLeave;
-
             // 
             // imgTitleIcon
             // 

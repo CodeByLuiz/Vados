@@ -53,8 +53,7 @@ namespace Vados
             btnCloseImageHover = Global.ImageChangeBrightness(btnCloseImage, 0.25f);
 
             //Definir mensagem
-            var messageFont = new Font("Segoe UI", 11f);
-            txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
+            txtMessage.Rtf = messageRtf;
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -69,6 +68,12 @@ namespace Vados
         private void FormMessage_Load(object sender, EventArgs e)
         {
             Form1 parentForm = (Form1)Owner;
+
+            //Definir fontes
+            lblTitle.Font = new Font(Fonts.MavenRegular, 16, FontStyle.Bold);
+            btnConfirm.Font = new Font(Fonts.DarkerMedium, 12);
+            btnCancel.Font = new Font(Fonts.DarkerMedium, 12);
+            txtMessage.Font = new Font(Fonts.DarkerMedium, 14);
 
             //Mensagem de erro
             if (isErrorMessage)
@@ -103,10 +108,12 @@ namespace Vados
                 }
             }
 
+            txtMessage.Rtf = Global.RtfChangeFont(txtMessage.Rtf, txtMessage.Font, new Font(Fonts.DarkerExtraBold, 14));
+
 
             //Ajustar tamanho do form para caber a mensagem
             Global.TextBoxFitHeight(txtMessage);
-            int messageMarginBottom = 20;
+            int messageMarginBottom = 18;
             int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
             int actualDistance = btnConfirm.Top - txtMessage.Bottom;
 
@@ -168,13 +175,14 @@ namespace Vados
 
             textBox.Text = "Você deseja";
 
-
             //Comando
             string commandConnector = "";
 
+            Font bold = new Font(textBox.Font, FontStyle.Bold);
+
             if (commandType != "")
             {
-                Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, bold);
 
                 //Conector após comando
                 switch (commandType)
@@ -233,7 +241,7 @@ namespace Vados
                 if (amount != "") connector += "s";
 
                 Global.AppendPlainText(textBox, connector + " ");
-                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, bold);
             }
 
 
@@ -270,7 +278,7 @@ namespace Vados
                 if (amount != "") insideIndicator = " presentes na pasta ";
 
                 Global.AppendPlainText(textBox, insideIndicator);
-                Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, bold);
             }
 
 
@@ -292,7 +300,7 @@ namespace Vados
 
 
                 Global.AppendPlainText(textBox, destinationIndicator);
-                Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, bold);
             }
 
 
@@ -300,7 +308,7 @@ namespace Vados
             if (newName != "")
             {
                 Global.AppendPlainText(textBox, " para ");
-                Global.AppendFormattedText(textBox, newName, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, newName, Colors.greenHighlight, bold);
             }
 
 

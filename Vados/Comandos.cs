@@ -830,16 +830,17 @@ namespace Vados
             if (paths.Count == 0)
             {
                 var rtb = new RichTextBox();
+                var bold = new Font(rtb.Font, FontStyle.Bold);
 
                 string objectIndication = $"nenhum {objectType} chamado ";
                 if (objectType == "pasta") objectIndication = "nenhuma pasta chamada ";
 
                 Global.AppendPlainText(rtb, "Não foi possível encontrar " + objectIndication);
-                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                 if (origin != "")
                 {
                     Global.AppendPlainText(rtb, " dentro da pasta ");
-                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, bold);
                 }
                 Global.AppendPlainText(rtb, ".");
 
@@ -897,7 +898,8 @@ namespace Vados
             if (objectType != "pasta" && !string.IsNullOrEmpty(name) && !IsValidFileName(name))
             {
                 var rtb = new RichTextBox();
-                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                var bold = new Font(rtb.Font, FontStyle.Bold);
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                 Global.AppendPlainText(rtb, " é um nome de " + objectType + " inválido.");
                 return rtb.Rtf;
             }
@@ -908,13 +910,14 @@ namespace Vados
 
             if (objectType == "pasta") {
                 var rtb = new RichTextBox();
+                var bold = new Font(rtb.Font, FontStyle.Bold);
 
                 if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
-                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                 else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
-                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, bold);
                 else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
-                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, bold);
 
                 if (rtb.Text != "")
                 {
@@ -938,8 +941,9 @@ namespace Vados
                 if (string.IsNullOrEmpty(originPath))
                 {
                     var rtb = new RichTextBox();
+                    var bold = new Font(rtb.Font, FontStyle.Bold);
                     Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de origem chamada ");
-                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, bold);
                     Global.AppendPlainText(rtb, ".");
                     return rtb.Rtf;
                 }
@@ -959,8 +963,9 @@ namespace Vados
                 if (string.IsNullOrEmpty(destinationPath))
                 {
                     var rtb = new RichTextBox();
+                    var bold = new Font(rtb.Font, FontStyle.Bold);
                     Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta de destino chamada ");
-                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, bold);
                     Global.AppendPlainText(rtb, ".");
                     return rtb.Rtf;
                 }
@@ -1727,8 +1732,9 @@ namespace Vados
                 else
                 {
                     var rtb = new RichTextBox();
+                    var bold = new Font(rtb.Font, FontStyle.Bold);
                     Global.AppendPlainText(rtb, "Não foi possível criar uma pasta chamada ");
-                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                     Global.AppendPlainText(rtb, ", pois já existe um arquivo com esse nome.");
                     return rtb.Rtf;
                 }
@@ -1742,7 +1748,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível criar a pasta.\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -1776,8 +1782,9 @@ namespace Vados
                 else
                 {
                     var rtb = new RichTextBox();
+                    var bold = new Font(rtb.Font, FontStyle.Bold);
                     Global.AppendPlainText(rtb, "Não foi possível criar um arquivo chamado ");
-                    Global.AppendFormattedText(rtb, finalName, Colors.greenHighlight, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, finalName, Colors.greenHighlight, bold);
                     Global.AppendPlainText(rtb, ", pois já existe uma pasta com esse nome.");
                     return rtb.Rtf;
                 }
@@ -1791,7 +1798,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível criar o arquivo.\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -1817,7 +1824,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -1854,7 +1861,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível excluir o(s) arquivo(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -1869,8 +1876,9 @@ namespace Vados
             if (string.IsNullOrEmpty(path))
             {
                 var rtb = new RichTextBox();
+                var bold = new Font(rtb.Font, FontStyle.Bold);
                 Global.AppendPlainText(rtb, "Não foi possível encontrar o arquivo chamado ");
-                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                 Global.AppendPlainText(rtb, ".");
                 return rtb.Rtf;
             }
@@ -1896,8 +1904,9 @@ namespace Vados
             if (string.IsNullOrEmpty(path))
             {
                 var rtb = new RichTextBox();
+                var bold = new Font(rtb.Font, FontStyle.Bold);
                 Global.AppendPlainText(rtb, "Não foi possível encontrar a pasta chamada ");
-                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
                 Global.AppendPlainText(rtb, ".");
                 return rtb.Rtf;
             }
@@ -1926,10 +1935,11 @@ namespace Vados
                     if (Directory.Exists(newPath))
                     {
                         var rtb = new RichTextBox();
+                        var bold = new Font(rtb.Font, FontStyle.Bold);
                         Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, " na pasta ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, ".");
                         return rtb.Rtf;
                     }
@@ -1946,7 +1956,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível mover a(s) pasta(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -1964,10 +1974,11 @@ namespace Vados
                     if (File.Exists(newPath))
                     {
                         var rtb = new RichTextBox();
+                        var bold = new Font(rtb.Font, FontStyle.Bold);
                         Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, " na pasta ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, ".");
                         return rtb.Rtf;
                     }
@@ -1984,7 +1995,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível mover o(s) arquivos(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -2012,10 +2023,11 @@ namespace Vados
                     if (Directory.Exists(folderPath))
                     {
                         var rtb = new RichTextBox();
+                        var bold = new Font(rtb.Font, FontStyle.Bold);
                         Global.AppendPlainText(rtb, "Já existe um arquivo com o nome ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, " na pasta ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, ".");
                         return rtb.Rtf;
                     }
@@ -2051,7 +2063,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível duplicar a(s) pasta(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -2081,10 +2093,11 @@ namespace Vados
                     if (Directory.Exists(newPath))
                     {
                         var rtb = new RichTextBox();
+                        var bold = new Font(rtb.Font, FontStyle.Bold);
                         Global.AppendPlainText(rtb, "Já existe uma pasta com o nome ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(path), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, " na pasta ");
-                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, FontStyle.Bold);
+                        Global.AppendFormattedText(rtb, Path.GetFileName(destination), Colors.greenHighlight, bold);
                         Global.AppendPlainText(rtb, ".");
                         return rtb.Rtf;
                     }
@@ -2104,7 +2117,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível duplicar o(s) arquivo(s).\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------
@@ -2195,7 +2208,7 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível abrir o arquivo / programa.\n");
-                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, FontStyle.Regular);
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }
             //----------------------------------------

@@ -640,32 +640,44 @@ namespace Vados
 
 
         #region Métodos Load
+
         private void LoadCriarPastaContent()
         {
+            //Título
             AddTitleToContent("Criar Pasta");
+
+            //Descrição
             AddDescriptionToContent();
+            var descBold = new Font(descriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(descriptionBox, "Para criar uma pasta, basta utilizar o comando ");
-            Global.AppendFormattedText(descriptionBox, "Criar Pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, "Criar Pasta", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". As pastas criadas são encontradas na pasta padrão do aplicativo, chamada \"Vados\". Caso uma pasta seja criada com o mesmo nome de outra já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguida.");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
 
+            //Imagem
             AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
 
+            //Descrição secundária
             AddSecundaryDescriptionToContent();
+            var secDescBold = new Font(secundarydescriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(secundarydescriptionBox, "A execução desse comando depende de apenas um fator, o ");
-            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, secDescBold);
             secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
 
-
+            //Exemplos
             AddExampleBox();
+            var exampleRegular = exampleRichTextBox.Font;
+            var exampleBold = new Font(exampleRichTextBox.Font, FontStyle.Bold);
+            var exampleUnderline = new Font(exampleRichTextBox.Font, FontStyle.Underline);
 
-
-            Global.AppendFormattedText(exampleRichTextBox, "crie uma pasta", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "crie uma pasta", Color.Black, exampleUnderline);
             Global.AppendPlainText(exampleRichTextBox, " chamada ");
-            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'\n", Color.Black, FontStyle.Bold);
-            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta chamada 'Fotos'.\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
-            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta com o nome 'Músicas'.\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'\n", Color.Black, exampleBold);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta chamada 'Fotos'.\n", Color.FromArgb(125, 125, 125), exampleRegular);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta com o nome 'Músicas'.\n", Color.FromArgb(125, 125, 125), exampleRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
 
@@ -673,38 +685,54 @@ namespace Vados
 
         private void LoadAbrirPastaContent()
         {
+            //Título
             AddTitleToContent("Abrir Pasta");
+
+            //Descrição
             AddDescriptionToContent();
+            var descBold = new Font(descriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(descriptionBox, "Para abrir uma pasta do computador, basta utilizar o comando ");
-            Global.AppendFormattedText(descriptionBox, "Abrir Pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, "Abrir Pasta", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Caso a pasta esteja dentro da pasta padrão (chamada “vados”), ela terá prioridade na busca, e caso contrário, se não for encontrada, a busca será feita no resto do computador.");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
 
+            //Imagem
             AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
 
+            //Descrição secundária
             AddSecundaryDescriptionToContent();
+            var secDescBold = new Font(secundarydescriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(secundarydescriptionBox, "Esse comando precisa de um único fator, o ");
-            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(secundarydescriptionBox, "nome da pasta.", Colors.greenHighlight, secDescBold);
             secundarydescriptionBox.Rtf = Global.RtfChangeFont(secundarydescriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
 
-
+            //Exemplos
             AddExampleBox();
+            var exampleRegular = exampleRichTextBox.Font;
+            var exampleBold = new Font(exampleRichTextBox.Font, FontStyle.Bold);
+            var exampleUnderline = new Font(exampleRichTextBox.Font, FontStyle.Underline);
 
-
-            Global.AppendFormattedText(exampleRichTextBox, "Abrir a pasta ", Color.Black, FontStyle.Underline);
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’\n", Color.Black, FontStyle.Bold);
-            Global.AppendFormattedText(exampleRichTextBox, "“Abra a pasta ‘Fotos’.”\n“Abrir a pasta chamada ‘Músicas’.”\n", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir a pasta ", Color.Black, exampleUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’\n", Color.Black, exampleBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Abra a pasta ‘Fotos’.”\n“Abrir a pasta chamada ‘Músicas’.”\n", Color.FromArgb(125, 125, 125), exampleRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
         }
 
         private void LoadRenomearPastaContent()
         {
+            //Título
             AddTitleToContent("Renomear pasta");
+
+            //Descrição
             AddDescriptionToContent();
+            var descBold = new Font(descriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(descriptionBox, "Para renomear uma pasta presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
-            Global.AppendFormattedText(descriptionBox, " Renomear pasta.", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, " Renomear pasta.", Colors.blueHighlight, descBold);
 
 
 
@@ -715,29 +743,37 @@ namespace Vados
 
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Para executar esse comando, diga o ");
-            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, " e o ");
-            Global.AppendFormattedText(descriptionBox, "novo nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, "novo nome da pasta", Colors.greenHighlight, descBold);
 
 
+            //Exemplos
             AddExampleBox();
+            var exampleRegular = exampleRichTextBox.Font;
+            var exampleBold = new Font(exampleRichTextBox.Font, FontStyle.Bold);
+            var exampleUnderline = new Font(exampleRichTextBox.Font, FontStyle.Underline);
 
-
-            Global.AppendFormattedText(exampleRichTextBox, "Renomeie a pasta ", Color.Black, FontStyle.Underline);
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta' ", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "Renomeie a pasta ", Color.Black, exampleUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta' ", Color.Black, exampleBold);
             Global.AppendPlainText(exampleRichTextBox, "para ");
-            Global.AppendFormattedText(exampleRichTextBox, "‘novo nome da pasta'\n", Color.Black, FontStyle.Bold);
-            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie a pasta ‘Fotos’ para ‘Fotos 2025’.”\n“Renomeie a pasta chamada ‘Músicas’ para ‘Músicas Pop/Rock’.”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "‘novo nome da pasta'\n", Color.Black, exampleBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie a pasta ‘Fotos’ para ‘Fotos 2025’.”\n“Renomeie a pasta chamada ‘Músicas’ para ‘Músicas Pop/Rock’.”", Color.FromArgb(125, 125, 125), exampleRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
         }
 
         private void LoadExcluirPastaContent()
         {
+            //Título
             AddTitleToContent("Excluir uma Pasta");
+
+            //Descrição
             AddDescriptionToContent();
+            var descBold = new Font(descriptionBox.Font, FontStyle.Bold);
+
             Global.AppendPlainText(descriptionBox, "Para excluir uma pasta presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
-            Global.AppendFormattedText(descriptionBox, " Excluir pasta.", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, " Excluir pasta.", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". As pastas excluídas podem ser encontradas na lixeira, e de lá podem ser recuperadas.");
 
 
@@ -748,18 +784,20 @@ namespace Vados
 
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas de um fator, o ");
-            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, " a ser excluída.");
 
 
-
+            //Exemplos
             AddExampleBox();
+            var exampleRegular = exampleRichTextBox.Font;
+            var exampleBold = new Font(exampleRichTextBox.Font, FontStyle.Bold);
+            var exampleUnderline = new Font(exampleRichTextBox.Font, FontStyle.Underline);
 
+            Global.AppendFormattedText(exampleRichTextBox, "Excluir a pasta", Color.Black, exampleUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, exampleBold);
 
-            Global.AppendFormattedText(exampleRichTextBox, "Excluir a pasta", Color.Black, FontStyle.Underline);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, FontStyle.Bold);
-
-            Global.AppendFormattedText(exampleRichTextBox, "“Exclua a pasta chamada ‘Jogos’.”\r\n“Delete a pasta ‘Fotos 2017’.”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            Global.AppendFormattedText(exampleRichTextBox, "“Exclua a pasta chamada ‘Jogos’.”\r\n“Delete a pasta ‘Fotos 2017’.”", Color.FromArgb(125, 125, 125), exampleRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
         }

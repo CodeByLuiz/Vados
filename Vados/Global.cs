@@ -397,7 +397,7 @@ namespace Vados
 
 
         //Adiciona texto formatado a uma RichTextBox
-        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
+        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, Font font)
         {
             //Iniciar seleção no fim da string
             textBox.SelectionStart = textBox.TextLength;
@@ -405,17 +405,20 @@ namespace Vados
 
             //Formatar texto
             textBox.SelectionColor = color;
-            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
+            textBox.SelectionFont = font;
 
             //Adicionar texto
             textBox.AppendText(text);
         }
 
         //Muda apenas a fonte de um rtf (texto formatado)
-        public static string RtfChangeFont(string rtf, Font newFont)
+        public static string RtfChangeFont(string rtf, Font newRegularFont, Font newBoldFont = null)
         {
             var rtb = new RichTextBox();
             rtb.Rtf = rtf;
+
+            if (newBoldFont == null)
+                newBoldFont = new Font(newRegularFont, FontStyle.Bold);
 
             //Mudar fonte de cada caractere
             for (int i = 0; i < rtb.TextLength; i++)
@@ -425,11 +428,24 @@ namespace Vados
 
                 if (currentFont != null)
                 {
-                    rtb.SelectionFont = new Font(
-                        newFont.FontFamily,
-                        newFont.Size,
-                        currentFont.Style   //Manter negrito, itálico, etc
-                    );
+                    //Negrito
+                    if (currentFont.Style == FontStyle.Bold)
+                    {
+                        rtb.SelectionFont = new Font(
+                            newBoldFont.FontFamily,
+                            newBoldFont.Size,
+                            newBoldFont.Style
+                        );
+                    }
+                    //Normal
+                    else
+                    {
+                        rtb.SelectionFont = new Font(
+                            newRegularFont.FontFamily,
+                            newRegularFont.Size,
+                            currentFont.Style
+                        );
+                    }
                 }
             }
 

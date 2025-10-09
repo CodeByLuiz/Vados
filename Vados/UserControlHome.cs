@@ -20,12 +20,7 @@ namespace Vados
     {
 
         public event EventHandler<LoadPageEventArgs> loadPage;
-
-
-
-         
         System.Windows.Forms.Timer timer;
-        private Image sendIcon;
 
         //Imagens dos botões da interface
         Image btnHistoryImage;
@@ -161,7 +156,6 @@ namespace Vados
             btnSendImageHover = Global.ImageChangeBrightness(btnSendImage, brightnessChange);
             btnSendShadow = Global.ImageCreateShadow(btnSendImage, Color.Black, 0.3f, 15);
             btnSendCurrentImage = btnSendImage;
-            sendIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
 
             //Botão do microfone
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
@@ -171,6 +165,14 @@ namespace Vados
             micShadow = Global.ImageCreateShadow(inactiveMicIcon, Color.Black, 0.35f, 12);
             ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
             micIcon = inactiveMicIcon;
+
+            #endregion
+
+
+            #region FONTES
+
+            txtComando.Font = new Font("Segoe UI", 20);
+            lblText.Font = new Font(Fonts.DarkerSemiBold, 34);
 
             #endregion
 
@@ -226,7 +228,7 @@ namespace Vados
                 {
                     var rtb = new RichTextBox();
                     Global.AppendPlainText(rtb, "Áudio não identificado. ");
-                    Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, FontStyle.Regular);
+                    Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, rtb.Font);
                     parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
                 }
 

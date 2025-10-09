@@ -30,12 +30,16 @@ namespace Vados
         //Imagens dos botões da interface
         Image btnHistoryImage;
         Image btnHistoryImageHover;
+        Image btnHistoryShadow;
         Image btnManualImage;
         Image btnManualImageHover;
+        Image btnManualShadow;
         Image btnConfigsImage;
         Image btnConfigsImageHover;
+        Image btnConfigsShadow;
         Image btnSendImage;
         Image btnSendImageHover;
+        Image btnSendShadow;
         Image btnPauseImage;
         Image btnPauseImageHover;
         Image btnStopImage;
@@ -107,7 +111,6 @@ namespace Vados
         bool textboxCanClick = true;
         bool btnSendHovering = false;
         Image btnSendCurrentImage;
-        Image btnSendShadow;
 
 
         public UserControlHome()
@@ -137,10 +140,13 @@ namespace Vados
             //Botões da interface
             btnConfigsImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\configIcon.png"));
             btnConfigsImageHover = Global.ImageChangeBrightness(btnConfigsImage, brightnessChange);
+            btnConfigsShadow = Global.ImageCreateShadow(btnConfigsImage, Color.Black, 0.2f, 15);
             btnManualImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\manualIcon.png"));
             btnManualImageHover = Global.ImageChangeBrightness(btnManualImage, brightnessChange);
+            btnManualShadow = Global.ImageCreateShadow(btnManualImage, Color.Black, 0.2f, 15);
             btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
             btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
+            btnHistoryShadow = Global.ImageCreateShadow(btnHistoryImage, Color.Black, 0.2f, 15);
 
             //Botões do comando de voz
             btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
@@ -925,14 +931,38 @@ namespace Vados
 
 
         //Botão do manual
+        private void btnManual_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnManual.Height - btnManual.Width) / 2;
+
+            //Sombra
+            e.Graphics.DrawImage(btnManualShadow, new Rectangle(0, yy + 3, btnManual.Width, btnManual.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnManualImage, new Rectangle(0, yy, btnManual.Width, btnManual.Width));
+        }
+
         private void btnManual_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
         private void btnManual_MouseEnter(object sender, EventArgs e) => btnManual.Image = btnManualImageHover;
         private void btnManual_MouseLeave(object sender, EventArgs e) => btnManual.Image = btnManualImage;
 
+
         //Botão das configurações
+        private void btnConfigs_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnConfigs.Height - btnConfigs.Width) / 2;
+
+            //Sombra
+            e.Graphics.DrawImage(btnConfigsShadow, new Rectangle(0, yy + 3, btnConfigs.Width, btnConfigs.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnConfigsImage, new Rectangle(0, yy, btnConfigs.Width, btnConfigs.Width));
+        }
+
         private void btnConfigs_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
         private void btnConfigs_MouseEnter(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImageHover;
         private void btnConfigs_MouseLeave(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImage;
+
 
         //Botão do histórico
         private bool historyOpen = false;
@@ -943,8 +973,18 @@ namespace Vados
             set { historyOpen = value; } 
         }
 
+        private void btnHistory_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnHistory.Height - btnHistory.Width) / 2;
 
-        private void btnHistorico_Click(object sender, EventArgs e)
+            //Sombra
+            e.Graphics.DrawImage(btnHistoryShadow, new Rectangle(0, yy + 3, btnHistory.Width, btnHistory.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnHistoryImage, new Rectangle(0, yy, btnHistory.Width, btnHistory.Width));
+        }
+
+        private void btnHistory_Click(object sender, EventArgs e)
         {
             var parentForm = FindForm() as Form1;
             if (!historyOpen)
@@ -961,8 +1001,8 @@ namespace Vados
 
         }
 
-        private void btnHistorico_MouseEnter(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImageHover;
-        private void btnHistorico_MouseLeave(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImage;
+        private void btnHistory_MouseEnter(object sender, EventArgs e) => btnHistory.Image = btnHistoryImageHover;
+        private void btnHistory_MouseLeave(object sender, EventArgs e) => btnHistory.Image = btnHistoryImage;
 
 
         //Botão de pausar comando de voz

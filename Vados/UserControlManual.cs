@@ -26,7 +26,7 @@ namespace Vados
         private RichTextBox descriptionBox = null;
         private RichTextBox secundarydescriptionBox = null;
 
-        private string pathreturnbutton = @"Images/Icons/closeicon.png"; 
+        private string pathreturnbutton = @"Images/Icons/closeIcon.png"; 
 
 
         private PictureBox btnReturn = null;

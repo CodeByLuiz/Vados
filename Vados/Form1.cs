@@ -110,7 +110,7 @@ namespace Vados
 
             var history = new FormHistory(this);
             history.Owner = form;
-            //history.userControl= userControl;
+            //history.userControl = userControl;
             history.Show();
             history.Focus();
             CorrectHistoryForm();

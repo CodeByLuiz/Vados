@@ -172,6 +172,7 @@ namespace Vados
 
             txtComando.Font = new Font("Segoe UI", 20);
             lblText.Font = new Font(Fonts.DarkerSemiBold, 34);
+            lblButtonName.Font = new Font(Fonts.DarkerMedium, 13);
 
             #endregion
 
@@ -953,7 +954,7 @@ namespace Vados
 
             Global.LabelFitWidth(lblButtonName);
             int btnX = btnManual.Location.X + btnManual.Width / 2 - lblButtonName.Width / 2;
-            int btnY = btnManual.Location.Y + btnManual.Height + 5;
+            int btnY = btnManual.Location.Y + btnManual.Height;
             lblButtonName.Location = new Point(btnX, btnY);
 
             lblButtonName.Visible = true;
@@ -989,7 +990,7 @@ namespace Vados
 
             Global.LabelFitWidth(lblButtonName);
             int btnX = btnConfigs.Location.X + btnConfigs.Width / 2 - lblButtonName.Width / 2;
-            int btnY = btnConfigs.Location.Y + btnConfigs.Height + 5;
+            int btnY = btnConfigs.Location.Y + btnConfigs.Height;
             lblButtonName.Location = new Point(btnX, btnY);
 
             lblButtonName.Visible = true;
@@ -1049,7 +1050,7 @@ namespace Vados
 
             Global.LabelFitWidth(lblButtonName);
             int btnX = btnHistory.Location.X + btnHistory.Width / 2 - lblButtonName.Width / 2;
-            int btnY = btnHistory.Location.Y + btnHistory.Height + 5;
+            int btnY = btnHistory.Location.Y + btnHistory.Height;
             lblButtonName.Location = new Point(btnX, btnY);
 
             lblButtonName.Visible = true;

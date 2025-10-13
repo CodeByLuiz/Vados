@@ -311,6 +311,18 @@ namespace Vados
 
         #region OBJETOS
 
+        //Sinônimos da pasta padrão
+        public static List<string> defaultFolderWords = new List<string>()
+        {
+            "padrao",
+            "nativa",
+            "do app",
+            "do aplicativo",
+            "do programa",
+            "do vados",
+            "vados"
+        };
+
         //Todas as variações de pasta
         public static List<string> folderWords = new List<string>()
         {
@@ -883,6 +895,8 @@ namespace Vados
             sizeUnit = arguments.SizeUnit,
             sizeModifier = arguments.SizeModifier;
 
+            bool nameIsPath = Path.IsPathRooted(name);
+
 
             //Definições para arquivo executável (programa)
             if (objectType == "aplicativo")
@@ -1032,8 +1046,8 @@ namespace Vados
                     //Procurar caminhos mais eficientemente
                     if (objectType == "arquivo" || objectType == "pasta")
                     {
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
-                    } 
+                        paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    }
                     else
                     {
                         //Prioridades e excessões para procurar aplicativos
@@ -1045,11 +1059,16 @@ namespace Vados
 
 
                     if (objectType != "pasta")
+                    {
                         //Abrir arquivo / programa
                         return await ExecutarCaminho(paths.list.FirstOrDefault());
+                    }
                     else
+                    {
                         //Abrir explorador de arquivos no caminho da pasta
-                        OpenFileExplorer(paths.list.FirstOrDefault(), true);
+                        string folderPath = Path.Combine(paths.list.FirstOrDefault(), name);
+                        OpenFileExplorer(folderPath, true);
+                    }
                     break;
             }
 

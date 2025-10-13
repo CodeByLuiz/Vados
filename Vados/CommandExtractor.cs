@@ -194,16 +194,24 @@ namespace Vados
 
             if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
 
-            //MessageBox.Show(objName);
-            //MessageBox.Show(string.Join("|", stopWords));
-
             //Checar se o nome não é uma das palavras de parada
             if (stopWords.Contains(objName.ToLower()))
             {
-                //MessageBox.Show("mesmo nome");
                 if (nameIsRequired) return false;
                 return true;
             }
+
+
+            //Palavras associadas à arquivos / pastas específicas
+            if (criteria.ObjectType == "pasta")
+            {
+                //Pasta padrão
+                if (Comandos.defaultFolderWords.Contains(objName) && match.Groups[9].Success)
+                {
+                    objName = Global.DefaultFolder;
+                }
+            }
+
 
             criteria.ObjectName = objName;
 

@@ -18,7 +18,6 @@ namespace Vados
 {
     public partial class UserControlHome : UserControl
     {
-
         public event EventHandler<LoadPageEventArgs> loadPage;
         System.Windows.Forms.Timer timer;
 
@@ -941,12 +940,31 @@ namespace Vados
             e.Graphics.DrawImage(btnManualShadow, new Rectangle(0, yy + 3, btnManual.Width, btnManual.Width));
 
             //Imagem normal
-            e.Graphics.DrawImage(btnManualImage, new Rectangle(0, yy, btnManual.Width, btnManual.Width));
+            e.Graphics.DrawImage(btnManual.Image, new Rectangle(0, yy, btnManual.Width, btnManual.Width));
         }
 
         private void btnManual_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
-        private void btnManual_MouseEnter(object sender, EventArgs e) => btnManual.Image = btnManualImageHover;
-        private void btnManual_MouseLeave(object sender, EventArgs e) => btnManual.Image = btnManualImage;
+        private void btnManual_MouseEnter(object sender, EventArgs e)
+        {
+            btnManual.Image = btnManualImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Manual";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnManual.Location.X + btnManual.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnManual.Location.Y + btnManual.Height + 5;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+        private void btnManual_MouseLeave(object sender, EventArgs e)
+        {
+            btnManual.Image = btnManualImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
 
 
         //Botão das configurações
@@ -958,12 +976,31 @@ namespace Vados
             e.Graphics.DrawImage(btnConfigsShadow, new Rectangle(0, yy + 3, btnConfigs.Width, btnConfigs.Width));
 
             //Imagem normal
-            e.Graphics.DrawImage(btnConfigsImage, new Rectangle(0, yy, btnConfigs.Width, btnConfigs.Width));
+            e.Graphics.DrawImage(btnConfigs.Image, new Rectangle(0, yy, btnConfigs.Width, btnConfigs.Width));
         }
 
         private void btnConfigs_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        private void btnConfigs_MouseEnter(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImageHover;
-        private void btnConfigs_MouseLeave(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImage;
+        private void btnConfigs_MouseEnter(object sender, EventArgs e)
+        {
+            btnConfigs.Image = btnConfigsImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Configurações";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnConfigs.Location.X + btnConfigs.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnConfigs.Location.Y + btnConfigs.Height + 5;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+        private void btnConfigs_MouseLeave(object sender, EventArgs e)
+        {
+            btnConfigs.Image = btnConfigsImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
 
 
         //Botão do histórico
@@ -983,7 +1020,7 @@ namespace Vados
             e.Graphics.DrawImage(btnHistoryShadow, new Rectangle(0, yy + 3, btnHistory.Width, btnHistory.Width));
 
             //Imagem normal
-            e.Graphics.DrawImage(btnHistoryImage, new Rectangle(0, yy, btnHistory.Width, btnHistory.Width));
+            e.Graphics.DrawImage(btnHistory.Image, new Rectangle(0, yy, btnHistory.Width, btnHistory.Width));
         }
 
         private void btnHistory_Click(object sender, EventArgs e)
@@ -1003,8 +1040,28 @@ namespace Vados
 
         }
 
-        private void btnHistory_MouseEnter(object sender, EventArgs e) => btnHistory.Image = btnHistoryImageHover;
-        private void btnHistory_MouseLeave(object sender, EventArgs e) => btnHistory.Image = btnHistoryImage;
+        private void btnHistory_MouseEnter(object sender, EventArgs e)
+        {
+            btnHistory.Image = btnHistoryImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Histórico";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnHistory.Location.X + btnHistory.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnHistory.Location.Y + btnHistory.Height + 5;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+
+        private void btnHistory_MouseLeave(object sender, EventArgs e)
+        {
+            btnHistory.Image = btnHistoryImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
 
 
         //Botão de pausar comando de voz

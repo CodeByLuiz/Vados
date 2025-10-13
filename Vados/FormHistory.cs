@@ -19,7 +19,7 @@ namespace Vados
     public partial class FormHistory : Form
     {
         private OptmizedPanel historyPanel;
-        private List<HistoryEntry> entradas = new List<HistoryEntry>();
+       // private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
         private Label title;
        
@@ -58,6 +58,7 @@ namespace Vados
                      ControlStyles.AllPaintingInWmPaint, true);
 
             this.Paint += new PaintEventHandler(FormHistory_Paint);
+
             LostFocus += FormHistory_LostFocus;
             this.BackColor = Color.LimeGreen;
             this.TransparencyKey = Color.LimeGreen;
@@ -125,10 +126,6 @@ namespace Vados
 
             //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
 
-            // Timer pra repintar 
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16;
-            timer.Tick += Timer_Tick;
 
             this.Resize += FormHistory_Resize_1;
         }
@@ -161,22 +158,17 @@ namespace Vados
         {
             
 
-            historyPanel.Controls.Clear(); 
+            historyPanel.Controls.Clear();
 
-            using (var db = new BancoDeDados.DbConnection())
-            {
-                db.Database.EnsureCreated();
-                entradas = db.Historico
-                             .OrderByDescending(e => e.Data)
-                             .ToList();
-            }
+            Global.InitializeDb();
+            
 
             startY = 0;
             int lastDrawnY = 0;
 
             
 
-            foreach (var entry in entradas)
+            foreach (var entry in Global.entradas)
             {
                 string HistoryTitle = char.ToUpper(entry.Comandotitle[0]) + entry.Comandotitle.Substring(1).ToLower(); // titulo com a primeira letra maiuscula
 

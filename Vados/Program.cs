@@ -51,9 +51,16 @@ namespace Vados
 
             #endregion
 
+            using (var db = new BancoDeDados.DbConnection())
+            {
+                db.Database.EnsureCreated();
+
+            }
 
             //Iniciar aplicativo no Form1
             Application.Run(new Form1());
+
+
         }
     }
 }

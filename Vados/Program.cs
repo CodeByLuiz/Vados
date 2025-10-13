@@ -57,6 +57,8 @@ namespace Vados
 
             }
 
+            Global.InitializeDb();
+
             //Iniciar aplicativo no Form1
             Application.Run(new Form1());
 

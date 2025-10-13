@@ -26,7 +26,7 @@ namespace Vados
 
 
 
-        private int rectangleSideMargin = 15;
+        private int rectangleSideMargin = 17;
         private int rectangleBottomMargin = 15;
         private int rectangleHeight = 115;
         private int rectangleWidth;
@@ -34,6 +34,7 @@ namespace Vados
         private int startY;
         private Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
         private Form1 parentForm;
+        private int scrollBarWidth = 10;
 
 
 
@@ -111,8 +112,8 @@ namespace Vados
             
             //ajustes de posicionamento e tamanho que só podem ser feitos após o negocio ja estar criado no form 😭
             title.BringToFront();
-            int scrollBarWidth = 10;
-            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;//- scrollBarWidth;
+            
+            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;// - scrollBarWidth;
             btnExit.Location = new Point((this.Width - 20) - (btnExit.Width), 20);
 
 
@@ -156,17 +157,17 @@ namespace Vados
 
         private void LoadCommands()
         {
-            
+
 
             historyPanel.Controls.Clear();
 
             Global.InitializeDb();
-            
+
 
             startY = 0;
             int lastDrawnY = 0;
 
-            
+
 
             foreach (var entry in Global.entradas)
             {
@@ -180,21 +181,21 @@ namespace Vados
                     BackColor = entryColor,
                     BorderStyle = BorderStyle.None,
                     Padding = new Padding(5)
-                    
+
 
 
 
                 };
-                
+
                 Label lbltitle = new Label
                 {
                     Text = $"{HistoryTitle}",
                     Location = new Point(10, 5),
                     AutoSize = true,
-                    
+
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 14, FontStyle.Bold),
-                  
+
 
 
                 };
@@ -211,7 +212,7 @@ namespace Vados
 
                 };
 
-                Label lblData = new Label 
+                Label lblData = new Label
                 {
                     Text = $"{entry.Data.ToString("g", CultureInfo.CurrentCulture)}",
                     AutoSize = true,
@@ -259,12 +260,12 @@ namespace Vados
                 entryPanel.Controls.Add(btnEditar);
                 entryPanel.Controls.Add(btnExcluir);
 
-                
+
                 //ajusta a posição dos elementos necessarios
-                btnEditar.Location = new Point(10,entryPanel.Height-btnEditar.Height-5);
+                btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
                 btnEditar.BringToFront();
 
-                btnExcluir.Location = new Point(btnEditar.Location.X +btnExcluir.Width+15, btnEditar.Location.Y);
+                btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
                 btnExcluir.BringToFront();
 
                 lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
@@ -272,17 +273,17 @@ namespace Vados
 
                 //ajusta o tamanho de elementos necessarios
                 lbl.Width = rectangleWidth - lbl.Location.X - 10;
-                lbl.Height =rectangleHeight-( rectangleHeight-btnEditar.Location.Y) - (lbltitle.Location.Y+lbltitle.Height);
+                lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
 
                 // Faz o hover bonito
-                void HoverEnter(object sender, EventArgs e) 
+                void HoverEnter(object sender, EventArgs e)
                 {
-                   
+
                     entryPanel.BackColor = Global.ChangeColorBrightness(entryColor, -0.1f);
-                    
+
                 }
-                void HoverLeave(object sender, EventArgs e) 
-                { 
+                void HoverLeave(object sender, EventArgs e)
+                {
                     entryPanel.BackColor = entryColor;
                     //lbl.ForeColor = Colors.bluePrimary;
                 }
@@ -300,7 +301,7 @@ namespace Vados
                 void EditHoverEnter(object sender, EventArgs e)
                 {
                     btnEditar.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\editiconhover.png"));
-                    
+
                 }
 
                 void EditHoverLeave(object sender, EventArgs e)
@@ -316,7 +317,7 @@ namespace Vados
                 void EditEntry(object sender, EventArgs e)
                 {
                     Global.userControlHome.TxtComandoEditar = entry.Comando;
-                   
+
                     parentForm.CloseHistoryTab();
                 }
 
@@ -350,7 +351,27 @@ namespace Vados
 
             //Margem adicional no final das entradas
             //historyPanel.AutoScrollMinSize = new Size(0, lastDrawnY + rectangleBottomMargin);
-            PositionFix();
+
+
+            //Redimensiona o tamanho das entradas caso o scrollbar esteja visivel (não ta funcionando 😭)
+            if (historyPanel.VerticalScroll.Visible)
+            {
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - 10;
+            }
+            else
+            {
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;
+            }
+
+            foreach (Control control in historyPanel.Controls)
+            {
+                if (control is Panel entryPanels)
+                {
+                    entryPanels.Width = rectangleWidth;
+                }
+
+                PositionFix();
+            }
         }
 
 

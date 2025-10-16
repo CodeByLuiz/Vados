@@ -18,11 +18,14 @@ namespace Vados
         public string Action = "";          //Tipo de comando
         public string ObjectType = "";      //Tipo de objeto (arquivo / pasta)
         public string ObjectName = "";      //Nome do objeto
+        public string ObjectPath = "";      //Caminho do objeto
         public string ObjectAmount = "";    //Quantidade de objetos (todos, metade)
         public string ObjectNewName = "";   //Novo nome do objeto (ao renomear)
         public string ObjectFormat = "";    //Formato do objeto (pode ser várias extensões)
         public string Origin = "";          //Nome da pasta de origem 
+        public string OriginPath = "";      //Caminho da pasta de origem 
         public string Destination = "";     //Nome da pasta de destino
+        public string DestinationPath = ""; //Caminho da pasta de destino
         public string SizeAmount = "";      //Tamanho (número)
         public string SizeModifier = "";    //Modificador do tamanho (maior, menor)
         public string SizeUnit = "";        //Unidade de tamanho (giga, mega)
@@ -206,10 +209,16 @@ namespace Vados
             if (criteria.ObjectType == "pasta")
             {
                 //Pasta padrão
-                if (Comandos.defaultFolderWords.Contains(objName) && match.Groups[9].Success)
+                if (Comandos.defaultFolderWords.Contains(objName) && match.Groups[11].Success)
                 {
-                    objName = Global.DefaultFolder;
+                    criteria.ObjectPath = Global.DefaultFolder;
                 }
+            }
+
+
+            if (criteria.ObjectType == "site")
+            {
+                criteria.ObjectPath = Comandos.WordGetLink(objName);
             }
 
 
@@ -289,6 +298,13 @@ namespace Vados
                 criteria.Origin = match.Groups[5].Success ? match.Groups[5].Value :
                                        match.Groups[6].Success ? match.Groups[6].Value :
                                        match.Groups[7].Value; ;
+
+                //Pasta padrão
+                if (Comandos.defaultFolderWords.Contains(criteria.Origin) && match.Groups[7].Success)
+                {
+                    MessageBox.Show("origin padrao");
+                    criteria.OriginPath = Global.DefaultFolder;
+                }
             }
 
             string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -331,7 +347,14 @@ namespace Vados
             {
                 criteria.Destination = match.Groups[5].Success ? match.Groups[5].Value :
                                        match.Groups[6].Success ? match.Groups[6].Value :
-                                       match.Groups[7].Value; ;
+                                       match.Groups[7].Value;
+
+                //Pasta padrão
+                if (Comandos.defaultFolderWords.Contains(criteria.Destination) && match.Groups[7].Success)
+                {
+                    MessageBox.Show("destination padrao");
+                    criteria.DestinationPath = Global.DefaultFolder;
+                }
             }
 
             string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));

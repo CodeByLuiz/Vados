@@ -311,18 +311,6 @@ namespace Vados
 
         #region OBJETOS
 
-        //Sinônimos da pasta padrão
-        public static List<string> defaultFolderWords = new List<string>()
-        {
-            "padrao",
-            "nativa",
-            "do app",
-            "do aplicativo",
-            "do programa",
-            "do vados",
-            "vados"
-        };
-
         //Todas as variações de pasta
         public static List<string> folderWords = new List<string>()
         {
@@ -344,6 +332,9 @@ namespace Vados
             { "programa", "aplicativo" },
             { "app", "aplicativo" },
             { "executavel", "aplicativo" },
+            { "site", "site" },
+            { "link", "site" },
+            { "pagina", "site" },
         };
 
         //Todas as variações de objetos (pasta / arquivo)
@@ -351,9 +342,48 @@ namespace Vados
 
         #endregion
 
-        #region TAMANHO
+        #region CAMINHOS / LINKS
 
-        //Variações das unidades de tamanho de arquivo
+        //Sinônimos da pasta padrão
+        public static List<string> defaultFolderWords = new List<string>()
+        {
+            "padrao",
+            "nativa",
+            "do app",
+            "do aplicativo",
+            "do programa",
+            "do vados",
+            "vados"
+        };
+
+        //Links associados à palavras
+        static Dictionary<string, string> linkSynonyms = new Dictionary<string, string>()
+        {
+            //Bytes
+            { "google", "https://google.com" },
+            { "youtube", "https://www.youtube.com" },
+            { "netflix", "https://www.netflix.com" },
+            { "whatsapp", "https://www.whatsapp.com" },
+            { "github", "https://github.com" },
+            { "tradutor", "https://translate.google.com.br" },
+            { "wikipedia", "https://pt.wikipedia.org/wiki/" },
+        };
+
+        public static List<string> allLinkWords = new List<string>(linkSynonyms.Keys);
+
+        //Palavras para indicar o site
+        public static List<string> linkNamingWords = new List<string>()
+        {
+            "da",
+            "do",
+            "do site",
+        };
+
+        #endregion
+
+            #region TAMANHO
+
+            //Variações das unidades de tamanho de arquivo
         static Dictionary<string, string> sizeUnitSynonyms = new Dictionary<string, string>()
         {
             //Bytes
@@ -457,7 +487,7 @@ namespace Vados
 
         #endregion
 
-        #region ALL SYNONYMS
+        #region TODOS OS SINÔNIMOS
 
         //Todos os sinônimos
         static Dictionary<string, string> currentSynonyms0 = commandSynonyms.Concat(objectSynonyms).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -499,6 +529,7 @@ namespace Vados
 
         #endregion
 
+        #region PALAVRAS DE CONEXÃO
 
         //Formas de indicar a pasta de criação (comando criar)
         public static List<string> destinationWords = new List<string>()
@@ -645,6 +676,7 @@ namespace Vados
             "cada",
         };
 
+        #endregion
 
         #region FUNÇÕES
 
@@ -666,6 +698,16 @@ namespace Vados
             }
 
             return new List<string>();
+        }
+
+        public static string WordGetLink(string word)
+        {
+            if (linkSynonyms.TryGetValue(word, out string link))
+            {
+                return link;
+            }
+
+            return "";
         }
 
         #endregion
@@ -893,9 +935,10 @@ namespace Vados
             amount = arguments.ObjectAmount,
             size = arguments.SizeAmount,
             sizeUnit = arguments.SizeUnit,
-            sizeModifier = arguments.SizeModifier;
-
-            bool nameIsPath = Path.IsPathRooted(name);
+            sizeModifier = arguments.SizeModifier,
+            objectPath = arguments.ObjectPath,
+            originPath = arguments.OriginPath,
+            destinationPath = arguments.DestinationPath;
 
 
             //Definições para arquivo executável (programa)
@@ -909,13 +952,16 @@ namespace Vados
             #region---------ERRO: nome inválido (nome, origem ou destino)---------
 
             //Nome do arquivo inválido
-            if (objectType != "pasta" && !string.IsNullOrEmpty(name) && !IsValidFileName(name))
+            if (objectType != "pasta" && objectType != "site")
             {
-                var rtb = new RichTextBox();
-                var bold = new Font(rtb.Font, FontStyle.Bold);
-                Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
-                Global.AppendPlainText(rtb, " é um nome de " + objectType + " inválido.");
-                return rtb.Rtf;
+                if (!string.IsNullOrEmpty(name) && !IsValidFileName(name) && objectPath == "")
+                {
+                    var rtb = new RichTextBox();
+                    var bold = new Font(rtb.Font, FontStyle.Bold);
+                    Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
+                    Global.AppendPlainText(rtb, " é um nome de " + objectType + " inválido.");
+                    return rtb.Rtf;
+                }
             }
 
 
@@ -926,11 +972,11 @@ namespace Vados
                 var rtb = new RichTextBox();
                 var bold = new Font(rtb.Font, FontStyle.Bold);
 
-                if (name != "" && !IsValidFolderName(name))                 //Pasta indicada
+                if (name != "" && objectPath == "" && !IsValidFolderName(name))     //Pasta indicada
                     Global.AppendFormattedText(rtb, name, Colors.greenHighlight, bold);
-                else if (origin != "" && !IsValidFolderName(origin))          //Pasta de origem
+                else if (origin != "" && originPath == "" && !IsValidFolderName(origin))    //Pasta de origem
                     Global.AppendFormattedText(rtb, origin, Colors.greenHighlight, bold);
-                else if (destination != "" && !IsValidFolderName(destination))     //Pasta de destino
+                else if (destination != "" && destinationPath == "" && !IsValidFolderName(destination))     //Pasta de destino
                     Global.AppendFormattedText(rtb, destination, Colors.greenHighlight, bold);
 
                 if (rtb.Text != "")
@@ -939,20 +985,23 @@ namespace Vados
                     return rtb.Rtf;
                 }
             }
-            
+
             #endregion----------------------------------------
 
 
             //Caminho da pasta de origem
-            string originPath = "";
-
             if (!string.IsNullOrEmpty(origin))
             {
-                originPath = (await SearchPaths(origin, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+                if (originPath == "")
+                {
+                    MessageBox.Show("procurando pasta");
+                    //Procurar caminho
+                    originPath = (await SearchPaths(origin, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+                }
 
                 #region---------ERRO: pasta de origem não existe---------
 
-                if (string.IsNullOrEmpty(originPath))
+                if (!Directory.Exists(originPath))
                 {
                     var rtb = new RichTextBox();
                     var bold = new Font(rtb.Font, FontStyle.Bold);
@@ -965,16 +1014,19 @@ namespace Vados
                 #endregion----------------------------------------
             }
 
-            //Caminho da pasta de destino
-            string destinationPath = "";
 
+            //Caminho da pasta de destino
             if (!string.IsNullOrEmpty(destination))
             {
-                destinationPath = (await SearchPaths(destination, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+                if (destinationPath == "")
+                {
+                    //Procurar caminho
+                    destinationPath = (await SearchPaths(destination, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
+                }
 
                 #region---------ERRO: pasta de destino não existe---------
 
-                if (string.IsNullOrEmpty(destinationPath))
+                if (!Directory.Exists(destinationPath))
                 {
                     var rtb = new RichTextBox();
                     var bold = new Font(rtb.Font, FontStyle.Bold);
@@ -990,6 +1042,8 @@ namespace Vados
 
             //Realizar comando
             (List<string> list, string errorMessage) paths = (new List<string>(), "");
+            List<string> objectPathAsList = new List<string>() { objectPath };
+            List<string> finalList = objectPathAsList;
 
             switch (commandType)
             {
@@ -1010,64 +1064,97 @@ namespace Vados
 
                 //Excluir
                 case "excluir":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    if (objectPath == "")
+                    {
+                        //Procurar caminhos
+                        paths = await GetPaths(objectType, name, format, originPath, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                        finalList = paths.list;
+                    }
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { return await ExcluirPasta(paths.list); }
-                    if (objectType == "arquivo") { return await ExcluirArquivo(paths.list); }
+                    //Realizar comando
+                    if (objectType == "pasta") { return await ExcluirPasta(finalList); }
+                    if (objectType == "arquivo") { return await ExcluirArquivo(finalList); }
                     break;
 
 
                 //Mover
                 case "mover":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    if (objectPath == "")
+                    {
+                        //Procurar caminhos
+                        paths = await GetPaths(objectType, name, format, originPath, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                        finalList = paths.list;
+                    }
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { return await MoverPasta(paths.list, destinationPath); }
-                    if (objectType == "arquivo") { return await MoverArquivo(paths.list, destinationPath); }
+                    //Realizar comando
+                    if (objectType == "pasta") { return await MoverPasta(finalList, destinationPath); }
+                    if (objectType == "arquivo") { return await MoverArquivo(finalList, destinationPath); }
                     break;
 
 
                 //Duplicar
                 case "duplicar":
-                    paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                    if (objectPath == "")
+                    {
+                        //Procurar caminhos
+                        paths = await GetPaths(objectType, name, format, originPath, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                        finalList = paths.list;
+                    }
                     //Erro na busca
                     if (paths.errorMessage != "") return paths.errorMessage;
 
-                    if (objectType == "pasta") { return await DuplicarPasta(paths.list, destinationPath); }
-                    if (objectType == "arquivo") { return await DuplicarArquivo(paths.list, destinationPath); }
+                    //Realizar comando
+                    if (objectType == "pasta") { return await DuplicarPasta(finalList, destinationPath); }
+                    if (objectType == "arquivo") { return await DuplicarArquivo(finalList, destinationPath); }
                     break;
 
 
                 //Abrir
                 case "abrir":
-                    //Procurar caminhos mais eficientemente
-                    if (objectType == "arquivo" || objectType == "pasta")
+                    //Abrir link
+                    if (objectType == "site")
                     {
-                        paths = await GetPaths(objectType, name, format, origin, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        //Prioridades e excessões para procurar aplicativos
-                        paths = await GetPaths("arquivo", name, format, origin, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions).ConfigureAwait(false);
+                        return await AbrirLink(objectPath);
                     }
 
-                    //Erro na busca
-                    if (paths.errorMessage != "") return paths.errorMessage;
+
+                    string finalPath = objectPath;
+
+                    if (objectPath == "")
+                    {
+                        //Procurar caminhos
+                        if (objectType == "arquivo" || objectType == "pasta")
+                        {
+                            paths = await GetPaths(objectType, name, format, originPath, amount, size, sizeUnit, sizeModifier).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            //Prioridades e excessões mais eficientes para procurar aplicativos
+                            paths = await GetPaths("arquivo", name, format, originPath, amount, size, sizeUnit, sizeModifier, Global.exePriorities, Global.exeExceptions).ConfigureAwait(false);
+                        }
+
+                        finalPath = paths.list.FirstOrDefault();
+
+                        //Erro na busca
+                        if (paths.errorMessage != "") return paths.errorMessage;
+                    }
+
 
 
                     if (objectType != "pasta")
                     {
                         //Abrir arquivo / programa
-                        return await ExecutarCaminho(paths.list.FirstOrDefault());
+                        return await ExecutarCaminho(finalPath);
                     }
                     else
                     {
                         //Abrir explorador de arquivos no caminho da pasta
-                        string folderPath = Path.Combine(paths.list.FirstOrDefault(), name);
-                        OpenFileExplorer(folderPath, true);
+                        finalPath = Path.Combine(finalPath, "x");   //Qualquer string serve
+                        OpenFileExplorer(finalPath, true);
                     }
                     break;
             }
@@ -1370,10 +1457,13 @@ namespace Vados
             int? maxLength = pathAmount;
 
             if (!string.IsNullOrEmpty(rootFolder)) {
-                //Procurar pasta de origem
-                rootFolder = (await SearchPaths(rootFolder, true)).FirstOrDefault();
-                if (string.IsNullOrEmpty(rootFolder))   //Retornar lista vazia se não encontrar a pasta de origem
-                    return resultados;
+                //Procurar pasta de origem se não for indicado um caminho como argumento
+                if (!Path.IsPathRooted(rootFolder))
+                {
+                    rootFolder = (await SearchPaths(rootFolder, true)).FirstOrDefault();
+                    if (string.IsNullOrEmpty(rootFolder))   //Retornar lista vazia se não encontrar a pasta de origem
+                        return resultados;
+                }
 
                 //Buscar apenas na pasta determinada
                 priorities = new List<string>() { rootFolder };
@@ -2217,6 +2307,7 @@ namespace Vados
 
             try
             {
+                //Executar caminho
                 processInfo.FileName = caminho;
                 processInfo.UseShellExecute = true;
                 Process.Start(processInfo);
@@ -2227,6 +2318,28 @@ namespace Vados
             {
                 var rtb = new RichTextBox();
                 Global.AppendPlainText(rtb, "Não foi possível abrir o arquivo / programa.\n");
+                Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
+                return rtb.Rtf;
+            }
+            //----------------------------------------
+
+            return "";
+        }
+
+
+        public static async Task<string> AbrirLink(string url)
+        {
+            try
+            {
+                //Abrir link
+                Process.Start("explorer", url);
+            }
+
+            //---------ERRO: erro não especificado---------
+            catch (Exception ex)
+            {
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Não foi possível abrir o link.\n");
                 Global.AppendFormattedText(rtb, ex.Message, Color.Gray, rtb.Font);
                 return rtb.Rtf;
             }

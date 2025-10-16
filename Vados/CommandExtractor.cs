@@ -141,6 +141,7 @@ namespace Vados
     public class ObjectExtractor : CriteriaExtractor
     {
         Pattern objects;
+        List<string> objectsList;
         Pattern amount;
         Pattern extensions;
         Pattern nominators;
@@ -151,6 +152,7 @@ namespace Vados
         {
             //amount_ = (lista, é obrigatório) --> isso para todos
             amount = new Pattern(amount_.v, amount_.r);
+            objectsList = objects_.v;
             objects = new Pattern(objects_.v, objects_.r);
             extensions = new Pattern(extensions_.v, extensions_.r);
             nominators = new Pattern(nominators_.v, nominators_.r);
@@ -164,25 +166,48 @@ namespace Vados
         public override bool Extract(string command, CommandCriteria criteria)
         {
             command = command.ToLower().Substring(criteria.ActionPos);
-            //string patternObject = string.Join("|", objects.v.Select(Regex.Escape));
-            //string patternAmount = string.Join("|", amount.v.Select(Regex.Escape));
-            //string patternExtension = string.Join("|", extensions.v.Select(Regex.Escape));
-            //string patternNominator = string.Join("|", nominators.v.Select(Regex.Escape));
-            string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
 
-            string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
-                             $@"{objects.ToPattern()}{objects.ToRequired()}" +
-                             $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
-                             $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()}" +
-                             $@"\s+({patternName}))?";
+            string BuildPattern()
+            {
+                string nameRequirement = nameIsRequired ? "" : "?";
+                string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
+                string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
+                                 $@"{objects.ToPattern()}{objects.ToRequired()}" +
+                                 $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
+                                 $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()}" +
+                                 $@"\s+({patternName})){nameRequirement}";
+
+                return pattern;
+            }
 
             //Checar se o padrão está no comando
+            var pattern = BuildPattern();
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
 
             //Tipo de objeto
             string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
             criteria.ObjectType = obj;
+
+
+            #region TENTAR CORRESPONDÊNCIA NOVAMENTE (em casos específicos)
+
+            //Trocar palavras de nomeação caso o tipo de objeto seja site
+            if (criteria.ObjectType == "site")
+            {
+                nominators = new Pattern(Comandos.linkNamingWords, false);
+                match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
+            }
+
+            //Se não encontrar o tipo de objeto, tentar corresponder o nome de outra forma
+            if (criteria.ObjectType == "")
+            {
+                objects = new Pattern(objectsList, false);
+                nominators = new Pattern(new List<string>() { "o", "a", "os", "as" }, false);
+                match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
+            }
+
+            #endregion
 
             //Formato do objeto
             criteria.ObjectFormat = match.Groups[5].Value;
@@ -215,7 +240,16 @@ namespace Vados
                 }
             }
 
+            //Definir tipo de objeto caso não definido
+            if (criteria.ObjectType == "")
+            {
+                criteria.ObjectType = "aplicativo";
 
+                if (Comandos.allLinkWords.Contains(objName))
+                    criteria.ObjectType = "site";
+            }
+
+            //Definir link do site
             if (criteria.ObjectType == "site")
             {
                 criteria.ObjectPath = Comandos.WordGetLink(objName);
@@ -225,7 +259,7 @@ namespace Vados
             criteria.ObjectName = objName;
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            //MessageBox.Show("Objeto -> " + objectStr);
+            MessageBox.Show("Objeto -> " + objectStr);
             return match.Success;
         }
     }

@@ -702,10 +702,19 @@ namespace Vados
 
         public static string WordGetLink(string word)
         {
+            //Retornar o link associado a palavra
             if (linkSynonyms.TryGetValue(word, out string link))
             {
                 return link;
             }
+
+            //Checar se já é um url válido
+            Uri uriResult;
+            bool isUrl = Uri.TryCreate(word, UriKind.Absolute, out uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+            if (isUrl)
+                return word;
 
             return "";
         }
@@ -792,7 +801,7 @@ namespace Vados
             }
 
             var arguments = parser.Parse(command);
-            //MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
+            MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
 
             return arguments;
         }
@@ -941,7 +950,7 @@ namespace Vados
             destinationPath = arguments.DestinationPath;
 
 
-            //Definições para arquivo executável (programa)
+            //Definições para arquivo executável (aplicativo)
             if (objectType == "aplicativo")
             {
                 name.Replace(" ", "");

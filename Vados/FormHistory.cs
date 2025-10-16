@@ -119,7 +119,8 @@ namespace Vados
 
             void ExitForm(object sender, EventArgs e) 
             {
-                parentForm.CloseHistoryTab();
+                entryHeight();
+                //parentForm.CloseHistoryTab();
             }
 
             btnExit.Click += ExitForm;
@@ -265,17 +266,7 @@ namespace Vados
                 lbl.Width = rectangleWidth - lbl.Location.X - 10;
                 lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
 
-                void entryPositionFix()
-                {
-                    //ajusta a posição dos elementos necessarios
-                    btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
-                    btnEditar.BringToFront();
-
-                    btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
-                    btnExcluir.BringToFront();
-
-                    lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
-                }
+               
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e)
@@ -322,6 +313,10 @@ namespace Vados
 
                     parentForm.CloseHistoryTab();
                 }
+                void ResizeEntryPanel(object sender, EventArgs e)
+                {
+                    entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, entryPanel);
+                }
 
                 // Adiciona os eventos aos elementos
                 entryPanel.MouseEnter += HoverEnter;
@@ -346,35 +341,56 @@ namespace Vados
                 btnExcluir.Click += DeleteEntry;
                 btnEditar.Click += EditEntry;
 
+                entryPanel.Resize += ResizeEntryPanel;
+
                 startY += rectangleHeight + rectangleBottomMargin;
                 lastDrawnY = entryPanel.Bottom + rectangleBottomMargin;
-                entryPositionFix();
+                entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, entryPanel);
             }
 
              //MessageBox.Show($"{historyPanel.Height} entrada {ScrollBarHeightCalc()}");
             
-            foreach (Control control in historyPanel.Controls)
-            {
-                if (control is Panel entryPanels)
-                {
-                    entryPanels.Width = rectangleWidth;
-                }
+        }
 
-                PositionFix();
-                //MessageBox.Show("cu3");
-            }
+        void entryPositionFix(PictureBox btnEditar, PictureBox btnExcluir, Label lblData, Label lbltitle, Panel entryPanel)
+        {
+            //ajusta a posição dos elementos necessarios
+            btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
+            btnEditar.BringToFront();
+
+            btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
+            btnExcluir.BringToFront();
+
+            lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
         }
 
         private int entryHeight()
         {
             int entradaHeight = 0;
-            int visibleFormHeight = 0;
+            int visibleFormHeight = historyPanel.Height;
             foreach(var entry in Global.entradas)
             {
                 entradaHeight+=rectangleHeight + rectangleBottomMargin;
             }
 
-            visibleFormHeight =(this.Height - historyPanel.Location.X)-spacing*2;
+            MessageBox.Show($"entradas: {entradaHeight} visivel: {visibleFormHeight} ");
+
+            
+                
+
+            foreach (Control control in historyPanel.Controls)
+            {
+                if (control is Panel entryPanels)
+                {
+                    if (entradaHeight > visibleFormHeight)
+                    {
+                        entryPanels.Width = (historyPanel.ClientSize.Width - (rectangleSideMargin * 2)) - 10;
+
+                    }
+            }
+                //MessageBox.Show("cu3");
+            }
+            
 
             return entradaHeight;
         }
@@ -408,7 +424,7 @@ namespace Vados
 
         private void FormHistory_LostFocus(object sender, EventArgs e)
         {
-            parentForm.CloseHistoryTab();
+            //parentForm.CloseHistoryTab();
         }
     }
 }

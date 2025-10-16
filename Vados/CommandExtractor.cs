@@ -230,16 +230,6 @@ namespace Vados
             }
 
 
-            //Palavras associadas à arquivos / pastas específicas
-            if (criteria.ObjectType == "pasta")
-            {
-                //Pasta padrão
-                if (Comandos.defaultFolderWords.Contains(objName) && match.Groups[11].Success)
-                {
-                    criteria.ObjectPath = Global.DefaultFolder;
-                }
-            }
-
             //Definir tipo de objeto caso não definido
             if (criteria.ObjectType == "")
             {
@@ -247,13 +237,43 @@ namespace Vados
 
                 if (Comandos.allLinkWords.Contains(objName))
                     criteria.ObjectType = "site";
+
+                //Lixeira
+                if (objName == "lixeira")
+                {
+                    criteria.ObjectPath = "explorer.exe";
+                }
+
+                //Navegador
+                if (objName == "navegador")
+                {
+                    criteria.ObjectType = "site";
+                    criteria.ObjectPath = "https://";
+                }
+            }
+
+
+            #region CAMINHOS PREDEFINIDOS
+
+            //Palavras associadas à arquivos / pastas específicas
+            if (criteria.ObjectType == "pasta")
+            {
+                bool isSpecificName = !match.Groups[11].Success || match.Groups[8].Success;
+                
+                //Pasta padrão
+                if (Comandos.defaultFolderWords.Contains(objName) && !isSpecificName)
+                {
+                    criteria.ObjectPath = Global.DefaultFolder;
+                }
             }
 
             //Definir link do site
-            if (criteria.ObjectType == "site")
+            if (criteria.ObjectType == "site" && criteria.ObjectPath == "")
             {
                 criteria.ObjectPath = Comandos.WordGetLink(objName);
             }
+
+            #endregion
 
 
             criteria.ObjectName = objName;

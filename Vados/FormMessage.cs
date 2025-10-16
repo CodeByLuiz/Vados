@@ -163,6 +163,7 @@ namespace Vados
         {
             string commandType = criteria.Action;
             string objectType = criteria.ObjectType;
+            string objectPath = criteria.ObjectPath;
             string name = criteria.ObjectName;
             string newName = criteria.ObjectNewName;
             string format = criteria.ObjectFormat;
@@ -173,13 +174,16 @@ namespace Vados
             string sizeUnit = criteria.SizeUnit;
             string sizeModifier = criteria.SizeModifier;
 
+            bool isBrowser = objectType == "site" && name == "navegador" && objectPath != "";
+            bool isRecycleBin = name == "lixeira" && objectPath != "";
+            bool isDefaultFolder = objectType == "pasta" && Comandos.defaultFolderWords.Contains(name) && objectPath != "";
+            if (isDefaultFolder) name = "pasta padrão (Vados)";
+
             textBox.Text = "Você deseja";
-
-            //Comando
             string commandConnector = "";
-
             Font bold = new Font(textBox.Font, FontStyle.Bold);
 
+            //Comando
             if (commandType != "")
             {
                 Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, bold);
@@ -191,6 +195,13 @@ namespace Vados
                         commandConnector = " um ";
                         if (objectType == "pasta") commandConnector = " uma ";
                         break;
+
+                    case "abrir":
+                        commandConnector = " o ";
+                        if (objectType == "pasta") commandConnector = " a ";
+                        if (isRecycleBin) commandConnector = " a ";
+                        break;
+
                     default:
                         commandConnector = " o ";
                         if (objectType == "pasta") commandConnector = " a ";
@@ -220,9 +231,13 @@ namespace Vados
             //Objeto
             if (objectType != "")
             {
-                string objectStr = objectType;
+                string objectStr = " " + objectType;
                 if (amount != "") objectStr += "s";
-                Global.AppendPlainText(textBox, commandConnector + objectType);
+
+                Global.AppendPlainText(textBox, commandConnector);  //"o", "a", "todos os", etc
+
+                if (objectType != "aplicativo" && !isBrowser && !isDefaultFolder) //Exceções
+                    Global.AppendPlainText(textBox, objectType);  //"arquivo", "pasta", etc
             }
 
 
@@ -240,8 +255,10 @@ namespace Vados
                 if (objectType == "pasta") connector = " chamada";
                 if (amount != "") connector += "s";
 
-                Global.AppendPlainText(textBox, connector + " ");
-                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, bold);
+                if (objectType != "aplicativo" && !isBrowser && !isRecycleBin && !isDefaultFolder) //Exceções
+                    Global.AppendPlainText(textBox, connector + " ");   //"chamado", "de nome", etc
+
+                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, bold);     //Nome
             }
 
 

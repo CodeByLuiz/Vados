@@ -23,6 +23,7 @@ using Microsoft.VisualBasic;
 using NAudio.Wave;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Vados
 {
@@ -381,9 +382,9 @@ namespace Vados
 
         #endregion
 
-            #region TAMANHO
+        #region TAMANHO
 
-            //Variações das unidades de tamanho de arquivo
+        //Variações das unidades de tamanho de arquivo
         static Dictionary<string, string> sizeUnitSynonyms = new Dictionary<string, string>()
         {
             //Bytes
@@ -497,10 +498,14 @@ namespace Vados
         static Dictionary<string, string> wordSynonyms = new Dictionary<string, string>(currentSynonyms)
         {
             //Quantidade
+            { "os", "todos" },
+            { "as", "todos" },
             { "todos", "todos" },
             { "todos os", "todos" },
+            { "todas as", "todos" },
             { "cada", "todos" },
             { "metade dos", "metade" },
+            { "metade das", "metade" },
         };
 
         #endregion
@@ -670,9 +675,14 @@ namespace Vados
         //Formas de indicar a quantidade de arquivos / pastas
         public static List<string> amountWords = new List<string>()
         {
+            "os",
+            "as",
             "todos",
+            "todas",
             "todos os",
+            "todas os",
             "metade dos",
+            "metade das",
             "cada",
         };
 
@@ -1156,8 +1166,14 @@ namespace Vados
 
                     if (objectType != "pasta")
                     {
+                        string processArguments = "";
+
+                        //Abrir lixeira
+                        if (name == "lixeira")
+                            processArguments = "shell:RecycleBinFolder";
+
                         //Abrir arquivo / programa
-                        return await ExecutarCaminho(finalPath);
+                        return await ExecutarCaminho(finalPath, processArguments);
                     }
                     else
                     {
@@ -1807,7 +1823,7 @@ namespace Vados
 
         public static string CriarPastaPadrao()
         {
-            string defaultFolderPath = DriveGetFirst() + @"Users\" + Environment.UserName + @"\Documents\Vados";
+            string defaultFolderPath = Global.driverPath + @"Users\" + Environment.UserName + @"\Documents\Vados";
 
             try
             {
@@ -2295,29 +2311,30 @@ namespace Vados
         }
 
 
-        public static string CriarNome(string nome, string destination)
+        public static string CriarNome(string name, string destination)
         {
             int i = 2;
-            string newName = nome;
+            string newName = name;
 
 
             while (Path.Exists(Path.Combine(destination, newName)))
             {
-                newName = $"{nome} ({i})";
+                newName = $"{name} ({i})";
                 i++;
             }
 
             return newName;
         }
         
-        public static async Task<string> ExecutarCaminho(string caminho)
+        public static async Task<string> ExecutarCaminho(string path, string arguments = "")
         {
             ProcessStartInfo processInfo = new ProcessStartInfo();
 
             try
             {
                 //Executar caminho
-                processInfo.FileName = caminho;
+                processInfo.FileName = path;
+                processInfo.Arguments = arguments;
                 processInfo.UseShellExecute = true;
                 Process.Start(processInfo);
             }

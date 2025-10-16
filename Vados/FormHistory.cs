@@ -261,19 +261,21 @@ namespace Vados
                 entryPanel.Controls.Add(btnExcluir);
 
 
-                //ajusta a posição dos elementos necessarios
-                btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
-                btnEditar.BringToFront();
-
-                btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
-                btnExcluir.BringToFront();
-
-                lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
-
-
                 //ajusta o tamanho de elementos necessarios
                 lbl.Width = rectangleWidth - lbl.Location.X - 10;
                 lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
+
+                void entryPositionFix()
+                {
+                    //ajusta a posição dos elementos necessarios
+                    btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
+                    btnEditar.BringToFront();
+
+                    btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
+                    btnExcluir.BringToFront();
+
+                    lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
+                }
 
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e)
@@ -341,28 +343,16 @@ namespace Vados
                 btnEditar.MouseEnter += EditHoverEnter;
                 btnEditar.MouseLeave += EditHoverLeave;
 
-
                 btnExcluir.Click += DeleteEntry;
                 btnEditar.Click += EditEntry;
 
                 startY += rectangleHeight + rectangleBottomMargin;
                 lastDrawnY = entryPanel.Bottom + rectangleBottomMargin;
+                entryPositionFix();
             }
 
-            //Margem adicional no final das entradas
-            //historyPanel.AutoScrollMinSize = new Size(0, lastDrawnY + rectangleBottomMargin);
-
-
-            //Redimensiona o tamanho das entradas caso o scrollbar esteja visivel (não ta funcionando 😭)
-            if (historyPanel.VerticalScroll.Visible)
-            {
-                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - 10;
-            }
-            else
-            {
-                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;
-            }
-
+             //MessageBox.Show($"{historyPanel.Height} entrada {ScrollBarHeightCalc()}");
+            
             foreach (Control control in historyPanel.Controls)
             {
                 if (control is Panel entryPanels)
@@ -371,9 +361,23 @@ namespace Vados
                 }
 
                 PositionFix();
+                //MessageBox.Show("cu3");
             }
         }
 
+        private int entryHeight()
+        {
+            int entradaHeight = 0;
+            int visibleFormHeight = 0;
+            foreach(var entry in Global.entradas)
+            {
+                entradaHeight+=rectangleHeight + rectangleBottomMargin;
+            }
+
+            visibleFormHeight =(this.Height - historyPanel.Location.X)-spacing*2;
+
+            return entradaHeight;
+        }
 
         private void FormHistory_Resize_1(object sender, EventArgs e)
         {
@@ -404,7 +408,7 @@ namespace Vados
 
         private void FormHistory_LostFocus(object sender, EventArgs e)
         {
-            //Close();
+            parentForm.CloseHistoryTab();
         }
     }
 }

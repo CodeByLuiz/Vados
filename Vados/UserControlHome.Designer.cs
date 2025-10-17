@@ -47,6 +47,7 @@
             // 
             // pnlBottom
             // 
+            pnlBottom.BackColor = Color.FromArgb(223, 223, 223);
             pnlBottom.Controls.Add(btnHistorico);
             pnlBottom.Controls.Add(lblText);
             pnlBottom.Controls.Add(lblDebug);

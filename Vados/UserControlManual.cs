@@ -26,7 +26,7 @@ namespace Vados
         private RichTextBox descriptionBox = null;
         private RichTextBox secundarydescriptionBox = null;
 
-        private string pathreturnbutton = @"Images/Icons/closeicon.png"; 
+        private string pathreturnbutton = @"Images/Icons/closeicon.png";
 
 
         private PictureBox btnReturn = null;
@@ -39,13 +39,15 @@ namespace Vados
         {
             InitializeComponent();
 
+            SetupNavBar();
             SetupContentArea();
+
             this.Controls.Add(panelContent);
+            this.Controls.Add(panelNav);
+
             this.Resize += UserControlManual_Resize;
 
-
-            SetupNavBar();
-
+            // Seleciona botão padrão
             foreach (Control ctrl in flow.Controls)
             {
                 if (ctrl is Button btn && btn.Text == "Criar uma pasta")
@@ -54,11 +56,8 @@ namespace Vados
                     break;
                 }
             }
-
-            this.Controls.Add(panelNav);
-
-            //  LoadContentBasedOnSelection("Criar uma pasta");
         }
+
 
         PrivateFontCollection pfc = new PrivateFontCollection();
 
@@ -168,8 +167,25 @@ namespace Vados
             panelContent = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(231, 231, 231)
+                BackColor = Color.FromArgb(223, 223, 223)
             };
+            this.Controls.Add(panelContent);
+
+
+            btnReturn = new PictureBox
+            {
+                Width = 50,
+                Height = 50,
+                Image = Image.FromFile(pathreturnbutton),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Cursor = Cursors.Hand
+            };
+            btnReturn.Click += btnReturn_Click;
+            btnReturn.Location = new Point(this.Width - btnReturn.Width - 20, 20);
+            btnReturn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            this.Controls.Add(btnReturn);
+            btnReturn.BringToFront();
+
 
             tableLayoutContent = new TableLayoutPanel
             {
@@ -177,32 +193,12 @@ namespace Vados
                 AutoScroll = true,
                 ColumnCount = 1,
                 RowCount = 0,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(20)
+                Padding = new Padding(20, 20, 20, 20)
             };
-
-            btnReturn = new PictureBox
-            {
-                Location = new Point(panelContent.Width-70-20,20),
-                Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                Width = 50,
-                Height = 50,
-                Margin = new Padding(10,10,10,10),
-                Image = Image.FromFile(pathreturnbutton),
-                SizeMode = PictureBoxSizeMode.Zoom
-
-            };
-            btnReturn.Click += btnReturn_Click;
-            btnReturn.Cursor = Cursors.Hand;
-
-            panelContent.Controls.Add(btnReturn);
-
-
             panelContent.Controls.Add(tableLayoutContent);
 
-            this.Controls.Add(panelContent);
         }
+
 
 
 
@@ -231,7 +227,7 @@ namespace Vados
                 Text = null,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
-                BackColor = Color.FromArgb(231, 231, 231),
+                BackColor = Color.FromArgb(223, 223, 223),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
                 ScrollBars = RichTextBoxScrollBars.None,
@@ -240,7 +236,8 @@ namespace Vados
                 WordWrap = true,
                 Dock = DockStyle.None,
                 Margin = new Padding(65, 10, 40, 30), // margem externa
-                Tag = "descrição"
+                Tag = "descrição",
+                Cursor = Cursors.Arrow
             };
             Global.TextBoxFitHeight(exampleRichTextBox, 10);
 
@@ -268,9 +265,10 @@ namespace Vados
             secundarydescriptionBox = new RichTextBox
             {
                 Text = null,
+                Height = 80,
                 Font = Fonts.GetFont(Fonts.DarkerRegular, 18f),
                 ForeColor = Color.Black,
-                BackColor = Color.FromArgb(231, 231, 231),
+                BackColor = Color.FromArgb(223, 223, 223),
                 BorderStyle = BorderStyle.None,
                 ReadOnly = true,
                 ScrollBars = RichTextBoxScrollBars.None,
@@ -279,7 +277,8 @@ namespace Vados
                 WordWrap = true,
                 Dock = DockStyle.None,
                 Margin = new Padding(65, 10, 40, 30), // margem externa
-                Tag = "descrição"
+                Tag = "descrição",
+                Cursor = Cursors.Arrow
             };
 
 
@@ -305,20 +304,19 @@ namespace Vados
 
         private void ResizeDescriptionBox(RichTextBox box)
         {
-            int horizontalPadding = box.Margin.Left + box.Margin.Right + 20;
-            int maxWidth = panelContent.Width - horizontalPadding;
+            if (string.IsNullOrEmpty(box.Text))
+                return;
 
-            box.MaximumSize = new Size(maxWidth, 0);
-
-            Size textSize = TextRenderer.MeasureText(
-                box.Text,
-                box.Font,
-                new Size(maxWidth, int.MaxValue),
-                TextFormatFlags.WordBreak
-            );
+            int horizontalPadding = box.Margin.Left + box.Margin.Right;
+            int maxWidth = panelContent.Width - horizontalPadding - btnReturn.Width - 20;
 
             box.Width = maxWidth;
-            box.Height = textSize.Height + 25;
+
+            int lastCharIndex = box.Text.Length - 1;
+            Point lastCharPos = box.GetPositionFromCharIndex(lastCharIndex);
+
+
+            box.Height = lastCharPos.Y + box.Font.Height + 10;
         }
 
 
@@ -423,37 +421,38 @@ namespace Vados
 
         private void SetupNavBar()
         {
+            // Painel principal da NavBar
             panelNav = new Panel
             {
                 Dock = DockStyle.Left,
-                Width = 250,
+                Width = 320,
                 BackColor = Color.FromArgb(48, 61, 99),
 
 
             };
             this.Controls.Add(panelNav);
 
-
-            //panel que organiza os bagulho dentro do panel nav
             flow = new FlowLayoutPanel
             {
                 Dock = DockStyle.Fill,
+
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                AutoScroll = false,
-
+                AutoScroll = true,
+                Margin = new Padding(0, 0, 0, 20)
             };
+
             panelNav.Controls.Add(flow);
 
-
+            // Logo no topo
             PictureBox pictureLogo = new PictureBox
             {
                 Image = Image.FromFile("Images/LogoBranco.png"),
                 SizeMode = PictureBoxSizeMode.Zoom,
-                Width = 134,
-                Height = 134,
+                Width = 200,
+                Height = 200,
                 Margin = new Padding(0, 10, 0, 10),
-                Anchor = AnchorStyles.None
+                Anchor = AnchorStyles.Top,
             };
             flow.Controls.Add(pictureLogo);
 
@@ -461,27 +460,77 @@ namespace Vados
             Label lblTitle = new Label
             {
                 Text = "Comandos",
+                Height = 60,
                 ForeColor = Color.FromArgb(200, 219, 236),
                 Font = Fonts.GetFont(Fonts.MavenMedium, 26f),
-                Height = 50,
-                Width = flow.Width,
+                AutoSize = false,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Margin = new Padding(0, 10, 0, 10)
             };
 
-            lblTitle.Paint += DrawTitleLines;
+
+            lblTitle.Width = flow.ClientSize.Width;
+
+
+            flow.Resize += (s, e) =>
+            {
+                lblTitle.Width = flow.ClientSize.Width;
+                lblTitle.Invalidate();
+            };
+
+            lblTitle.Paint += (sender, e) =>
+            {
+                Label lbl = sender as Label;
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                using (Pen pen = new Pen(Color.FromArgb(200, 219, 236), 2))
+                {
+                    SizeF textSize = e.Graphics.MeasureString(lbl.Text, lbl.Font);
+                    int textWidth = (int)textSize.Width;
+                    int centerY = lbl.Height / 2;
+                    int lineY = centerY;
+                    int padding = 1;
+                    int lineLength = (lbl.Width - textWidth) / 2 - padding;
+                    if (lineLength > 0)
+                    {
+                        e.Graphics.DrawLine(pen, 20, lineY, lineLength, lineY);
+                        e.Graphics.DrawLine(pen, lbl.Width - lineLength, lineY, lbl.Width - 20, lineY);
+                    }
+                }
+            };
             flow.Controls.Add(lblTitle);
 
-            // Categorias
-            AddSection(flow, "Pastas ", @"Images/Icons/pasta.png", new[] { "Criar uma pasta", "Abrir uma pasta", "Abrir pasta padrão", "Renomear uma pasta", "Excluir uma pasta", "Mover uma pasta", "Duplicar uma pasta" });
-            AddSection(flow, "Arquivos ", @"Images/Icons/Arquivos.png", new[] { "Criar um arquivo", "Abrir um arquivo", "Renomear um arquivo", "Excluir um arquivo", "Mover um arquivo", "Duplicar um arquivo", "Operar múltiplos arquivos " });
-            AddSection(flow, "Sistema ", @"Images/Icons/Sistema.png", new[] { "Abrir software", "Alterar volume", "Alterar horário", "Alterar brilho da tela", "Alterar idioma" });
+
+
+            // Categorias e comandos
+            AddSection(flow, "Pastas", @"Images/Icons/pasta.png", new[]
+            {
+        "Criar uma pasta", "Abrir uma pasta",
+        "Renomear uma pasta", "Excluir uma pasta", "Mover uma pasta", "Duplicar uma pasta"
+    });
+
+            AddSection(flow, "Arquivos", @"Images/Icons/Arquivos.png", new[]
+            {
+        "Criar um arquivo", "Abrir um arquivo", "Renomear um arquivo",
+        "Excluir um arquivo", "Mover um arquivo", "Duplicar um arquivo", "Operar múltiplos arquivos"
+    });
+
+            AddSection(flow, "Sistema", @"Images/Icons/Sistema.png", new[]
+            {
+        "Abrir software", "Alterar volume", "Alterar horário",
+        "Alterar brilho da tela", "Alterar idioma"
+    });
+
+
+
+
         }
 
 
-        private void AddSection(FlowLayoutPanel flow, string sectionTitle, string iconPath, string[] commands)
-        {
 
+
+        private void AddSection(FlowLayoutPanel parentFlow, string sectionTitle, string iconPath, string[] commands)
+        {
+            // Painel horizontal para título + ícone
             FlowLayoutPanel sectionPanel = new FlowLayoutPanel
             {
                 FlowDirection = FlowDirection.LeftToRight,
@@ -491,7 +540,7 @@ namespace Vados
                 Padding = new Padding(0)
             };
 
-
+            // Label da seção
             Label lblSection = new Label
             {
                 Text = sectionTitle,
@@ -502,7 +551,7 @@ namespace Vados
             };
             sectionPanel.Controls.Add(lblSection);
 
-
+            // Ícone da seção
             PictureBox icon = new PictureBox
             {
                 Image = Image.FromFile(iconPath),
@@ -513,63 +562,49 @@ namespace Vados
             };
             sectionPanel.Controls.Add(icon);
 
-            // Adiciona ao FlowLayoutPanel principal
-            flow.Controls.Add(sectionPanel);
+            // Adiciona a seção ao Flow principal
+            parentFlow.Controls.Add(sectionPanel);
 
-            // Botões da seção
+            // Criação de botões responsivos
             foreach (var cmd in commands)
             {
                 RoundedButton btn = new RoundedButton
                 {
                     Text = cmd,
                     Height = 30,
-                    Width = flow.Width - 20,
                     TextAlign = ContentAlignment.MiddleLeft,
-                    FlatStyle = FlatStyle.Flat,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
                     Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                     Padding = new Padding(15, 0, 15, 0),
-                    Margin = new Padding(15, 3, 15, 3)
+                    Margin = new Padding(15, 3, 15, 3),
+                    AutoSize = false, // importante para definir Width manualmente
+                    Cursor = Cursors.Hand
                 };
+
+                // Define a largura do botão baseado na largura do FlowLayoutPanel
+                btn.Width = flow.ClientSize.Width - btn.Margin.Left - btn.Margin.Right;
+
+                btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
                 btn.Click += NavButton_Click;
                 flow.Controls.Add(btn);
             }
-        }
 
-        private void DrawTitleLines(object sender, PaintEventArgs e)
-        {
-            Label lbl = sender as Label;
-            if (lbl == null) return;
-
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-
-            using (Pen pen = new Pen(Color.FromArgb(200, 219, 236), 2))
+            // Atualiza largura dos botões quando a janela é redimensionada
+            flow.Resize += (s, e) =>
             {
-
-                SizeF textSize = e.Graphics.MeasureString(lbl.Text, lbl.Font);
-
-                int textWidth = (int)textSize.Width;
-                int textHeight = (int)textSize.Height;
-
-                int centerY = lbl.Height / 2;
-                int lineY = centerY;
-
-                int padding = 1;
-                int lineLength = (lbl.Width - textWidth) / 2 - padding;
-
-                if (lineLength > 0)
+                foreach (RoundedButton btn in flow.Controls.OfType<RoundedButton>())
                 {
-                    // Linha à esquerda
-                    e.Graphics.DrawLine(pen, 20, lineY, lineLength, lineY);
-
-                    // Linha à direita
-                    e.Graphics.DrawLine(pen, lbl.Width - lineLength, lineY, lbl.Width - 20, lineY);
+                    btn.Width = flow.ClientSize.Width - btn.Margin.Left - btn.Margin.Right;
                 }
-            }
+            };
+
+
+
         }
+
+
 
 
 
@@ -599,26 +634,9 @@ namespace Vados
 
         private void LoadContentBasedOnSelection(string buttonText)
         {
-
-
-
             tableLayoutContent.Controls.Clear();
             tableLayoutContent.RowStyles.Clear();
             tableLayoutContent.RowCount = 0;
-
-            panelContent.Layout += (s, e) =>
-            {
-                foreach (Control control in tableLayoutContent.Controls)
-                {
-                    if (control is RichTextBox box && box.Tag?.ToString() == "descrição")
-                    {
-                        ResizeDescriptionBox(box);
-                    }
-                }
-            };
-
-
-
 
             switch (buttonText)
             {
@@ -634,8 +652,25 @@ namespace Vados
                 case "Excluir uma pasta":
                     LoadExcluirPastaContent();
                     break;
-
             }
+
+            // Redimensiona todas as RichTextBox do conteúdo **uma única vez**
+            foreach (Control control in tableLayoutContent.Controls)
+            {
+                if (control is RichTextBox box && box.Tag?.ToString() == "descrição")
+                {
+                    ResizeDescriptionBox(box);
+                }
+            }
+
+            // Também redimensiona o exemplo, se existir
+            if (exampleRichTextBox != null)
+                ResizeDescriptionBox(exampleRichTextBox);
+
+
+
+            tableLayoutContent.ResumeLayout();
+            tableLayoutContent.PerformLayout();
         }
 
 
@@ -769,9 +804,9 @@ namespace Vados
         {
 
             loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlHome));
-      
-    }
+
+        }
     }
 
 
-}
+}

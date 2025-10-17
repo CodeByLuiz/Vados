@@ -34,7 +34,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(231, 231, 231);
+            BackColor = Color.FromArgb(223, 223, 223);
             Name = "UserControlManual";
             Size = new Size(1060, 576);
             ResumeLayout(false);

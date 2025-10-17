@@ -34,7 +34,7 @@ namespace Vados
         private int startY;
         private Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
         private Form1 parentForm;
-        private int scrollBarWidth = 10;
+        private int scrollBarWidth = 5;
 
 
 
@@ -115,20 +115,13 @@ namespace Vados
             
             rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;// - scrollBarWidth;
             btnExit.Location = new Point((this.Width - 20) - (btnExit.Width), 20);
-
-
+            
             void ExitForm(object sender, EventArgs e) 
             {
-                entryHeight();
-                //parentForm.CloseHistoryTab();
+                parentForm.CloseHistoryTab();
             }
 
             btnExit.Click += ExitForm;
-            
-
-            //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
-
-
             this.Resize += FormHistory_Resize_1;
         }
 
@@ -136,6 +129,7 @@ namespace Vados
         public void FormHistory_Load(object sender, EventArgs e)
         {
             LoadCommands();
+            
         }
 
 
@@ -146,7 +140,7 @@ namespace Vados
 
             
             //spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
-            spacing = 30;
+            spacing = 20;
             historyPanel.Height = this.Height - (title.Location.Y + title.Height) - spacing * 2;
 
 
@@ -154,6 +148,8 @@ namespace Vados
             title.Left = (historyPanel.Width / 2) - (title.Width / 2);
             title.Top = spacing;
             historyPanel.Top = title.Bottom + spacing;
+
+            entriesHVerification();
         }
 
         private void LoadCommands()
@@ -203,7 +199,6 @@ namespace Vados
                 Label lbl = new Label
                 {
                     Text = $"{entry.Comando}",
-                    Location = new Point(lbltitle.Location.X + 2, lbltitle.Location.Y + lbltitle.Height + 2),
                     // AutoSize = false,
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 12, FontStyle.Regular),
@@ -262,12 +257,6 @@ namespace Vados
                 entryPanel.Controls.Add(btnExcluir);
 
 
-                //ajusta o tamanho de elementos necessarios
-                lbl.Width = rectangleWidth - lbl.Location.X - 10;
-                lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
-
-               
-
                 // Faz o hover bonito
                 void HoverEnter(object sender, EventArgs e)
                 {
@@ -315,7 +304,7 @@ namespace Vados
                 }
                 void ResizeEntryPanel(object sender, EventArgs e)
                 {
-                    entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, entryPanel);
+                    entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle,lbl, entryPanel);
                 }
 
                 // Adiciona os eventos aos elementos
@@ -345,14 +334,12 @@ namespace Vados
 
                 startY += rectangleHeight + rectangleBottomMargin;
                 lastDrawnY = entryPanel.Bottom + rectangleBottomMargin;
-                entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, entryPanel);
+                entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, lbl, entryPanel);
             }
-
-             //MessageBox.Show($"{historyPanel.Height} entrada {ScrollBarHeightCalc()}");
-            
+            //entriesHVerification();
         }
 
-        void entryPositionFix(PictureBox btnEditar, PictureBox btnExcluir, Label lblData, Label lbltitle, Panel entryPanel)
+        void entryPositionFix(PictureBox btnEditar, PictureBox btnExcluir, Label lblData, Label lbltitle,Label lbl, Panel entryPanel)
         {
             //ajusta a posição dos elementos necessarios
             btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
@@ -362,37 +349,41 @@ namespace Vados
             btnExcluir.BringToFront();
 
             lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
+
+            lbl.Location = new Point(lbltitle.Location.X + 2, lbltitle.Location.Y + lbltitle.Height + 2);
+            lbl.Width = rectangleWidth - lbl.Location.X - 10;
+            lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
         }
 
-        private int entryHeight()
+
+        bool trecoDeControle = false;
+        private void entriesHVerification()
         {
-            int entradaHeight = 0;
+
+            int entradaHeight = -rectangleBottomMargin;
             int visibleFormHeight = historyPanel.Height;
             foreach(var entry in Global.entradas)
             {
                 entradaHeight+=rectangleHeight + rectangleBottomMargin;
             }
 
-            MessageBox.Show($"entradas: {entradaHeight} visivel: {visibleFormHeight} ");
-
+            //MessageBox.Show($"entradas: {entradaHeight} visivel: {visibleFormHeight} ");
             
-                
-
-            foreach (Control control in historyPanel.Controls)
+            if (entradaHeight > visibleFormHeight && !trecoDeControle)
             {
-                if (control is Panel entryPanels)
-                {
-                    if (entradaHeight > visibleFormHeight)
-                    {
-                        entryPanels.Width = (historyPanel.ClientSize.Width - (rectangleSideMargin * 2)) - 10;
 
-                    }
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - scrollBarWidth;
+                LoadCommands();
+                trecoDeControle = true;
             }
-                //MessageBox.Show("cu3");
+            else if (entradaHeight <= visibleFormHeight && trecoDeControle )
+            {
+                //MessageBox.Show("cu");
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;
+                LoadCommands();
+                trecoDeControle = false;
             }
-            
 
-            return entradaHeight;
         }
 
         private void FormHistory_Resize_1(object sender, EventArgs e)

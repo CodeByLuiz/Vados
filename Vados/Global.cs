@@ -82,7 +82,7 @@ namespace Vados
 
         //Adiciona as entradas do banco de dados para uma lista 👎👎
           public static void InitializeDb()
-        {
+          {
             using (var db = new BancoDeDados.DbConnection())
             {
                 db.Database.EnsureCreated();
@@ -90,7 +90,7 @@ namespace Vados
                              .OrderByDescending(e => e.Data)
                              .ToList();
             }
-        }
+          }
 
 //Inicializar user controls
 public static UserControlHome userControlHome;

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -52,7 +53,8 @@ namespace Vados
         //Variáveis do botão do microfone
         Image inactiveMicIcon;
         Image activeMicIcon;
-        Image loadingMicIcon;
+        Image loadingWhiteMicIcon;
+        Image loadingBlueMicIcon;
         Image pausedMicIcon;
         Image micIcon;
         Image micShadow;
@@ -160,9 +162,11 @@ namespace Vados
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
             activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
             pausedMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pausedMicIcon.png"));
-            loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
+            loadingWhiteMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loadingWhite.gif"));
+            loadingBlueMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loadingBlue.gif"));
             micShadow = Global.ImageCreateShadow(inactiveMicIcon, Color.Black, 0.35f, 12);
-            ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
+            ImageAnimator.Animate(loadingWhiteMicIcon, Timer_Tick);
+            ImageAnimator.Animate(loadingBlueMicIcon, Timer_Tick);
             micIcon = inactiveMicIcon;
 
             #endregion
@@ -173,6 +177,7 @@ namespace Vados
             txtComando.Font = new Font("Segoe UI", 20);
             lblText.Font = new Font(Fonts.DarkerSemiBold, 34);
             lblButtonName.Font = new Font(Fonts.DarkerMedium, 13);
+            lblInfo.Font = new Font(Fonts.DarkerMedium, 17);
 
             #endregion
 
@@ -246,15 +251,14 @@ namespace Vados
 
             //Mostrar mensagem de confirmação
             parentForm.ToggleOverlay(true);
-            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria,Comandotxt:txtComando.Text);
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria, commandText:txtComando.Text);
         }
 
         public void FocusCommand(bool clear = false)
         {
             if (clear) txtComando.Text = "";
             txtComando.Focus();
-            txtComando.SelectionLength = 0;
-            txtComando.SelectionStart = txtComando.Text.Length;
+            txtComando.Select(0, 0);
         }
 
 
@@ -292,7 +296,7 @@ namespace Vados
         //Para de escutar o comando de voz
         public async Task StopListening()
         {
-            micIcon = loadingMicIcon;
+            SetMicLoadingIcon(true, "loadingWhite");
             btnStop.Enabled = false;
             btnPause.Enabled = false;
 
@@ -311,7 +315,7 @@ namespace Vados
             hasTranscribedAudio = true;
 
             //Resetar botão do microfone
-            micIcon = inactiveMicIcon;
+            SetMicLoadingIcon(false);
             circleColor = Colors.grayPrimary;
 
 
@@ -335,13 +339,6 @@ namespace Vados
 
             //Pausar timer
             audioTimer.Enabled = false;
-
-            ////Mostrar texto parcial
-            //TextBoxReset("Transcrevendo...");
-            //string result = await Global.VoiceRecognizer.Stop();
-            //result = Comandos.CleanText(result);
-            //TextBoxWrite(result);
-
             Global.VoiceRecognizer.Pause();
             hasTranscribedAudio = true;
         }
@@ -362,6 +359,19 @@ namespace Vados
         }
 
 
+        //Ativa o carregamento no botão do microfone
+        public void SetMicLoadingIcon(bool loading, string gif = "")
+        {
+            Image loadingGif = loadingWhiteMicIcon;
+            if (gif == "loadingBlue") loadingGif = loadingBlueMicIcon;
+
+            micIcon = inactiveMicIcon;
+            if (loading)
+                micIcon = loadingGif;
+        }
+
+
+        //Desativa a textbox
         public void TextBoxReset(string text, bool canClick = true)
         {
             txtComando.Text = text;
@@ -372,30 +382,57 @@ namespace Vados
             //Desfocar textbox
             if (!canClick)
             {
+                txtComando.Select(0, 0);
+                txtComando.Cursor = Cursors.Default;
                 ActiveControl = imgLogo;
             }
         }
 
+        //Ativa a textbox
         public void TextBoxWrite(string text)
         {
             txtComando.Text = text;
             txtComando.ForeColor = Color.Black;
+            txtComando.Select(0, 0);
             textboxActive = true;
             textboxCanClick = true;
+            txtComando.Cursor = Cursors.IBeam;
         }
         public string TxtComandoEditar
         {
-            
+
             get { return txtComando.Text; }
-            set 
-            { 
+            set
+            {
                 txtComando.Text = value;
-                txtComando.ForeColor=Color.Black;
+                txtComando.ForeColor = Color.Black;
                 FocusCommand();
             }
 
         }
-        
+
+
+        //Define o texto da label de informação do comando
+        public void UpdateCommandInfoLabel(string text, FontStyle fontStyle, Color color)
+        {
+            lblInfo.Text = text;
+            lblInfo.ForeColor = color;
+            lblInfo.Font = new Font(lblInfo.Font, fontStyle);
+
+            Global.LabelFitWidth(lblInfo);
+            CorrectCommandInfoLabel();
+        }
+
+        //Corrige a posição da label de informação do comando
+        public void CorrectCommandInfoLabel()
+        {
+            int topMargin = 35;
+            int labelX = Width / 2 - lblInfo.Width / 2;
+            int labelY = txtComando.Bottom + topMargin;
+
+            lblInfo.Location = new Point(labelX, labelY);
+        }
+
 
         //Corrige as variáveis do botão de microfone
         public void CorrectMicButton(bool setOnlyTargets = false)
@@ -567,7 +604,7 @@ namespace Vados
             float drawY = innerY + (innerD - drawH) / 2f;
 
             //Desenhar sombra
-            if (micIcon != loadingMicIcon)
+            if (micIcon != loadingWhiteMicIcon && micIcon != loadingBlueMicIcon)
             {
                 shadowOffset = 4;
                 e.Graphics.DrawImage(micShadow, drawX, drawY + shadowOffset, drawW, drawH);
@@ -722,7 +759,7 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            #region AJUSTAR LABEL
+            #region AJUSTAR LABELS (O que você deseja fazer?)
 
             int labelX = this.Width / 2 - lblText.Width / 2;
             int labelY = txtComando.Top - lblText.Height - 40;
@@ -762,6 +799,13 @@ namespace Vados
             //Diminuir tamanho da textbox para não passar por cima do botão de enviar
             txtComando.Width -= txtboxWidthOffset;
             setTextboxWidth = true;
+
+            #endregion
+
+
+            #region AJUSTAR LABEL DE INFORMAÇÃO DO COMANDO
+
+            CorrectCommandInfoLabel();
 
             #endregion
 

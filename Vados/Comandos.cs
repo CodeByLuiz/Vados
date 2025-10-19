@@ -1006,14 +1006,13 @@ namespace Vados
             }
 
             #endregion----------------------------------------
-
+            
 
             //Caminho da pasta de origem
             if (!string.IsNullOrEmpty(origin))
             {
                 if (originPath == "")
                 {
-                    MessageBox.Show("procurando pasta");
                     //Procurar caminho
                     originPath = (await SearchPaths(origin, true, pathAmount: 1).ConfigureAwait(false)).FirstOrDefault();
                 }

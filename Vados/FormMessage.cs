@@ -21,7 +21,7 @@ namespace Vados
         CommandCriteria criteria;
         bool isErrorMessage = false;
         public UserControl userControl;
-        private string ComandoBdTxt;
+        private string commandText;
 
         Image btnCloseImage;
         Image btnCloseImageHover;
@@ -40,13 +40,12 @@ namespace Vados
         );
 
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string txtbd="")
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string commandText_ = "")
         {
             InitializeComponent();
             criteria = criteria_;
             isErrorMessage = isErrorMessage_;
-
-            ComandoBdTxt = txtbd;
+            commandText = commandText_;
 
             //Imagens
             btnCloseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeIcon.png"));
@@ -150,7 +149,7 @@ namespace Vados
         }
 
 
-        private void FocusCommand(bool clear = false)
+        void FocusCommand(bool clear = false)
         {
             UserControlHome page = (UserControlHome)userControl;
             page.FocusCommand(clear);
@@ -402,7 +401,104 @@ namespace Vados
 
         #endregion
 
-        
+
+        #region INFORMAÇÃO DO COMANDO
+
+        private string CommandInfoGetProgress(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            string obj = objectType;
+            if (amount != "")
+                obj += "s";
+
+
+            switch(action)
+            {
+                //Criar
+                case "criar":
+                    return "Criando " + objectType + "...";
+
+                //Demais comandos
+                default:
+                    return "Procurando " + obj + "...";
+            }
+        }
+
+
+        private string CommandInfoGetConfirmation(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            //Tipo de objeto (primeira letra maiúscula)
+            string obj = char.ToUpper(objectType[0]) + objectType.Substring(1);
+
+            //Terminações das palavras no plural
+            string termination = "o";
+            if (amount != "")
+            {
+                obj += "s";
+                termination = "as";
+            }
+
+
+            //Verbo (comando)
+            string verb = "";
+
+            switch (action)
+            {
+                case "criar":
+                    verb = "criad";
+                    break;
+
+                case "renomear":
+                    verb = "renomead";
+                    break;
+
+                case "excluir":
+                    verb = "excluid";
+                    break;
+
+                case "mover":
+                    verb = "movid";
+                    break;
+
+                case "duplicar":
+                    verb = "duplicad";
+                    break;
+
+                case "abrir":
+                    verb = "abert";
+                    break;
+            }
+
+            return obj + " " + verb + termination + " com sucesso!";
+        }
+
+
+        private string CommandInfoGetError(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            string obj = objectType;
+
+            if (amount != "")
+                obj += "s";
+
+
+            return "Erro ao " + action + " " + obj;
+        }
+
+
+        #endregion
+
+
 
         //Botões de confrmar e cancelar
         private void btnCancel_Click(object sender, EventArgs e)
@@ -429,15 +525,53 @@ namespace Vados
             else
             {
                 Form1 form = (Form1)Owner;
+                UserControlHome home = (UserControlHome)userControl;
                 CommandCriteria criteriaCopy = criteria;
 
                 _ = Task.Run(async () =>    //Iniciar uma task, que realiza o código separadamente quando terminar
                 {
                     try
                     {
-                        //Realizar comando
+                        //Desabilitar outros comandos enquanto o atual estiver sendo executado
+                        form.BeginInvoke((MethodInvoker)(() =>
+                        {
+                            home.SetMicLoadingIcon(true, "loadingBlue");
+                            home.TextBoxReset(commandText + "...", false);
+
+                            //Mostrar informação do comando
+                            string info = CommandInfoGetProgress(criteria);
+                            home.UpdateCommandInfoLabel(info, FontStyle.Regular, Color.Black);
+                        }));
+
+
+                        //Executar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
-                       
+
+
+                        //Reabilitar outros comandos
+                        form.BeginInvoke((MethodInvoker)(() =>
+                        {
+                            home.SetMicLoadingIcon(false);
+                            home.TextBoxWrite(commandText);
+                            FocusCommand(false);
+
+                            //Mostrar confirmação/erro do comando
+                            string info;
+                            if (errorMessage == "")
+                            {
+                                //Sucesso
+                                info = CommandInfoGetConfirmation(criteria);
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.greenHighlight);
+                            }
+                            else
+                            {
+                                //Falha
+                                info = CommandInfoGetError(criteria);
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.redErrorDark);
+                            }
+                        }));
+
+
                         //Mostrar mensagem de erro
                         if (errorMessage != "")
                         {
@@ -446,12 +580,12 @@ namespace Vados
                                 form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
                             }));
                         }
-                        else if (!String.IsNullOrEmpty(ComandoBdTxt))
+                        //Salvar comando no banco de dados
+                        else if (!String.IsNullOrEmpty(commandText))
                         {
                             BancoDeDados.AdicionarEntrada(
-                             comando: ComandoBdTxt,
-                             titulo: $"{criteria.Action} {criteria.ObjectType} "
-                             
+                                comando: commandText,
+                                titulo: $"{criteria.Action} {criteria.ObjectType} " 
                             );
                         }
                     }

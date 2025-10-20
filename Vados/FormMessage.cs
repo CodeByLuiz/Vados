@@ -540,7 +540,7 @@ namespace Vados
 
                             //Mostrar informação do comando
                             string info = CommandInfoGetProgress(criteria);
-                            home.UpdateCommandInfoLabel(info, FontStyle.Regular, Color.Black);
+                            home.UpdateCommandInfoLabel(info, FontStyle.Regular, Color.Black, false);
                         }));
 
 
@@ -561,14 +561,14 @@ namespace Vados
                             {
                                 //Sucesso
                                 info = CommandInfoGetConfirmation(criteria);
-                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.greenHighlight);
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.greenHighlight, true);
                             }
                             else
                             {
                                 //Falha
                                 info = CommandInfoGetError(criteria);
-                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.redErrorDark);
-                            }
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.redErrorDark, true);
+                            };
                         }));
 
 

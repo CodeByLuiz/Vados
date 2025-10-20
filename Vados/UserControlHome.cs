@@ -108,6 +108,15 @@ namespace Vados
         bool btnSendHovering = false;
         Image btnSendCurrentImage;
 
+        //Informação do progresso do comando
+        System.Windows.Forms.Timer infoTimer;
+        int infoTimerMaxMs = 2500;
+        int infoTimerCurrentMs = 2500;
+        int infoTextAlpha = 0;
+        Color infoTextColor;
+        Font infoTextFont;
+        string infoText = "Info";
+
 
         public UserControlHome()
         {
@@ -125,6 +134,11 @@ namespace Vados
             audioTimer = new System.Windows.Forms.Timer();
             audioTimer.Interval = 1000;
             audioTimer.Tick += audioTimer_Tick;
+
+            //Timer para desaparecer a informação do comando
+            infoTimer = new System.Windows.Forms.Timer();
+            infoTimer.Interval = 16;    //Todo frame
+            infoTimer.Tick += infoTimer_Tick;
 
             #endregion
 
@@ -177,7 +191,7 @@ namespace Vados
             txtComando.Font = new Font("Segoe UI", 20);
             lblText.Font = new Font(Fonts.DarkerSemiBold, 34);
             lblButtonName.Font = new Font(Fonts.DarkerMedium, 13);
-            lblInfo.Font = new Font(Fonts.DarkerMedium, 17);
+            infoTextFont = new Font(Fonts.DarkerMedium, 17);
 
             #endregion
 
@@ -251,7 +265,7 @@ namespace Vados
 
             //Mostrar mensagem de confirmação
             parentForm.ToggleOverlay(true);
-            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria, commandText:txtComando.Text);
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria, commandText: txtComando.Text);
         }
 
         public void FocusCommand(bool clear = false)
@@ -413,24 +427,18 @@ namespace Vados
 
 
         //Define o texto da label de informação do comando
-        public void UpdateCommandInfoLabel(string text, FontStyle fontStyle, Color color)
+        public void UpdateCommandInfoLabel(string text, FontStyle fontStyle, Color color, bool startTimer)
         {
-            lblInfo.Text = text;
-            lblInfo.ForeColor = color;
-            lblInfo.Font = new Font(lblInfo.Font, fontStyle);
+            infoText = text;
+            infoTextColor = color;
+            infoTextFont = new Font(infoTextFont, fontStyle);
 
-            Global.LabelFitWidth(lblInfo);
-            CorrectCommandInfoLabel();
-        }
-
-        //Corrige a posição da label de informação do comando
-        public void CorrectCommandInfoLabel()
-        {
-            int topMargin = 35;
-            int labelX = Width / 2 - lblInfo.Width / 2;
-            int labelY = txtComando.Bottom + topMargin;
-
-            lblInfo.Location = new Point(labelX, labelY);
+            infoTextAlpha = 255;
+            if (startTimer)
+            {
+                infoTimer.Start();
+                infoTimerCurrentMs = infoTimerMaxMs;
+            }
         }
 
 
@@ -544,6 +552,7 @@ namespace Vados
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
             #region BOTÃO DO MICROFONE
 
@@ -717,6 +726,21 @@ namespace Vados
             #endregion
 
 
+            #region INFORMAÇÃO DO COMANDO
+
+            int topMargin = 35;
+            SizeF textSize = e.Graphics.MeasureString(infoText, infoTextFont);
+            int infoTextX = Width / 2 - (int)textSize.Width / 2;
+            int infoTextY = txtComando.Bottom + topMargin;
+            Point infoTextPos = new Point(infoTextX, infoTextY);
+            Color textColor = Color.FromArgb(infoTextAlpha, infoTextColor);
+
+            brush = new SolidBrush(textColor);
+            e.Graphics.DrawString(infoText, infoTextFont, brush, infoTextPos);
+
+            #endregion
+
+
             path.Dispose();
             brush.Dispose();
 
@@ -799,13 +823,6 @@ namespace Vados
             //Diminuir tamanho da textbox para não passar por cima do botão de enviar
             txtComando.Width -= txtboxWidthOffset;
             setTextboxWidth = true;
-
-            #endregion
-
-
-            #region AJUSTAR LABEL DE INFORMAÇÃO DO COMANDO
-
-            CorrectCommandInfoLabel();
 
             #endregion
 
@@ -968,12 +985,36 @@ namespace Vados
             audioSeconds += 1;
         }
 
+        //Timer da informação do comando
+        private void infoTimer_Tick(object? sender, EventArgs e)
+        {
+            infoTimerCurrentMs -= infoTimer.Interval;   //Diminuir tempo
+            infoTimerCurrentMs = Math.Max(infoTimerCurrentMs, 0);
+
+            //Definir opacidade do texto
+            float fadeOutMs = 300;
+            float alpha = infoTextAlpha;
+
+            if (infoTimerCurrentMs <= fadeOutMs)
+            {
+                alpha = (float)infoTimerCurrentMs / fadeOutMs * 255f;
+            }
+
+            infoTextAlpha = (int)Math.Ceiling(alpha);
+
+            //Parar timer quando alpha for 0
+            if (infoTimerCurrentMs == 0)
+            {
+                infoTimer.Stop();
+            }
+        }
+
+
         //Acontece quando há silêncio por determinado tempo no comando de voz
         private async void OnSilence(object sender, EventArgs e)
         {
             Invoke((MethodInvoker)(() => StopListening()));
         }
-
 
 
         //Botão do manual

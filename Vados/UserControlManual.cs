@@ -654,6 +654,36 @@ namespace Vados
                 case "Mover uma pasta":
                     LoadMoverUmaPastaContent();
                     break;
+                case "Duplicar uma pasta":
+                    LoadDuplicarUmaPastaContent();
+                    break;
+                case "Abrir um arquivo":
+                    LoadAbrirArquivoContent();
+                    break;
+                case "Criar um arquivo":
+                    LoadCriarArquivoContent();
+                    break;
+                case "Duplicar arquivo":
+                    LoadDuplicarArquivoContent();
+                    break;
+                case "Mover arquivo":
+                    LoadMoverArquivoContent();
+                    break;
+                case "Excluir arquivo":
+                    LoadExcluirArquivoContent();
+                    break;
+                case "Renomear um arquivo":
+                    LoadRenomearArquivoContent();
+                    break;
+                case "Operar múltiplos arquivos":
+                    LoadOperarMultiplosArquivosContent();
+                    break;
+                case "Abrir programa":
+                    LoadAbrirProgramaContent();
+                    break;
+                case "Abrir  site":
+                    LoadAbrirSiteContent();
+                    break;
             }
 
             // Redimensiona todas as RichTextBox do conteúdo **uma única vez**
@@ -837,6 +867,280 @@ namespace Vados
 
         }
 
+        private void LoadDuplicarUmaPastaContent()
+        {
+
+
+            AddTitleToContent("Duplicar pasta");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para duplicar uma pasta,basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Duplicar pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". A pasta duplicada será criada na mesma pasta que a pasta original, e também possuirá todos os arquivos e pastas existentes dentro da original. Como a nova pasta terá o mesmo nome da pasta original, seu nome terá um numero na frenten de dorma ascendente, para que as pastas possam ser distinguidas.");
+
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa de apenas um fator, o ");
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, " a ser duplicada  ");
+            
+
+
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Duplicar a pasta", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Duplicar a pasta 'Atividades'.”\r\n“Duplique a pasta chamada 'Jogos'”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+
+        }
+
+
+
+
+       private void LoadAbrirArquivoContent()
+        {
+            AddTitleToContent("Abrir Arquivo");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para Abrir um arquivo,basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Abrir Arquivo", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". O Arquivo será aberto com o software padrão para arquivos da determinada extensão. Caso nenhum software esteja definido como padrão, uma janela abrirá para a escolha do software");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa de um único fator, o ");
+            Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". Não é necessario dizer a ");
+            Global.AppendFormattedText(descriptionBox, "extensão do arquivo", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ", mas isso pode ajudar a distinguir arquivos que tenha o mesmo nome.");
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir o arquivo", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "'nome do arquivo'", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Abra o arquivo chamado 'Redação'.”\r\n“Abra o arquivo chamado 'Redação.txt'”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+
+        }
+        private void LoadCriarArquivoContent()
+        {
+            AddTitleToContent("Criar um arquivo");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+       private void LoadExcluirArquivoContent() {
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+        private void LoadDuplicarArquivoContent() {
+
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+        }
+
+        private void LoadOperarMultiplosArquivosContent() {
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+
+        private void LoadRenomearArquivoContent() {
+
+            AddTitleToContent("Renomear um arquivo");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para renomear um arquivo presente na pasta padrão(chamada 'Vados'), basta utilizar o comando");
+            Global.AppendFormattedText(descriptionBox, "Renomear arquivo", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". Com esse comando também é possívelm alterar a extensão do arquivo. ");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para executar esse comando, diga o ");
+            Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, " e o ");
+            Global.AppendFormattedText(descriptionBox, "novo nome desejado", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". Não é necessariamente dizer a ");
+            Global.AppendFormattedText(descriptionBox, "extensão do arquivo", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ", mas isso pode ajudar a distinguir arquivos que tenham o mesmo nome.");
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Renomeie o arquivo", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "'nome do arquivo'", Color.Black, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "para ");
+            Global.AppendFormattedText(exampleRichTextBox, " 'novo nome do arquivo'", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie o arquivo 'Documentos' para 'Documentos Importantes'.”\r\n“Renomeie o arquivo 'Documentos errados' para 'Documentos certos' ", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+
+        private void LoadMoverArquivoContent()
+        {
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+
+
+
+        private void LoadAbrirSiteContent() {
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
+        private void LoadAbrirProgramaContent() {
+            AddTitleToContent("");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, "");
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+        }
 
 
         #endregion

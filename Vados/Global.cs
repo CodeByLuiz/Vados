@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 //using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
@@ -451,6 +452,23 @@ namespace Vados
 
             rtb.Select(0, 0);
             return rtb.Rtf;
+        }
+
+
+        //Encontra a posição do primeiro grupo identificado pelo extrator
+        public static int FindFirstGroupIndex(GroupCollection group)
+        {
+            for (var i = 1; i < group.Count; i++)
+            {
+                MessageBox.Show("valor: " + group[i].Value);
+                if (group[i].Success)
+                {
+                    MessageBox.Show("sucesso");
+                    return group[i].Index;
+                }
+            }
+
+            return -1;
         }
     }
 }

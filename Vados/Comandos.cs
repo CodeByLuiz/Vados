@@ -751,27 +751,27 @@ namespace Vados
                 case "criar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
-                        new DestinationExtractor(destinationWords, folderWords, namingWords)
+                        new DestinationExtractor(destinationWords, folderWords, namingWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true)
                     });
                     break;
 
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
-                        new NewNameExtractor(),
                         new OriginExtractor(fromWords, folderWords, namingWords),
+                        new NewNameExtractor(),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
 
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                         new OriginExtractor(fromWords, folderWords, namingWords),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                     });
                     break;
 
@@ -779,10 +779,10 @@ namespace Vados
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                         new OriginExtractor(fromWords, folderWords, namingWords),
                         new DestinationExtractor(insideWords, folderWords, namingWords, true),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                     });
                     break;
 
@@ -790,18 +790,18 @@ namespace Vados
                 case "duplicar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                         new OriginExtractor(fromWords, folderWords, namingWords),
                         new DestinationExtractor(insideWords, folderWords, namingWords),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
 
                 case "abrir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
                         new OriginExtractor(fromWords, folderWords, namingWords),
+                        new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
                     });
                     break;
 

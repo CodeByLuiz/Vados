@@ -516,8 +516,7 @@ namespace Vados
 
             AddSection(flow, "Sistema", @"Images/Icons/Sistema.png", new[]
             {
-        "Abrir software", "Alterar volume", "Alterar horário",
-        "Alterar brilho da tela", "Alterar idioma"
+        "Abrir site","Abrir Programa"
     });
 
 
@@ -651,6 +650,9 @@ namespace Vados
                     break;
                 case "Excluir uma pasta":
                     LoadExcluirPastaContent();
+                    break;
+                case "Mover uma pasta":
+                    LoadMoverUmaPastaContent();
                     break;
             }
 
@@ -798,6 +800,45 @@ namespace Vados
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
 
         }
+
+        private void LoadMoverUmaPastaContent()
+        {
+
+            AddTitleToContent("Mover uma Pasta");
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Para mover uma pasta para dentro de uma outra pasta,basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Mover uma pasta", Colors.blueHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, ". Por questão de simplicidade, as pastas movidas devem estar presentes na pasta padrão(chamada \"Vados\"), ou a pasta de dentro deve ser a pasta padrão.");
+
+
+            descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 20f));
+
+
+
+
+            AddDescriptionToContent();
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores:");
+            Global.AppendFormattedText(descriptionBox, " o nome da pasta a ser movida", Colors.greenHighlight, FontStyle.Bold);
+            Global.AppendPlainText(descriptionBox, " e o  ");
+            Global.AppendFormattedText(descriptionBox, " nome da pasta de destino.", Colors.greenHighlight, FontStyle.Bold);
+
+
+
+
+            AddExampleBox();
+
+
+            Global.AppendFormattedText(exampleRichTextBox, "Mover Pasta", Color.Black, FontStyle.Underline);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "para a pasta", Color.Black, FontStyle.Regular );
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta de destino'\n", Color.Black, FontStyle.Bold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Mover a pasta ‘Currículos’ pa a pasta 'Arquivos'.”\r\n“Mova a Pasta chamada 'Redações' para a pasta 'Documentos'.”", Color.FromArgb(125, 125, 125), FontStyle.Regular);
+            exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, Fonts.GetFont(Fonts.DarkerRegular, 18f));
+
+        }
+
+
+
         #endregion
 
         private void btnReturn_Click(object sender, EventArgs e)

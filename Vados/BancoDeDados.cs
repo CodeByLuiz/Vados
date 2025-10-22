@@ -11,10 +11,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Vados
 {
-    internal class BancoDeDados
+    public class BancoDeDados
     {
 
-        private static readonly string UUIDComando = "computador_id.txt";
+        public static readonly string UUIDComando = "computador_id.txt";
         public class HistoryEntry
         {
             [Key] public int Id { get; set; }
@@ -58,7 +58,7 @@ namespace Vados
             }
 
         }
-        private static Guid ObterComputadorId()
+        public static Guid ObterComputadorId()
         {
             if (File.Exists(UUIDComando))
             {
@@ -114,13 +114,13 @@ namespace Vados
 
                 if (entradas.Count == 0)
                 {
-                    MessageBox.Show("Nenhuma entrada encontrada.");
+                    //MessageBox.Show("Nenhuma entrada encontrada.");
                     return;
                 }
 
                 foreach (var entrada in entradas)
                 {
-                    MessageBox.Show($"-----------\n ID: {entrada.Id}\n ComputadorId: {entrada.ComputadorId}\n Data: {entrada.Data}\n Comando: {entrada.Comando}\n Pastas:");
+                    //MessageBox.Show($"-----------\n ID: {entrada.Id}\n ComputadorId: {entrada.ComputadorId}\n Data: {entrada.Data}\n Comando: {entrada.Comando}\n Pastas:");
                     //MessageBox.Show($"ID: {entrada.Id}");
                    // MessageBox.Show($"ComputadorId: {entrada.ComputadorId}");
                     //MessageBox.Show($"Data: {entrada.Data}");

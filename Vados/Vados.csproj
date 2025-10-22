@@ -23,6 +23,8 @@
     <None Remove="Fonts\MavenPro-Medium.ttf" />
     <None Remove="Fonts\MavenPro-Regular.ttf" />
     <None Remove="Fonts\MavenPro-SemiBold.ttf" />
+    <None Remove="GIFs\loadingBlue.gif" />
+    <None Remove="GIFs\loadingWhite.gif" />
     <None Remove="Images\Icons\Arquivos.png" />
     <None Remove="GIFs\loading.gif" />
     <None Remove="Images\Icons\activeMicIcon.png" />
@@ -33,6 +35,7 @@
     <None Remove="Images\Icons\deleteiconhover.png" />
     <None Remove="Images\Icons\editicon.png" />
     <None Remove="Images\Icons\editiconhover.png" />
+    <None Remove="Images\Icons\historyIcon.png" />
     <None Remove="Images\Icons\manualIcon.png" />
     <None Remove="Images\Icons\pasta.png" />
     <None Remove="Images\Icons\sendIcon.png" />
@@ -102,10 +105,13 @@
     <Content Include="Fonts\MavenPro-SemiBold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Icons\Arquivos.png">
+    <Content Include="GIFs\loadingBlue.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GIFs\loading.gif">
+    <Content Include="GIFs\loadingWhite.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\Arquivos.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\activeMicIcon.png">
@@ -130,6 +136,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\editiconhover.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Icons\historyIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Icons\manualIcon.png">

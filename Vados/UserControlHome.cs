@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,24 +19,22 @@ namespace Vados
 {
     public partial class UserControlHome : UserControl
     {
-
         public event EventHandler<LoadPageEventArgs> loadPage;
-
-
-
-         
         System.Windows.Forms.Timer timer;
-        private Image sendIcon;
 
         //Imagens dos botões da interface
         Image btnHistoryImage;
         Image btnHistoryImageHover;
+        Image btnHistoryShadow;
         Image btnManualImage;
         Image btnManualImageHover;
+        Image btnManualShadow;
         Image btnConfigsImage;
         Image btnConfigsImageHover;
+        Image btnConfigsShadow;
         Image btnSendImage;
         Image btnSendImageHover;
+        Image btnSendShadow;
         Image btnPauseImage;
         Image btnPauseImageHover;
         Image btnStopImage;
@@ -54,7 +53,8 @@ namespace Vados
         //Variáveis do botão do microfone
         Image inactiveMicIcon;
         Image activeMicIcon;
-        Image loadingMicIcon;
+        Image loadingWhiteMicIcon;
+        Image loadingBlueMicIcon;
         Image pausedMicIcon;
         Image micIcon;
         Image micShadow;
@@ -107,7 +107,15 @@ namespace Vados
         bool textboxCanClick = true;
         bool btnSendHovering = false;
         Image btnSendCurrentImage;
-        Image btnSendShadow;
+
+        //Informação do progresso do comando
+        System.Windows.Forms.Timer infoTimer;
+        int infoTimerMaxMs = 2500;
+        int infoTimerCurrentMs = 2500;
+        int infoTextAlpha = 0;
+        Color infoTextColor;
+        Font infoTextFont;
+        string infoText = "Info";
 
 
         public UserControlHome()
@@ -127,6 +135,11 @@ namespace Vados
             audioTimer.Interval = 1000;
             audioTimer.Tick += audioTimer_Tick;
 
+            //Timer para desaparecer a informação do comando
+            infoTimer = new System.Windows.Forms.Timer();
+            infoTimer.Interval = 16;    //Todo frame
+            infoTimer.Tick += infoTimer_Tick;
+
             #endregion
 
 
@@ -137,10 +150,13 @@ namespace Vados
             //Botões da interface
             btnConfigsImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\configIcon.png"));
             btnConfigsImageHover = Global.ImageChangeBrightness(btnConfigsImage, brightnessChange);
+            btnConfigsShadow = Global.ImageCreateShadow(btnConfigsImage, Color.Black, 0.2f, 15);
             btnManualImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\manualIcon.png"));
             btnManualImageHover = Global.ImageChangeBrightness(btnManualImage, brightnessChange);
-            //btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
-            //btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
+            btnManualShadow = Global.ImageCreateShadow(btnManualImage, Color.Black, 0.2f, 15);
+            btnHistoryImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\historyIcon.png"));
+            btnHistoryImageHover = Global.ImageChangeBrightness(btnHistoryImage, brightnessChange);
+            btnHistoryShadow = Global.ImageCreateShadow(btnHistoryImage, Color.Black, 0.2f, 15);
 
             //Botões do comando de voz
             btnPauseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pauseIcon.png"));
@@ -155,16 +171,27 @@ namespace Vados
             btnSendImageHover = Global.ImageChangeBrightness(btnSendImage, brightnessChange);
             btnSendShadow = Global.ImageCreateShadow(btnSendImage, Color.Black, 0.3f, 15);
             btnSendCurrentImage = btnSendImage;
-            sendIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\sendIcon.png"));
 
             //Botão do microfone
             inactiveMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\inactiveMicIcon.png"));
             activeMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\activeMicIcon.png"));
             pausedMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\pausedMicIcon.png"));
-            loadingMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loading.gif"));
+            loadingWhiteMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loadingWhite.gif"));
+            loadingBlueMicIcon = Image.FromFile(Path.Combine(Application.StartupPath, @"GIFs\loadingBlue.gif"));
             micShadow = Global.ImageCreateShadow(inactiveMicIcon, Color.Black, 0.35f, 12);
-            ImageAnimator.Animate(loadingMicIcon, Timer_Tick);
+            ImageAnimator.Animate(loadingWhiteMicIcon, Timer_Tick);
+            ImageAnimator.Animate(loadingBlueMicIcon, Timer_Tick);
             micIcon = inactiveMicIcon;
+
+            #endregion
+
+
+            #region FONTES
+
+            txtComando.Font = new Font("Segoe UI", 20);
+            lblText.Font = new Font(Fonts.DarkerSemiBold, 34);
+            lblButtonName.Font = new Font(Fonts.DarkerMedium, 13);
+            infoTextFont = new Font(Fonts.DarkerMedium, 17);
 
             #endregion
 
@@ -220,7 +247,7 @@ namespace Vados
                 {
                     var rtb = new RichTextBox();
                     Global.AppendPlainText(rtb, "Áudio não identificado. ");
-                    Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, FontStyle.Regular);
+                    Global.AppendFormattedText(rtb, "(Inaudível / Ruído / Música)", Color.Gray, rtb.Font);
                     parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
                 }
 
@@ -231,21 +258,21 @@ namespace Vados
 
             //Extrair argumentos do comando
             string commandText = command.Replace(",", "");
+            commandText = commandText.Replace(".", "");
             commandText = commandText.Replace("!", "");
             commandText = commandText.Replace("?", "");
             var arguments = Comandos.CommandGetArguments(commandText);
 
             //Mostrar mensagem de confirmação
             parentForm.ToggleOverlay(true);
-            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria,Comandotxt:txtComando.Text);
+            parentForm.ShowPopupMessage(!arguments.success, parentForm, this, arguments.criteria, commandText: txtComando.Text);
         }
 
         public void FocusCommand(bool clear = false)
         {
             if (clear) txtComando.Text = "";
             txtComando.Focus();
-            txtComando.SelectionLength = 0;
-            txtComando.SelectionStart = txtComando.Text.Length;
+            txtComando.Select(0, 0);
         }
 
 
@@ -283,26 +310,27 @@ namespace Vados
         //Para de escutar o comando de voz
         public async Task StopListening()
         {
-            micIcon = loadingMicIcon;
+            SetMicLoadingIcon(true, "loadingWhite");
             btnStop.Enabled = false;
             btnPause.Enabled = false;
 
             audioTimer.Stop();  //Parar timer
 
 
-            //Transcrever audio
+            //Transcrever áudio
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
+            result = result.Replace("\"", "");
             result = Comandos.CleanText(result);
-            result = Comandos.CorrectText(result, Global.VoiceRecognizer.hints);
+            result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);
 
             //Realizar comando
-            PerformCommand(result, true);
             TextBoxWrite(result);
+            PerformCommand(result, true);
             hasTranscribedAudio = true;
 
             //Resetar botão do microfone
-            micIcon = inactiveMicIcon;
+            SetMicLoadingIcon(false);
             circleColor = Colors.grayPrimary;
 
 
@@ -326,13 +354,6 @@ namespace Vados
 
             //Pausar timer
             audioTimer.Enabled = false;
-
-            ////Mostrar texto parcial
-            //TextBoxReset("Transcrevendo...");
-            //string result = await Global.VoiceRecognizer.Stop();
-            //result = Comandos.CleanText(result);
-            //TextBoxWrite(result);
-
             Global.VoiceRecognizer.Pause();
             hasTranscribedAudio = true;
         }
@@ -353,6 +374,19 @@ namespace Vados
         }
 
 
+        //Ativa o carregamento no botão do microfone
+        public void SetMicLoadingIcon(bool loading, string gif = "")
+        {
+            Image loadingGif = loadingWhiteMicIcon;
+            if (gif == "loadingBlue") loadingGif = loadingBlueMicIcon;
+
+            micIcon = inactiveMicIcon;
+            if (loading)
+                micIcon = loadingGif;
+        }
+
+
+        //Desativa a textbox
         public void TextBoxReset(string text, bool canClick = true)
         {
             txtComando.Text = text;
@@ -363,30 +397,51 @@ namespace Vados
             //Desfocar textbox
             if (!canClick)
             {
+                txtComando.Select(0, 0);
+                txtComando.Cursor = Cursors.Default;
                 ActiveControl = imgLogo;
             }
         }
 
+        //Ativa a textbox
         public void TextBoxWrite(string text)
         {
             txtComando.Text = text;
             txtComando.ForeColor = Color.Black;
+            txtComando.Select(0, 0);
             textboxActive = true;
             textboxCanClick = true;
+            txtComando.Cursor = Cursors.IBeam;
         }
         public string TxtComandoEditar
         {
-            
+
             get { return txtComando.Text; }
-            set 
-            { 
+            set
+            {
                 txtComando.Text = value;
-                txtComando.ForeColor=Color.Black;
+                txtComando.ForeColor = Color.Black;
                 FocusCommand();
             }
 
         }
-        
+
+
+        //Define o texto da label de informação do comando
+        public void UpdateCommandInfoLabel(string text, FontStyle fontStyle, Color color, bool startTimer)
+        {
+            infoText = text;
+            infoTextColor = color;
+            infoTextFont = new Font(infoTextFont, fontStyle);
+
+            infoTextAlpha = 255;
+            if (startTimer)
+            {
+                infoTimer.Start();
+                infoTimerCurrentMs = infoTimerMaxMs;
+            }
+        }
+
 
         //Corrige as variáveis do botão de microfone
         public void CorrectMicButton(bool setOnlyTargets = false)
@@ -484,8 +539,8 @@ namespace Vados
         {
             if (keyData == Keys.Enter && ActiveControl == txtComando && txtComando.Text != "")
             {
-                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
-                PerformCommand(command, false);
+                //string command = Comandos.GetClosestMatch(txtComando.Text, Global.VoiceRecognizer.hints);
+                PerformCommand(txtComando.Text, false);
                 return true;
             }
 
@@ -498,6 +553,7 @@ namespace Vados
         private void pnlBottom_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
             #region BOTÃO DO MICROFONE
 
@@ -558,7 +614,7 @@ namespace Vados
             float drawY = innerY + (innerD - drawH) / 2f;
 
             //Desenhar sombra
-            if (micIcon != loadingMicIcon)
+            if (micIcon != loadingWhiteMicIcon && micIcon != loadingBlueMicIcon)
             {
                 shadowOffset = 4;
                 e.Graphics.DrawImage(micShadow, drawX, drawY + shadowOffset, drawW, drawH);
@@ -671,6 +727,21 @@ namespace Vados
             #endregion
 
 
+            #region INFORMAÇÃO DO COMANDO
+
+            int topMargin = 35;
+            SizeF textSize = e.Graphics.MeasureString(infoText, infoTextFont);
+            int infoTextX = Width / 2 - (int)textSize.Width / 2;
+            int infoTextY = txtComando.Bottom + topMargin;
+            Point infoTextPos = new Point(infoTextX, infoTextY);
+            Color textColor = Color.FromArgb(infoTextAlpha, infoTextColor);
+
+            brush = new SolidBrush(textColor);
+            e.Graphics.DrawString(infoText, infoTextFont, brush, infoTextPos);
+
+            #endregion
+
+
             path.Dispose();
             brush.Dispose();
 
@@ -704,7 +775,7 @@ namespace Vados
             //Checar se o mouse está em dentro do botão
             if (btnSendHovering && txtComando.ForeColor == Color.Black)
             {
-                string command = Comandos.CorrectText(txtComando.Text, Global.VoiceRecognizer.hints);
+                string command = Comandos.GetClosestMatch(txtComando.Text, Global.VoiceRecognizer.hints);
                 PerformCommand(command, false);
             }
 
@@ -713,7 +784,7 @@ namespace Vados
 
         private void pnlBottom_Resize(object sender, EventArgs e)
         {
-            #region AJUSTAR LABEL
+            #region AJUSTAR LABELS (O que você deseja fazer?)
 
             int labelX = this.Width / 2 - lblText.Width / 2;
             int labelY = txtComando.Top - lblText.Height - 40;
@@ -915,6 +986,31 @@ namespace Vados
             audioSeconds += 1;
         }
 
+        //Timer da informação do comando
+        private void infoTimer_Tick(object? sender, EventArgs e)
+        {
+            infoTimerCurrentMs -= infoTimer.Interval;   //Diminuir tempo
+            infoTimerCurrentMs = Math.Max(infoTimerCurrentMs, 0);
+
+            //Definir opacidade do texto
+            float fadeOutMs = 300;
+            float alpha = infoTextAlpha;
+
+            if (infoTimerCurrentMs <= fadeOutMs)
+            {
+                alpha = (float)infoTimerCurrentMs / fadeOutMs * 255f;
+            }
+
+            infoTextAlpha = (int)Math.Ceiling(alpha);
+
+            //Parar timer quando alpha for 0
+            if (infoTimerCurrentMs == 0)
+            {
+                infoTimer.Stop();
+            }
+        }
+
+
         //Acontece quando há silêncio por determinado tempo no comando de voz
         private async void OnSilence(object sender, EventArgs e)
         {
@@ -922,16 +1018,77 @@ namespace Vados
         }
 
 
-
         //Botão do manual
+        private void btnManual_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnManual.Height - btnManual.Width) / 2;
+
+            //Sombra
+            e.Graphics.DrawImage(btnManualShadow, new Rectangle(0, yy + 3, btnManual.Width, btnManual.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnManual.Image, new Rectangle(0, yy, btnManual.Width, btnManual.Width));
+        }
+
         private void btnManual_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlManual));
-        private void btnManual_MouseEnter(object sender, EventArgs e) => btnManual.Image = btnManualImageHover;
-        private void btnManual_MouseLeave(object sender, EventArgs e) => btnManual.Image = btnManualImage;
+        private void btnManual_MouseEnter(object sender, EventArgs e)
+        {
+            btnManual.Image = btnManualImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Manual";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnManual.Location.X + btnManual.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnManual.Location.Y + btnManual.Height;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+        private void btnManual_MouseLeave(object sender, EventArgs e)
+        {
+            btnManual.Image = btnManualImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
+
 
         //Botão das configurações
+        private void btnConfigs_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnConfigs.Height - btnConfigs.Width) / 2;
+
+            //Sombra
+            e.Graphics.DrawImage(btnConfigsShadow, new Rectangle(0, yy + 3, btnConfigs.Width, btnConfigs.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnConfigs.Image, new Rectangle(0, yy, btnConfigs.Width, btnConfigs.Width));
+        }
+
         private void btnConfigs_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        private void btnConfigs_MouseEnter(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImageHover;
-        private void btnConfigs_MouseLeave(object sender, EventArgs e) => btnConfigs.Image = btnConfigsImage;
+        private void btnConfigs_MouseEnter(object sender, EventArgs e)
+        {
+            btnConfigs.Image = btnConfigsImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Configurações";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnConfigs.Location.X + btnConfigs.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnConfigs.Location.Y + btnConfigs.Height;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+        private void btnConfigs_MouseLeave(object sender, EventArgs e)
+        {
+            btnConfigs.Image = btnConfigsImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
+
 
         //Botão do histórico
         private bool historyOpen = false;
@@ -942,8 +1099,18 @@ namespace Vados
             set { historyOpen = value; } 
         }
 
+        private void btnHistory_Paint(object sender, PaintEventArgs e)
+        {
+            int yy = (btnHistory.Height - btnHistory.Width) / 2;
 
-        private void btnHistorico_Click(object sender, EventArgs e)
+            //Sombra
+            e.Graphics.DrawImage(btnHistoryShadow, new Rectangle(0, yy + 3, btnHistory.Width, btnHistory.Width));
+
+            //Imagem normal
+            e.Graphics.DrawImage(btnHistory.Image, new Rectangle(0, yy, btnHistory.Width, btnHistory.Width));
+        }
+
+        private void btnHistory_Click(object sender, EventArgs e)
         {
             var parentForm = FindForm() as Form1;
             if (!historyOpen)
@@ -960,8 +1127,28 @@ namespace Vados
 
         }
 
-        //private void btnHistorico_MouseEnter(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImageHover;
-        //private void btnHistorico_MouseLeave(object sender, EventArgs e) => btnHistorico.Image = btnHistoryImage;
+        private void btnHistory_MouseEnter(object sender, EventArgs e)
+        {
+            btnHistory.Image = btnHistoryImageHover;
+
+            //Nome do botão
+            lblButtonName.Text = "Histórico";
+
+            Global.LabelFitWidth(lblButtonName);
+            int btnX = btnHistory.Location.X + btnHistory.Width / 2 - lblButtonName.Width / 2;
+            int btnY = btnHistory.Location.Y + btnHistory.Height;
+            lblButtonName.Location = new Point(btnX, btnY);
+
+            lblButtonName.Visible = true;
+            lblButtonName.Enabled = true;
+        }
+
+        private void btnHistory_MouseLeave(object sender, EventArgs e)
+        {
+            btnHistory.Image = btnHistoryImage;
+            lblButtonName.Visible = false;
+            lblButtonName.Enabled = false;
+        }
 
 
         //Botão de pausar comando de voz

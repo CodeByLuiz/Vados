@@ -21,7 +21,7 @@ namespace Vados
         CommandCriteria criteria;
         bool isErrorMessage = false;
         public UserControl userControl;
-        private string ComandoBdTxt;
+        private string commandText;
 
         Image btnCloseImage;
         Image btnCloseImageHover;
@@ -40,21 +40,19 @@ namespace Vados
         );
 
 
-        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string txtbd="")
+        public FormMessage(CommandCriteria criteria_, bool isErrorMessage_, string messageRtf = "", string commandText_ = "")
         {
             InitializeComponent();
             criteria = criteria_;
             isErrorMessage = isErrorMessage_;
-
-            ComandoBdTxt = txtbd;
+            commandText = commandText_;
 
             //Imagens
             btnCloseImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeIcon.png"));
             btnCloseImageHover = Global.ImageChangeBrightness(btnCloseImage, 0.25f);
 
             //Definir mensagem
-            var messageFont = new Font("Segoe UI", 11f);
-            txtMessage.Rtf = Global.RtfChangeFont(messageRtf, messageFont);
+            txtMessage.Rtf = messageRtf;
 
             //Otimizar pintura
             this.DoubleBuffered = true;
@@ -69,6 +67,12 @@ namespace Vados
         private void FormMessage_Load(object sender, EventArgs e)
         {
             Form1 parentForm = (Form1)Owner;
+
+            //Definir fontes
+            lblTitle.Font = new Font(Fonts.MavenRegular, 16, FontStyle.Bold);
+            btnConfirm.Font = new Font(Fonts.DarkerMedium, 12);
+            btnCancel.Font = new Font(Fonts.DarkerMedium, 12);
+            txtMessage.Font = new Font(Fonts.DarkerMedium, 14);
 
             //Mensagem de erro
             if (isErrorMessage)
@@ -103,15 +107,17 @@ namespace Vados
                 }
             }
 
+            txtMessage.Rtf = Global.RtfChangeFont(txtMessage.Rtf, txtMessage.Font, new Font(Fonts.DarkerExtraBold, 14));
+
 
             //Ajustar tamanho do form para caber a mensagem
             Global.TextBoxFitHeight(txtMessage);
-            int messageMarginBottom = 20;
+            int messageMarginBottom = 18;
             int minDistance = txtMessage.Top - lblTitle.Bottom + messageMarginBottom;
             int actualDistance = btnConfirm.Top - txtMessage.Bottom;
 
-            this.Height += minDistance - actualDistance;
-            this.StartPosition = FormStartPosition.CenterScreen;
+            Height += minDistance - actualDistance;
+            StartPosition = FormStartPosition.CenterScreen;
 
             //Corrigir posição do ícone ao lado do título
             Global.LabelFitWidth(lblTitle);
@@ -143,7 +149,7 @@ namespace Vados
         }
 
 
-        private void FocusCommand(bool clear = false)
+        void FocusCommand(bool clear = false)
         {
             UserControlHome page = (UserControlHome)userControl;
             page.FocusCommand(clear);
@@ -156,6 +162,7 @@ namespace Vados
         {
             string commandType = criteria.Action;
             string objectType = criteria.ObjectType;
+            string objectPath = criteria.ObjectPath;
             string name = criteria.ObjectName;
             string newName = criteria.ObjectNewName;
             string format = criteria.ObjectFormat;
@@ -166,15 +173,19 @@ namespace Vados
             string sizeUnit = criteria.SizeUnit;
             string sizeModifier = criteria.SizeModifier;
 
-            textBox.Text = "Você deseja";
+            bool isBrowser = objectType == "site" && name == "navegador" && objectPath != "";
+            bool isRecycleBin = name == "lixeira" && objectPath != "";
+            bool isDefaultFolder = objectType == "pasta" && Comandos.defaultFolderWords.Contains(name) && objectPath != "";
+            if (isDefaultFolder) name = "pasta padrão (Vados)";
 
+            textBox.Text = "Você deseja";
+            string commandConnector = "";
+            Font bold = new Font(textBox.Font, FontStyle.Bold);
 
             //Comando
-            string commandConnector = "";
-
             if (commandType != "")
             {
-                Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, bold);
 
                 //Conector após comando
                 switch (commandType)
@@ -183,6 +194,13 @@ namespace Vados
                         commandConnector = " um ";
                         if (objectType == "pasta") commandConnector = " uma ";
                         break;
+
+                    case "abrir":
+                        commandConnector = " o ";
+                        if (objectType == "pasta") commandConnector = " a ";
+                        if (isRecycleBin) commandConnector = " a ";
+                        break;
+
                     default:
                         commandConnector = " o ";
                         if (objectType == "pasta") commandConnector = " a ";
@@ -212,9 +230,13 @@ namespace Vados
             //Objeto
             if (objectType != "")
             {
-                string objectStr = objectType;
+                string objectStr = " " + objectType;
                 if (amount != "") objectStr += "s";
-                Global.AppendPlainText(textBox, commandConnector + objectType);
+
+                Global.AppendPlainText(textBox, commandConnector);  //"o", "a", "todos os", etc
+
+                if (objectType != "aplicativo" && !isBrowser && !isDefaultFolder) //Exceções
+                    Global.AppendPlainText(textBox, objectType);  //"arquivo", "pasta", etc
             }
 
 
@@ -232,8 +254,10 @@ namespace Vados
                 if (objectType == "pasta") connector = " chamada";
                 if (amount != "") connector += "s";
 
-                Global.AppendPlainText(textBox, connector + " ");
-                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, FontStyle.Bold);
+                if (objectType != "aplicativo" && !isBrowser && !isRecycleBin && !isDefaultFolder) //Exceções
+                    Global.AppendPlainText(textBox, connector + " ");   //"chamado", "de nome", etc
+
+                Global.AppendFormattedText(textBox, name, Colors.greenHighlight, bold);     //Nome
             }
 
 
@@ -270,7 +294,7 @@ namespace Vados
                 if (amount != "") insideIndicator = " presentes na pasta ";
 
                 Global.AppendPlainText(textBox, insideIndicator);
-                Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, bold);
             }
 
 
@@ -292,7 +316,7 @@ namespace Vados
 
 
                 Global.AppendPlainText(textBox, destinationIndicator);
-                Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, bold);
             }
 
 
@@ -300,7 +324,7 @@ namespace Vados
             if (newName != "")
             {
                 Global.AppendPlainText(textBox, " para ");
-                Global.AppendFormattedText(textBox, newName, Colors.greenHighlight, FontStyle.Bold);
+                Global.AppendFormattedText(textBox, newName, Colors.greenHighlight, bold);
             }
 
 
@@ -377,7 +401,104 @@ namespace Vados
 
         #endregion
 
-        
+
+        #region INFORMAÇÃO DO COMANDO
+
+        private string CommandInfoGetProgress(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            string obj = objectType;
+            if (amount != "")
+                obj += "s";
+
+
+            switch(action)
+            {
+                //Criar
+                case "criar":
+                    return "Criando " + objectType + "...";
+
+                //Demais comandos
+                default:
+                    return "Procurando " + obj + "...";
+            }
+        }
+
+
+        private string CommandInfoGetConfirmation(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            //Tipo de objeto (primeira letra maiúscula)
+            string obj = char.ToUpper(objectType[0]) + objectType.Substring(1);
+
+            //Terminações das palavras no plural
+            string termination = "o";
+            if (amount != "")
+            {
+                obj += "s";
+                termination = "as";
+            }
+
+
+            //Verbo (comando)
+            string verb = "";
+
+            switch (action)
+            {
+                case "criar":
+                    verb = "criad";
+                    break;
+
+                case "renomear":
+                    verb = "renomead";
+                    break;
+
+                case "excluir":
+                    verb = "excluid";
+                    break;
+
+                case "mover":
+                    verb = "movid";
+                    break;
+
+                case "duplicar":
+                    verb = "duplicad";
+                    break;
+
+                case "abrir":
+                    verb = "abert";
+                    break;
+            }
+
+            return obj + " " + verb + termination + " com sucesso!";
+        }
+
+
+        private string CommandInfoGetError(CommandCriteria criteria)
+        {
+            string action = criteria.Action;
+            string objectType = criteria.ObjectType;
+            string amount = criteria.ObjectAmount;
+
+            string obj = objectType;
+
+            if (amount != "")
+                obj += "s";
+
+
+            return "Erro ao " + action + " " + obj;
+        }
+
+
+        #endregion
+
+
 
         //Botões de confrmar e cancelar
         private void btnCancel_Click(object sender, EventArgs e)
@@ -404,15 +525,53 @@ namespace Vados
             else
             {
                 Form1 form = (Form1)Owner;
+                UserControlHome home = (UserControlHome)userControl;
                 CommandCriteria criteriaCopy = criteria;
 
                 _ = Task.Run(async () =>    //Iniciar uma task, que realiza o código separadamente quando terminar
                 {
                     try
                     {
-                        //Realizar comando
+                        //Desabilitar outros comandos enquanto o atual estiver sendo executado
+                        form.BeginInvoke((MethodInvoker)(() =>
+                        {
+                            home.SetMicLoadingIcon(true, "loadingBlue");
+                            home.TextBoxReset(commandText + "...", false);
+
+                            //Mostrar informação do comando
+                            string info = CommandInfoGetProgress(criteria);
+                            home.UpdateCommandInfoLabel(info, FontStyle.Regular, Color.Black, false);
+                        }));
+
+
+                        //Executar comando
                         var errorMessage = await Comandos.ExecuteCommand(criteria);
-                       
+
+
+                        //Reabilitar outros comandos
+                        form.BeginInvoke((MethodInvoker)(() =>
+                        {
+                            home.SetMicLoadingIcon(false);
+                            home.TextBoxWrite("");
+                            FocusCommand(false);
+
+                            //Mostrar confirmação/erro do comando
+                            string info;
+                            if (errorMessage == "")
+                            {
+                                //Sucesso
+                                info = CommandInfoGetConfirmation(criteria);
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.greenHighlight, true);
+                            }
+                            else
+                            {
+                                //Falha
+                                info = CommandInfoGetError(criteria);
+                                home.UpdateCommandInfoLabel(info, FontStyle.Bold, Colors.redErrorDark, true);
+                            };
+                        }));
+
+
                         //Mostrar mensagem de erro
                         if (errorMessage != "")
                         {
@@ -421,12 +580,12 @@ namespace Vados
                                 form.ShowPopupMessage(true, form, userControl, criteriaCopy, errorMessage);
                             }));
                         }
-                        else if (!String.IsNullOrEmpty(ComandoBdTxt))
+                        //Salvar comando no banco de dados
+                        else if (!String.IsNullOrEmpty(commandText))
                         {
                             BancoDeDados.AdicionarEntrada(
-                             comando: ComandoBdTxt,
-                             titulo: $"{criteria.Action} {criteria.ObjectType} "
-                             
+                                comando: commandText,
+                                titulo: $"{criteria.Action} {criteria.ObjectType} " 
                             );
                         }
                     }

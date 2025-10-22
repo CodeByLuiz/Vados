@@ -35,14 +35,14 @@ namespace Vados
                 if (!Directory.Exists(modelPath))
                     throw new DirectoryNotFoundException($"Modelo não encontrado: {modelPath}");
 
-                MessageBox.Show("modelo encontrado");
+                //MessageBox.Show("modelo encontrado");
                 Vosk.Vosk.SetLogLevel(0);
                 model = new Model(modelPath);
                 recognizer = new VoskRecognizer(model, 16000.0f);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
             }
         }
 

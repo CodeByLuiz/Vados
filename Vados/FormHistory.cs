@@ -19,19 +19,22 @@ namespace Vados
     public partial class FormHistory : Form
     {
         private OptmizedPanel historyPanel;
-        private List<HistoryEntry> entradas = new List<HistoryEntry>();
+       // private List<HistoryEntry> entradas = new List<HistoryEntry>();
         private System.Windows.Forms.Timer timer;
         private Label title;
+       
 
 
 
-        private int margin = 10;
+        private int rectangleSideMargin = 17;
+        private int rectangleBottomMargin = 15;
         private int rectangleHeight = 115;
         private int rectangleWidth;
         private int spacing;
         private int startY;
         private Color entryColor = Global.ChangeColorBrightness(ColorTranslator.FromHtml("#F0F5FF"), -0.1f);
-
+        private Form1 parentForm;
+        private int scrollBarWidth = 5;
 
 
 
@@ -45,7 +48,7 @@ namespace Vados
             int nHeightEllipse
         );
 
-        public FormHistory()
+        public FormHistory(Form1 parent)
         {
             InitializeComponent();
 
@@ -56,8 +59,12 @@ namespace Vados
                      ControlStyles.AllPaintingInWmPaint, true);
 
             this.Paint += new PaintEventHandler(FormHistory_Paint);
+
+            LostFocus += FormHistory_LostFocus;
             this.BackColor = Color.LimeGreen;
             this.TransparencyKey = Color.LimeGreen;
+
+            parentForm = parent;
 
             title = new Label
             {
@@ -85,24 +92,36 @@ namespace Vados
 
             };
 
+            PictureBox btnExit = new PictureBox
+            {
+                Size = new Size(25, 25),
+                Cursor = Cursors.Hand,
+                BackColor= Color.White,
+                BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\closeicon.png")),
+                BackgroundImageLayout = ImageLayout.Zoom,
+
+
+            };
+
 
           
             
             this.Controls.Add(historyPanel);
             this.Controls.Add(title);
+            this.Controls.Add(btnExit);
             
+            //ajustes de posicionamento e tamanho que só podem ser feitos após o negocio ja estar criado no form 😭
             title.BringToFront();
+            
+            rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;// - scrollBarWidth;
+            btnExit.Location = new Point((this.Width - 20) - (btnExit.Width), 20);
+            
+            void ExitForm(object sender, EventArgs e) 
+            {
+                parentForm.CloseHistoryTab();
+            }
 
-            rectangleWidth = historyPanel.ClientSize.Width - 35;
-
-
-            //MessageBox.Show("form: " + this.Height.ToString() + " panel: " + historyPanel.Height.ToString());
-
-            // Timer pra repintar 
-            timer = new System.Windows.Forms.Timer();
-            timer.Interval = 16;
-            timer.Tick += Timer_Tick;
-
+            btnExit.Click += ExitForm;
             this.Resize += FormHistory_Resize_1;
         }
 
@@ -110,6 +129,7 @@ namespace Vados
         public void FormHistory_Load(object sender, EventArgs e)
         {
             LoadCommands();
+            
         }
 
 
@@ -117,78 +137,68 @@ namespace Vados
         {
             if (historyPanel == null)
                 return;
-            //historyPanel.SuspendLayout();
-
-
-
-            //tamanho
 
             
-            spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
-            startY = spacing;
+            //spacing = ((historyPanel.ClientSize.Width - rectangleWidth) / 2);
+            spacing = 20;
+            historyPanel.Height = this.Height - (title.Location.Y + title.Height) - spacing * 2;
 
-            historyPanel.Height = this.Height - (title.Location.Y + title.Height)-spacing;
-            
 
             //posição
-            title.Location = new Point((historyPanel.Width / 2) - (title.Width / 2), startY);
-            historyPanel.Top = title.Bottom;
-            
+            title.Left = (historyPanel.Width / 2) - (title.Width / 2);
+            title.Top = spacing;
+            historyPanel.Top = title.Bottom + spacing;
 
-            //MessageBox.Show($"form {this.Height.ToString()} {this.Width.ToString()} \npanel {historyPanel.Height.ToString()} {historyPanel.Width.ToString()}");
-            //historyPanel.ResumeLayout();
+            entriesHVerification();
         }
 
         private void LoadCommands()
         {
-            
 
-            historyPanel.Controls.Clear(); 
 
-            using (var db = new BancoDeDados.DbConnection())
+            historyPanel.Controls.Clear();
+
+            Global.InitializeDb();
+
+
+            startY = 0;
+            int lastDrawnY = 0;
+
+
+
+            foreach (var entry in Global.entradas)
             {
-                db.Database.EnsureCreated();
-                entradas = db.Historico
-                             .OrderByDescending(e => e.Data)
-                             .ToList();
-            }
-
-            startY = spacing;
-            foreach (var entry in entradas)
-            {
-                int posX = (historyPanel.ClientSize.Width - rectangleWidth) / 2;
                 string HistoryTitle = char.ToUpper(entry.Comandotitle[0]) + entry.Comandotitle.Substring(1).ToLower(); // titulo com a primeira letra maiuscula
 
                 OptmizedPanel entryPanel = new OptmizedPanel
                 {
-                    Location = new Point(posX, startY),
+                    Location = new Point(rectangleSideMargin, startY),
 
                     Size = new Size(rectangleWidth, rectangleHeight),
                     BackColor = entryColor,
                     BorderStyle = BorderStyle.None,
                     Padding = new Padding(5)
-                    
+
 
 
 
                 };
-                
+
                 Label lbltitle = new Label
                 {
                     Text = $"{HistoryTitle}",
                     Location = new Point(10, 5),
                     AutoSize = true,
-                    
+
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 14, FontStyle.Bold),
-                  
+
 
 
                 };
                 Label lbl = new Label
                 {
                     Text = $"{entry.Comando}",
-                    Location = new Point(lbltitle.Location.X + 2, lbltitle.Location.Y + lbltitle.Height + 2),
                     // AutoSize = false,
                     ForeColor = Color.Black,
                     Font = new Font("Arial", 12, FontStyle.Regular),
@@ -198,7 +208,7 @@ namespace Vados
 
                 };
 
-                Label lblData = new Label 
+                Label lblData = new Label
                 {
                     Text = $"{entry.Data.ToString("g", CultureInfo.CurrentCulture)}",
                     AutoSize = true,
@@ -246,31 +256,16 @@ namespace Vados
                 entryPanel.Controls.Add(btnEditar);
                 entryPanel.Controls.Add(btnExcluir);
 
-                
-                //ajusta a posição dos elementos necessarios
-                btnEditar.Location = new Point(10,entryPanel.Height-btnEditar.Height-5);
-                btnEditar.BringToFront();
-
-                btnExcluir.Location = new Point(btnEditar.Location.X +btnExcluir.Width+15, btnEditar.Location.Y);
-                btnExcluir.BringToFront();
-
-                lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
-
-
-                //ajusta o tamanho de elementos necessarios
-                lbl.Width = rectangleWidth - lbl.Location.X - 10;
-                lbl.Height =rectangleHeight-( rectangleHeight-btnEditar.Location.Y) - (lbltitle.Location.Y+lbltitle.Height);
 
                 // Faz o hover bonito
-                void HoverEnter(object sender, EventArgs e) 
+                void HoverEnter(object sender, EventArgs e)
                 {
-                   
-                    entryPanel.BackColor = Global.ChangeColorBrightness(entryColor,-0.1f);
-                   // lbl.ForeColor = Color.Black; 
-                    
+
+                    entryPanel.BackColor = Global.ChangeColorBrightness(entryColor, -0.1f);
+
                 }
-                void HoverLeave(object sender, EventArgs e) 
-                { 
+                void HoverLeave(object sender, EventArgs e)
+                {
                     entryPanel.BackColor = entryColor;
                     //lbl.ForeColor = Colors.bluePrimary;
                 }
@@ -288,7 +283,7 @@ namespace Vados
                 void EditHoverEnter(object sender, EventArgs e)
                 {
                     btnEditar.BackgroundImage = Image.FromFile(Path.Combine(Application.StartupPath, @"Images\Icons\editiconhover.png"));
-                    
+
                 }
 
                 void EditHoverLeave(object sender, EventArgs e)
@@ -304,8 +299,12 @@ namespace Vados
                 void EditEntry(object sender, EventArgs e)
                 {
                     Global.userControlHome.TxtComandoEditar = entry.Comando;
-                    Global.userControlHome.HistoryOpen = false;
-                    this.Close();
+
+                    parentForm.CloseHistoryTab();
+                }
+                void ResizeEntryPanel(object sender, EventArgs e)
+                {
+                    entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle,lbl, entryPanel);
                 }
 
                 // Adiciona os eventos aos elementos
@@ -328,18 +327,64 @@ namespace Vados
                 btnEditar.MouseEnter += EditHoverEnter;
                 btnEditar.MouseLeave += EditHoverLeave;
 
-
                 btnExcluir.Click += DeleteEntry;
                 btnEditar.Click += EditEntry;
 
-                startY += rectangleHeight + margin;
+                entryPanel.Resize += ResizeEntryPanel;
 
+                startY += rectangleHeight + rectangleBottomMargin;
+                lastDrawnY = entryPanel.Bottom + rectangleBottomMargin;
+                entryPositionFix(btnEditar, btnExcluir, lblData, lbltitle, lbl, entryPanel);
             }
-
-
-            PositionFix();
+            //entriesHVerification();
         }
 
+        void entryPositionFix(PictureBox btnEditar, PictureBox btnExcluir, Label lblData, Label lbltitle,Label lbl, Panel entryPanel)
+        {
+            //ajusta a posição dos elementos necessarios
+            btnEditar.Location = new Point(10, entryPanel.Height - btnEditar.Height - 5);
+            btnEditar.BringToFront();
+
+            btnExcluir.Location = new Point(btnEditar.Location.X + btnExcluir.Width + 15, btnEditar.Location.Y);
+            btnExcluir.BringToFront();
+
+            lblData.Location = new Point(entryPanel.Width - lblData.Width - 5, lbltitle.Location.Y);
+
+            lbl.Location = new Point(lbltitle.Location.X + 2, lbltitle.Location.Y + lbltitle.Height + 2);
+            lbl.Width = rectangleWidth - lbl.Location.X - 10;
+            lbl.Height = rectangleHeight - (rectangleHeight - btnEditar.Location.Y) - (lbltitle.Location.Y + lbltitle.Height);
+        }
+
+
+        bool trecoDeControle = false;
+        private void entriesHVerification()
+        {
+
+            int entradaHeight = -rectangleBottomMargin;
+            int visibleFormHeight = historyPanel.Height;
+            foreach(var entry in Global.entradas)
+            {
+                entradaHeight+=rectangleHeight + rectangleBottomMargin;
+            }
+
+            //MessageBox.Show($"entradas: {entradaHeight} visivel: {visibleFormHeight} ");
+            
+            if (entradaHeight > visibleFormHeight && !trecoDeControle)
+            {
+
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2 - scrollBarWidth;
+                LoadCommands();
+                trecoDeControle = true;
+            }
+            else if (entradaHeight <= visibleFormHeight && trecoDeControle )
+            {
+                //MessageBox.Show("cu");
+                rectangleWidth = historyPanel.ClientSize.Width - rectangleSideMargin * 2;
+                LoadCommands();
+                trecoDeControle = false;
+            }
+
+        }
 
         private void FormHistory_Resize_1(object sender, EventArgs e)
         {
@@ -352,21 +397,6 @@ namespace Vados
         {
             historyPanel.Invalidate();
         }
-        private GraphicsPath RectArc(Rectangle rect, int raio) // deixa a borda arredondada
-        {
-            GraphicsPath path = new GraphicsPath();
-
-            int diametro = raio * 2;
-
-            
-            path.AddArc(rect.X, rect.Y, diametro, diametro, 180, 90);
-            path.AddArc(rect.Right - diametro, rect.Y, diametro, diametro, 270, 90);
-            path.AddArc(rect.Right - diametro, rect.Bottom - diametro, diametro, diametro, 0, 90);
-            path.AddArc(rect.X, rect.Bottom - diametro, diametro, diametro, 90, 90); 
-
-            path.CloseFigure();
-            return path;
-        }
 
         private void FormHistory_Paint(object sender, PaintEventArgs e)
         {
@@ -377,22 +407,15 @@ namespace Vados
             Rectangle rect = new Rectangle(0, 0, this.Width, this.Height);
 
 
-           Color cor = Color.White;
+            //Desenhar fundo com bordas arredondadas
+            Brush brush = new SolidBrush(Color.White);
+            GraphicsPath area = Global.RoundedRectangle(new RectangleF(0, 0, Width, Height), 0.05f * Width);
+            e.Graphics.FillPath(brush, area);
+        }
 
-            using (GraphicsPath path = RectArc(rect, raio))
-            {
-
-                using (Brush brush = new SolidBrush(cor)) // preenchimento
-                {
-                    g.FillPath(brush, path);
-                }
-
-                
-                using (Pen pen = new Pen(cor, 2)) // borda coisada
-                {
-                    g.DrawPath(pen, path);
-                }
-            }
+        private void FormHistory_LostFocus(object sender, EventArgs e)
+        {
+            //parentForm.CloseHistoryTab();
         }
     }
 }

@@ -33,6 +33,8 @@ namespace Vados
             overlayForm.Owner = this;
             overlayForm.StartPosition = FormStartPosition.Manual;
             overlayForm.GotFocus += overlayForm_GotFocus;
+
+           
         }
 
         public void ToggleOverlay(bool visible)

@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Vados.BancoDeDados;
 using System.Text.RegularExpressions;
 //using static System.Net.Mime.MediaTypeNames;
 
@@ -18,7 +19,7 @@ namespace Vados
         public static string VoiceRecognitionFolder = "";   //Pasta do modelo de reconhecimento de voz
         public static WhisperRecognizer VoiceRecognizer = null;    //Objeto do reconhecedor de voz
         public static string decibeis = "nao iniciado";
-
+        public static List<HistoryEntry> entradas = new List<HistoryEntry>();
 
 
         #region PRIORIDADES E EXCEÇÕES
@@ -81,9 +82,20 @@ namespace Vados
 
         #endregion
 
+        //Adiciona as entradas do banco de dados para uma lista 👎👎
+          public static void InitializeDb()
+          {
+            using (var db = new BancoDeDados.DbConnection())
+            {
+                db.Database.EnsureCreated();
+                entradas = db.Historico
+                             .OrderByDescending(e => e.Data)
+                             .ToList();
+            }
+          }
 
-        //Inicializar user controls
-        public static UserControlHome userControlHome;
+//Inicializar user controls
+public static UserControlHome userControlHome;
         public static UserControlSettings userControlSettings;
         public static UserControlManual userControlManual;
       

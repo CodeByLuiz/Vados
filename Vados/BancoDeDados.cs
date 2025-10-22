@@ -11,10 +11,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Vados
 {
-    internal class BancoDeDados
+    public class BancoDeDados
     {
 
-        private static readonly string UUIDComando = "computador_id.txt";
+        public static readonly string UUIDComando = "computador_id.txt";
         public class HistoryEntry
         {
             [Key] public int Id { get; set; }
@@ -58,7 +58,7 @@ namespace Vados
             }
 
         }
-        private static Guid ObterComputadorId()
+        public static Guid ObterComputadorId()
         {
             if (File.Exists(UUIDComando))
             {

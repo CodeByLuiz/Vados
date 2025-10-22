@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Vados.BancoDeDados;
+using System.Text.RegularExpressions;
+//using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
 {
@@ -49,20 +51,20 @@ namespace Vados
 
         public static List<string> defaultPriorities = new List<string>
         {
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\AppData\Roaming\Vados"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Favorites"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Desktop"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Documents"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Downloads"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Pictures"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Music"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Videos"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\OneDrive"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Searches"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Contacts"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Links"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\Saved Games"),
-            Path.Combine(driverPath, @"Users\"+Environment.UserName+@"\3D Objects"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Documents\Vados"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Favorites"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Desktop"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Documents"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Downloads"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Pictures"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Music"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Videos"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\OneDrive"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Searches"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Contacts"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Links"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\Saved Games"),
+            Path.Combine(driverPath, @"Users\" + Environment.UserName + @"\3D Objects"),
             //Path.Combine(driverPath, @"Users\"+Environment.UserName+@""),
 
             Path.Combine(driverPath),
@@ -406,8 +408,9 @@ public static UserControlHome userControlHome;
             textBox.AppendText(text);
         }
 
+
         //Adiciona texto formatado a uma RichTextBox
-        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, FontStyle fontStyle)
+        public static void AppendFormattedText(RichTextBox textBox, string text, Color color, Font font)
         {
             //Iniciar seleção no fim da string
             textBox.SelectionStart = textBox.TextLength;
@@ -415,17 +418,20 @@ public static UserControlHome userControlHome;
 
             //Formatar texto
             textBox.SelectionColor = color;
-            textBox.SelectionFont = new System.Drawing.Font(textBox.Font, fontStyle);
+            textBox.SelectionFont = font;
 
             //Adicionar texto
             textBox.AppendText(text);
         }
 
         //Muda apenas a fonte de um rtf (texto formatado)
-        public static string RtfChangeFont(string rtf, Font newFont)
+        public static string RtfChangeFont(string rtf, Font newRegularFont, Font newBoldFont = null)
         {
             var rtb = new RichTextBox();
             rtb.Rtf = rtf;
+
+            if (newBoldFont == null)
+                newBoldFont = new Font(newRegularFont, FontStyle.Bold);
 
             //Mudar fonte de cada caractere
             for (int i = 0; i < rtb.TextLength; i++)
@@ -435,16 +441,46 @@ public static UserControlHome userControlHome;
 
                 if (currentFont != null)
                 {
-                    rtb.SelectionFont = new Font(
-                        newFont.FontFamily,
-                        newFont.Size,
-                        currentFont.Style   //Manter negrito, itálico, etc
-                    );
+                    //Negrito
+                    if (currentFont.Style == FontStyle.Bold)
+                    {
+                        rtb.SelectionFont = new Font(
+                            newBoldFont.FontFamily,
+                            newBoldFont.Size,
+                            newBoldFont.Style
+                        );
+                    }
+                    //Normal
+                    else
+                    {
+                        rtb.SelectionFont = new Font(
+                            newRegularFont.FontFamily,
+                            newRegularFont.Size,
+                            currentFont.Style
+                        );
+                    }
                 }
             }
 
             rtb.Select(0, 0);
             return rtb.Rtf;
+        }
+
+
+        //Encontra a posição do primeiro grupo identificado pelo extrator
+        public static int FindFirstGroupIndex(GroupCollection group)
+        {
+            for (var i = 1; i < group.Count; i++)
+            {
+                MessageBox.Show("valor: " + group[i].Value);
+                if (group[i].Success)
+                {
+                    MessageBox.Show("sucesso");
+                    return group[i].Index;
+                }
+            }
+
+            return -1;
         }
     }
 }

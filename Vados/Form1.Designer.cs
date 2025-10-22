@@ -47,13 +47,13 @@
             ClientSize = new Size(1264, 681);
             Controls.Add(panelContainer);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(960, 540);
+            MinimumSize = new Size(960, 580);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Vados";
             Load += Form1_Load;
-            KeyDown += Form1_KeyDown;
             LocationChanged += Form1_LocationChanged;
+            KeyDown += Form1_KeyDown;
             Resize += Form1_Resize;
             ResumeLayout(false);
         }

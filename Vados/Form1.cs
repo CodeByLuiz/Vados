@@ -54,11 +54,11 @@ namespace Vados
 
 
         //Ativar mensagem
-        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "",string Comandotxt="")
+        public void ShowPopupMessage(bool isErrorMessage, Form form, UserControl userControl, CommandCriteria commandCriteria = null, string messageRtf = "", string commandText = "")
         {
             ToggleOverlay(true);
 
-            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf,txtbd:Comandotxt);
+            var message = new FormMessage(commandCriteria, isErrorMessage, messageRtf, commandText_: commandText);
             message.Owner = form;
             message.userControl = userControl;
             message.Show();
@@ -112,7 +112,7 @@ namespace Vados
 
             var history = new FormHistory(this);
             history.Owner = form;
-            //history.userControl= userControl;
+            //history.userControl = userControl;
             history.Show();
             history.Focus();
             CorrectHistoryForm();
@@ -183,9 +183,10 @@ namespace Vados
             //Eventos de mudar de página (pra cada user control)
             Global.userControlHome.loadPage += LoadPage;
             Global.userControlSettings.loadPage += LoadPage;
+            Global.userControlManual.loadPage += LoadPage;
 
-            
-            
+
+
         }
         
 

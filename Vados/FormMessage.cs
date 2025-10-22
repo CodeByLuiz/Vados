@@ -552,7 +552,7 @@ namespace Vados
                         form.BeginInvoke((MethodInvoker)(() =>
                         {
                             home.SetMicLoadingIcon(false);
-                            home.TextBoxWrite(commandText);
+                            home.TextBoxWrite("");
                             FocusCommand(false);
 
                             //Mostrar confirmação/erro do comando

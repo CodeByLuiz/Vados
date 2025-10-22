@@ -185,9 +185,6 @@ namespace Vados
             var pattern = BuildPattern();
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
-            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Objeto -> " + objectStr);
-
             //Tipo de objeto
             string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
             criteria.ObjectType = obj;
@@ -198,7 +195,8 @@ namespace Vados
             //Trocar palavras de nomeação caso o tipo de objeto seja site
             if (criteria.ObjectType == "site")
             {
-                nominators = new Pattern(Comandos.linkNamingWords, false);
+                List<string> newNominators = nominators.Values.Concat(Comandos.linkNamingWords).ToList();
+                nominators = new Pattern(newNominators, false);
                 match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
             }
 
@@ -210,6 +208,9 @@ namespace Vados
                 match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
             }
 
+            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            MessageBox.Show("Objeto -> " + objectStr);
+
             #endregion
 
             //Formato do objeto
@@ -217,7 +218,7 @@ namespace Vados
 
             //Quantidade
             criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
-
+            
             //Nome do objeto
             string objName = match.Groups[9].Success ? match.Groups[9].Value :
                             match.Groups[10].Success ? match.Groups[10].Value :
@@ -227,20 +228,27 @@ namespace Vados
 
             //Idenfificar nome composto sem aspas
             int nameGroup = 11;
+            int startIndex = match.Groups[nameGroup].Index;
+            bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
 
             if (match.Groups[nameGroup].Success)
             {
-                //Posição de parada do nome
-                int stopIndex = command.Length;
-                if (criteria.PostObjectNameIndex != -1)
+                if (hasName)
                 {
-                    stopIndex = criteria.PostObjectNameIndex;
-                }
+                    //Posição de parada do nome
+                    int stopIndex = command.Length;
+                    if (criteria.PostObjectNameIndex != -1)
+                    {
+                        stopIndex = criteria.PostObjectNameIndex;
+                    }
 
-                int startIndex = match.Groups[nameGroup].Index;
-                int nameLength = stopIndex - startIndex;
-                MessageBox.Show(startIndex.ToString() + " " + stopIndex.ToString());
-                objName = command.Substring(startIndex, nameLength).Trim();
+                    int nameLength = stopIndex - startIndex;
+                    objName = command.Substring(startIndex, nameLength).Trim();
+                }
+                else
+                {
+                    objName = "";
+                }
             }
 
             //Checar se o nome não é uma das palavras de parada
@@ -348,8 +356,7 @@ namespace Vados
 
 
                 //Palavra após o nome do objeto
-                if (criteria.PostObjectNameIndex == -1)
-                    criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
+                criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
             }
 
             string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -406,6 +413,8 @@ namespace Vados
                         stopIndex = criteria.PostOriginNameIndex;
                     }
 
+                    MessageBox.Show(criteria.PostOriginNameIndex.ToString());
+
                     int startIndex = match.Groups[nameGroup].Index;
                     int nameLength = stopIndex - startIndex;
                     criteria.Origin = command.Substring(startIndex, nameLength).Trim();
@@ -419,12 +428,10 @@ namespace Vados
 
 
                 //Palavra após o nome do objeto
-                if (criteria.PostObjectNameIndex == -1)
-                    criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
+                criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
 
                 //Palavra após o novo nome do objeto
-                if (criteria.PostNewNameIndex == -1)
-                    criteria.PostNewNameIndex = Global.FindFirstGroupIndex(match.Groups);
+                criteria.PostNewNameIndex = Global.FindFirstGroupIndex(match.Groups);
             }
 
             string originStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -490,13 +497,10 @@ namespace Vados
 
                 //Palavra após o nome do objeto
                 int index = Global.FindFirstGroupIndex(match.Groups);
-
-                if (criteria.PostObjectNameIndex == -1)
-                    criteria.PostObjectNameIndex = index;
+                criteria.PostObjectNameIndex = index;
 
                 //Palavra após o novo nome do objeto
-                if (criteria.PostNewNameIndex == -1)
-                    criteria.PostNewNameIndex = index;
+                criteria.PostNewNameIndex = index;
 
                 //Palavra após o nome da pasta de origem
                 criteria.PostOriginNameIndex = index;
@@ -550,8 +554,7 @@ namespace Vados
 
 
                 //Palavra após o nome do objeto
-                if (criteria.PostObjectNameIndex == -1)
-                    criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
+                criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
             }
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));

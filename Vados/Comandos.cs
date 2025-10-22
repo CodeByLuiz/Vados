@@ -24,6 +24,7 @@ using NAudio.Wave;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
 using System.Reflection.Metadata.Ecma335;
+//using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
 {
@@ -77,6 +78,7 @@ namespace Vados
             "[INAUDÍVEL]",
             "[inaudible]",
             "[Inaudible]",
+            "[INAUDIBLE]",
             "[ruído]",
             "[Ruído]",
             "[RUÍDO]",
@@ -92,6 +94,22 @@ namespace Vados
         public static List<string> extraSpeechWords = new List<string>()
         {
             "para",
+        };
+
+        //Palavras comumente confundidas
+        public static Dictionary<string, string> commonErrorSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            //Vados
+            { "matos", "Vados" },
+            //Criar
+            { "fiar", "criar" },
+            //Renomear
+            { "renomei", "renomeie" },
+            { "procar", "trocar" },
+            //Duplicar
+            { "piar", "copiar" },
+            //Arquivo
+            { "aqui o", "arquivo" },
         };
 
         #endregion
@@ -349,6 +367,7 @@ namespace Vados
         public static List<string> defaultFolderWords = new List<string>()
         {
             "padrao",
+            "padrão",
             "nativa",
             "do app",
             "do aplicativo",
@@ -577,12 +596,28 @@ namespace Vados
             "do",
             "pertencente a",
             "pertencentes a",
+            "associado a",
+            "associada a",
+            "associados a",
+            "associadas a",
+            "ligado a",
+            "ligada a",
+            "ligados a",
+            "associadas a",
             "que pertence a",
             "que pertencem a",
             "que esta dentro da",
             "que estao dentro da",
+            "que estiver dentro da",
+            "que estiverem dentro da",
             "que esta no interior da",
             "que estao no interior da",
+            "que estiver no interior da",
+            "que estiverem no interior da",
+            "que esta presente na",
+            "que estao presentes na",
+            "que estiver presente na",
+            "que estiverem presentes na",
         };
 
 
@@ -759,9 +794,9 @@ namespace Vados
                 case "renomear":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new OriginExtractor(fromWords, folderWords, namingWords),
                         new NewNameExtractor(),
-                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
@@ -769,8 +804,8 @@ namespace Vados
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                     });
                     break;
@@ -779,9 +814,9 @@ namespace Vados
                 case "mover":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new DestinationExtractor(insideWords, folderWords, namingWords, true),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                     });
                     break;
@@ -790,9 +825,9 @@ namespace Vados
                 case "duplicar":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new DestinationExtractor(insideWords, folderWords, namingWords),
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
@@ -1257,11 +1292,17 @@ namespace Vados
             return text;
         }
 
+        
+        //Corrige as palavras no texto que são comumente confundidas no comando de voz
+        public static string CorrectCommonErrors(string command, Dictionary<string, string> corrections)
+        {
+            foreach (var pair in corrections)
+            {
+                command = command.Replace(pair.Key, pair.Value);
+            }
 
-        //public static string CorrectCommonErrors()
-        //{
-
-        //}
+            return command;
+        }
 
 
         //Corrige o texto com as palavras mais parecidas

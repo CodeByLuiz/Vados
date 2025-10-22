@@ -317,15 +317,16 @@ namespace Vados
             audioTimer.Stop();  //Parar timer
 
 
-            //Transcrever audio
+            //Transcrever áudio
             TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
+            result = result.Replace("\"", "");
             result = Comandos.CleanText(result);
-            //result = Comandos.GetClosestMatch(result, Global.VoiceRecognizer.hints);
+            result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);
 
             //Realizar comando
-            PerformCommand(result, true);
             TextBoxWrite(result);
+            PerformCommand(result, true);
             hasTranscribedAudio = true;
 
             //Resetar botão do microfone

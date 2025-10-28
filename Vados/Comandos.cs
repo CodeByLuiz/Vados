@@ -796,7 +796,7 @@ namespace Vados
                     {
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new OriginExtractor(fromWords, folderWords, namingWords),
-                        new NewNameExtractor(),
+                        new NewNameExtractor(true),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
@@ -804,8 +804,8 @@ namespace Vados
                 case "excluir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
-                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new OriginExtractor(fromWords, folderWords, namingWords),
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, fromWords, true),
                     });
                     break;
@@ -846,7 +846,7 @@ namespace Vados
             }
 
             var arguments = parser.Parse(command);
-            MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
+            //MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
 
             return arguments;
         }
@@ -1110,6 +1110,7 @@ namespace Vados
 
                 //Renomear
                 case "renomear":
+                    //Realizar comando
                     if (objectType == "pasta") { return await RenomearPasta(name, newName, originPath); }
                     if (objectType == "arquivo") { return await RenomearArquivo(name, newName, originPath); }
                     break;
@@ -2044,7 +2045,10 @@ namespace Vados
 
         public static async Task<string> RenomearArquivo(string name, string newName, string originPath)
         {
+            //MessageBox.Show(name);
             string path = (await SearchPaths(name, false, rootFolder: originPath)).FirstOrDefault();
+            //MessageBox.Show(path);
+
 
             //---------ERRO: arquivo não encontrado---------
             if (string.IsNullOrEmpty(path))
@@ -2072,7 +2076,10 @@ namespace Vados
 
         public static async Task<string> RenomearPasta(string name, string newName, string originPath)
         {
+            //MessageBox.Show(name);
             string path = (await SearchPaths(name, true, rootFolder: originPath)).FirstOrDefault();
+            //MessageBox.Show(path);
+
 
             //---------ERRO: pasta não encontrada---------
             if (string.IsNullOrEmpty(path))

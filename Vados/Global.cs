@@ -468,19 +468,63 @@ public static UserControlHome userControlHome;
 
 
         //Encontra a posição do primeiro grupo identificado pelo extrator
-        public static int FindFirstGroupIndex(GroupCollection group)
+        public static int FindFirstGroupIndex(GroupCollection groups)
         {
-            for (var i = 1; i < group.Count; i++)
+            for (var i = 1; i < groups.Count; i++)
             {
-                MessageBox.Show("valor: " + group[i].Value);
-                if (group[i].Success)
+                //MessageBox.Show("valor: " + groups[i].Value);
+                if (groups[i].Success)
                 {
-                    MessageBox.Show("sucesso");
-                    return group[i].Index;
+                    //MessageBox.Show("sucesso");
+                    return groups[i].Index;
                 }
             }
 
             return -1;
+        }
+
+        public static int FindLastGroupIndex(GroupCollection groups)
+        {
+            //MessageBox.Show("count: " + groups.Count.ToString());
+            for (var i = groups.Count - 1; i > 1; i--)
+            {
+                if (groups[i].Success)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+
+        //Checa se há algum outro grupo no regex que identificou a mesma palavra
+        public static bool RegexHasSameGroup(GroupCollection groups, int checkedGroup, int[] ignoredGroups = null)
+        {
+            for(int i = checkedGroup - 1; i > 1; i--)
+            {
+                //Ignorar grupos especificados
+                bool ignore = false;
+                if (ignoredGroups != null)
+                {
+                    for(int j = 0; j < ignoredGroups.Count(); j++)
+                    {
+                        if (i == ignoredGroups[j])
+                        {
+                            ignore = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (ignore) continue;
+                int whiteSpaces = groups[i].Value.TakeWhile(char.IsWhiteSpace).Count(); //Descontar espaços no início da palavra
+
+                if (groups[i].Index + whiteSpaces == groups[checkedGroup].Index)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

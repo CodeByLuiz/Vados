@@ -298,7 +298,7 @@ namespace Vados
                 }
                 void EditEntry(object sender, EventArgs e)
                 {
-                    Global.userControlHome.TxtComandoEditar = entry.Comando;
+                    Global.userControlHome.TextBoxWrite(entry.Comando);
 
                     parentForm.CloseHistoryTab();
                 }

@@ -310,6 +310,7 @@ namespace Vados
                         destinationIndicator = " na pasta ";
                         break;
                     case "mover":
+                    case "duplicar":
                         destinationIndicator = " para dentro da pasta ";
                         break;
                 }
@@ -346,7 +347,7 @@ namespace Vados
             if (string.IsNullOrEmpty(criteria.ObjectType))
             {
                 string objects = "(arquivo / pasta)";
-                if (criteria.Action == "abrir") objects = "(arquivo / aplicativo / atalho)";
+                if (criteria.Action == "abrir") objects = "(arquivo / aplicativo / site)";
                 textBox.Text = $"Especifique o que você quer {criteria.Action} {objects}.";
                 return;
             }

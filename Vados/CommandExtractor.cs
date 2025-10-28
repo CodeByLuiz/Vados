@@ -127,7 +127,7 @@ namespace Vados
             {
                 string action = match.Groups[1].Value;
                 string correctAction = Comandos.WordGetSynonym(action);
-                criteria.Action = correctAction;
+                criteria.Action = correctAction.ToLower();
                 criteria.ActionPos = match.Index;
             }
 
@@ -166,7 +166,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower().Substring(criteria.ActionPos);
+            command = command.Substring(criteria.ActionPos).ToLower();
+            command = Comandos.RemoveDiacritics(command);
 
             string BuildPattern()
             {
@@ -175,15 +176,15 @@ namespace Vados
                 string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
                                  $@"{objects.ToPattern()}{objects.ToRequired()}" +
                                  $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
-                                 $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()}" +
-                                 $@"\s+({patternName})){nameRequirement}";
+                                 $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()})";// +
+                                 //$@"\s+({patternName})){nameRequirement}";
 
                 return pattern;
             }
 
             //Checar se o padrão está no comando
             var pattern = BuildPattern();
-            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
 
             //Tipo de objeto
             string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
@@ -208,9 +209,6 @@ namespace Vados
                 match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
             }
 
-            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Objeto -> " + objectStr);
-
             #endregion
 
             //Formato do objeto
@@ -224,43 +222,43 @@ namespace Vados
                             match.Groups[10].Success ? match.Groups[10].Value :
                             match.Groups[11].Value;
 
-            if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
+            //if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
 
-            //Idenfificar nome composto sem aspas
-            int nameGroup = 11;
-            int startIndex = match.Groups[nameGroup].Index;
+            //Idenfificar nome do arquivo
+            var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
+            int startIndex = lastGroup.Index + lastGroup.Length;
             bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
 
-            if (match.Groups[nameGroup].Success)
+            if (hasName)
             {
-                if (hasName)
+                //Posição de parada do nome
+                int stopIndex = command.Length;
+                if (criteria.PostObjectNameIndex != -1)
                 {
-                    //Posição de parada do nome
-                    int stopIndex = command.Length;
-                    if (criteria.PostObjectNameIndex != -1)
-                    {
-                        stopIndex = criteria.PostObjectNameIndex;
-                    }
+                    stopIndex = criteria.PostObjectNameIndex;
+                }
 
-                    int nameLength = stopIndex - startIndex;
-                    objName = command.Substring(startIndex, nameLength).Trim();
-                }
-                else
-                {
-                    objName = "";
-                }
+                int nameLength = stopIndex - startIndex;
+                objName = command.Substring(startIndex, nameLength).Trim();
+
+                objName = objName.Replace("\"", "");
+                objName = objName.Replace("\'", "");
+            }
+            else
+            {
+                objName = "";
             }
 
-            //Checar se o nome não é uma das palavras de parada
-            if (stopWords.Contains(objName.ToLower()))
-            {
-                if (nameIsRequired) return false;
-                return true;
-            }
+            ////Checar se o nome não é uma das palavras de parada
+            //if (stopWords.Contains(objName.ToLower()))
+            //{
+            //    if (nameIsRequired) return false;
+            //    return true;
+            //}
 
 
             //Definir tipo de objeto caso não definido
-            if (criteria.ObjectType == "")
+            if (criteria.ObjectType == "" && criteria.Action == "abrir")
             {
                 criteria.ObjectType = "aplicativo";
 
@@ -305,6 +303,15 @@ namespace Vados
             #endregion
 
 
+            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+            //MessageBox.Show("Objeto -> " + objectStr);
+
+            //Desconsiderar o nome se não houver o tipo de arquivo
+            if (criteria.ObjectType == "")
+                objName = "";
+
+            if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
+
             criteria.ObjectName = objName;
 
             return match.Success;
@@ -324,23 +331,20 @@ namespace Vados
         {
             command = command.ToLower().Substring(criteria.ActionPos);
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
-            string pattern = $@"\b(\s+(para|pra)\s+({patternName}))";
+            string pattern = $@"\b(\s+(para|pra))";//\s+({patternName}))";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
-            if (match.Success)
-            {
-                //Novo nome
-                criteria.ObjectNewName = match.Groups[3].Success ? match.Groups[3].Value :
-                                 match.Groups[4].Success ? match.Groups[4].Value :
-                                 match.Groups[5].Value;
+            if (match.Success) {
+                string newName = "";
+                //Idenfificar nome do novo arquivo
+                var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
+                int startIndex = lastGroup.Index + lastGroup.Length;
+                bool hasName = criteria.PostNewNameIndex == -1 || criteria.PostNewNameIndex > startIndex + 1;
 
-                //Idenfificar nome composto sem aspas
-                int nameGroup = 5;
-
-                if (match.Groups[nameGroup].Success)
+                if (hasName)
                 {
                     //Posição de parada do nome
                     int stopIndex = command.Length;
@@ -349,14 +353,24 @@ namespace Vados
                         stopIndex = criteria.PostNewNameIndex;
                     }
 
-                    int startIndex = match.Groups[nameGroup].Index;
                     int nameLength = stopIndex - startIndex;
-                    criteria.ObjectNewName = command.Substring(startIndex, nameLength).Trim();
+                    newName = command.Substring(startIndex, nameLength).Trim();
+
+                    newName = newName.Replace("\"", "");
+                    newName = newName.Replace("\'", "");
+                }
+                else
+                {
+                    newName = "";
                 }
 
+                criteria.ObjectNewName = newName;
 
                 //Palavra após o nome do objeto
                 criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
+
+                if (criteria.ObjectName == "" && required)
+                    return false;
             }
 
             string newNameStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -413,7 +427,7 @@ namespace Vados
                         stopIndex = criteria.PostOriginNameIndex;
                     }
 
-                    MessageBox.Show(criteria.PostOriginNameIndex.ToString());
+                    //MessageBox.Show(criteria.PostOriginNameIndex.ToString());
 
                     int startIndex = match.Groups[nameGroup].Index;
                     int nameLength = stopIndex - startIndex;

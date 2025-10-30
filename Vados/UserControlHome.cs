@@ -256,6 +256,13 @@ namespace Vados
                 return;
             }
 
+            //Realizer testes
+            if (command == "teste")
+            {
+                Comandos.TestCases();
+                return;
+            }
+
             //Extrair argumentos do comando
             string commandText = command.Replace(",", "");
             commandText = commandText.Replace(".", "");

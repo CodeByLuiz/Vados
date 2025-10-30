@@ -452,12 +452,15 @@ namespace Vados
             { "maior que", "maior" },
             { "maiores que", "maior" },
             { "superior a", "maior" },
+            { "superiores a", "maior" },
             { "acima de", "maior" },
             { "mais alto que", "maior" },
             { "mais alta que", "maior" },
             { "mais altos que", "maior" },
             { "mais altas que", "maior" },
             { "mais que", "maior" },
+            { "com mais que", "maior" },
+            { "com mais de", "maior" },
             //Menor
             { "menor que", "menor" },
             { "menores que", "menor" },
@@ -468,6 +471,8 @@ namespace Vados
             { "mais baixos que", "menor" },
             { "mais baixas que", "menor" },
             { "menos que", "menor" },
+            { "com menos que", "menor" },
+            { "com menos de", "menor" },
             //Igual
             { "igual a", "igual" },
             { "iguais a", "igual" },
@@ -499,10 +504,20 @@ namespace Vados
             "pesando",
             "que pesa",
             "que pesam",
+            "que pesem",
+            "que pesarem",
+            "que tenha peso",
+            "que tenham peso",
+            "que tenha tamanho",
+            "que tenham tamanho",
             "que ocupa",
             "que ocupam",
+            "que ocupem",
+            "que ocuparem",
             "que ocupa o espaço de",
             "que ocupam o espaço de",
+            "que ocupem o espaço de",
+            "que ocuparem o espaço de",
         };
 
         #endregion
@@ -577,6 +592,7 @@ namespace Vados
             "no",
             "pra",
             "pro",
+            "para",
             "para a",
             "para o",
             "pra dentro da",
@@ -795,8 +811,8 @@ namespace Vados
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
                         new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
-                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new NewNameExtractor(true),
+                        new OriginExtractor(fromWords, folderWords, namingWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), false, null, true),
                     });
                     break;
@@ -1097,22 +1113,24 @@ namespace Vados
             (List<string> list, string errorMessage) paths = (new List<string>(), "");
             List<string> objectPathAsList = new List<string>() { objectPath };
             List<string> finalList = objectPathAsList;
+            string fileName;
 
             switch (commandType)
             {
                 //Criar
                 case "criar":
-                    string fileName = name + "." + WordGetExtensions(format).FirstOrDefault();
-                    if (objectType == "pasta") { return await CriarPasta(fileName, destinationPath); }
-                    if (objectType == "arquivo") { return await CriarArquivo(name, destinationPath); }
+                    fileName = name + "." + WordGetExtensions(format).FirstOrDefault();
+                    if (objectType == "pasta") { return await CriarPasta(name, destinationPath); }
+                    if (objectType == "arquivo") { return await CriarArquivo(fileName, destinationPath); }
                     break;
 
 
                 //Renomear
                 case "renomear":
                     //Realizar comando
+                    fileName = name + "." + WordGetExtensions(format).FirstOrDefault();
                     if (objectType == "pasta") { return await RenomearPasta(name, newName, originPath); }
-                    if (objectType == "arquivo") { return await RenomearArquivo(name, newName, originPath); }
+                    if (objectType == "arquivo") { return await RenomearArquivo(fileName, newName, originPath); }
                     break;
 
 
@@ -1594,16 +1612,13 @@ namespace Vados
                         //Percorrer todas as pastas dentro da pasta atual
                         foreach (var folderPath in subpasta)
                         {
-                            //MessageBox.Show(folderPath);
-                            //Console.WriteLine(folderPath);
+                            //Checar se está na pasta especificada
+                            if (!string.IsNullOrEmpty(rootFolder) && !folderPath.Contains(rootFolder))
+                                continue;
 
                             //Checar se a pasta tem o nome correto
                             string actualName = Path.GetFileName(folderPath);
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
-                                continue;
-
-                            //Checar se está na pasta especificada
-                            if (!string.IsNullOrEmpty(rootFolder) && !folderPath.Contains(rootFolder))
                                 continue;
 
 
@@ -1658,16 +1673,15 @@ namespace Vados
                             if (!visitados.Add(filePath)) 
                                continue;
 
-                            //Console.WriteLine(filePath);
+                            //Checar se está na pasta especificada
+                            if (!string.IsNullOrEmpty(rootFolder) && !filePath.Contains(rootFolder, StringComparison.OrdinalIgnoreCase))
+                                continue;
 
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
 
-                            if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
-                                continue;
 
-                            //Checar se está na pasta especificada
-                            if (!string.IsNullOrEmpty(rootFolder) && !filePath.Contains(rootFolder, StringComparison.OrdinalIgnoreCase))
+                            if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;
 
 
@@ -2419,6 +2433,36 @@ namespace Vados
             //----------------------------------------
 
             return "";
+        }
+
+
+        //Testa determinados comandos em sequência
+        public static void TestCases()
+        {
+            string testsPath = Path.Combine(Application.StartupPath, "Vados-Command-Tests.txt");
+            MessageBox.Show(testsPath);
+            string[] lines = File.ReadAllLines(testsPath);
+
+            for(int i = 0; i < lines.Count(); i++)
+            {
+                if (string.IsNullOrEmpty(lines[i]))
+                    continue;
+
+                //Remover resultado da frente da string
+                string command = lines[i].Substring(4);
+                
+                //Obter resultado
+                var args = Comandos.CommandGetArguments(command);
+                int success = args.success ? 1 : 0;
+                //string errorMessage = await Comandos.ExecuteCommand(args.criteria);
+
+                //Escrever resultado na frente da linha
+                lines[i] = success.ToString() + " - " + command;
+            }
+
+            //Reescrever linhas do arquivo
+            File.WriteAllLines(testsPath, lines);
+            ExecutarCaminho(testsPath);
         }
     }
 

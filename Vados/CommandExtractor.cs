@@ -54,6 +54,7 @@ namespace Vados
             for (int i = 0; i < extractors.Count; i++)
             {
                 var extractor = extractors[i];
+                //MessageBox.Show("extractor " + i.ToString() + " " + extractor.required.ToString());
                 bool success = extractor.Extract(command, criteria);
 
                 //Retornar falso se algum critério obrigatório estiver faltando
@@ -128,7 +129,7 @@ namespace Vados
                 string action = match.Groups[1].Value;
                 string correctAction = Comandos.WordGetSynonym(action);
                 criteria.Action = correctAction.ToLower();
-                criteria.ActionPos = match.Index;
+                criteria.ActionPos = match.Index + action.Length;
             }
 
             string actionStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
@@ -173,10 +174,10 @@ namespace Vados
             {
                 string nameRequirement = nameIsRequired ? "" : "?";
                 string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
-                string pattern = $@"\b({amount.ToPattern()}\s+){amount.ToRequired()}" +
+                string pattern = $@"({amount.ToPattern()}\s+){amount.ToRequired()}" +
                                  $@"{objects.ToPattern()}{objects.ToRequired()}" +
                                  $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
-                                 $@"((\s+{nominators.ToPattern()}){nominators.ToRequired()})";// +
+                                 $@"(\s+{nominators.ToPattern()}){nominators.ToRequired()}";// +
                                  //$@"\s+({patternName})){nameRequirement}";
 
                 return pattern;
@@ -188,13 +189,12 @@ namespace Vados
 
             //Tipo de objeto
             string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
-            criteria.ObjectType = obj;
 
 
             #region TENTAR CORRESPONDÊNCIA NOVAMENTE (em casos específicos)
 
             //Trocar palavras de nomeação caso o tipo de objeto seja site
-            if (criteria.ObjectType == "site")
+            if (obj == "site")
             {
                 List<string> newNominators = nominators.Values.Concat(Comandos.linkNamingWords).ToList();
                 nominators = new Pattern(newNominators, false);
@@ -202,117 +202,124 @@ namespace Vados
             }
 
             //Se não encontrar o tipo de objeto, tentar corresponder o nome de outra forma
-            if (criteria.ObjectType == "")
+            if (obj == "")
             {
                 objects = new Pattern(objectsList, false);
                 nominators = new Pattern(new List<string>() { "o", "a", "os", "as" }, false);
                 match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
-            }
-
-            #endregion
-
-            //Formato do objeto
-            criteria.ObjectFormat = match.Groups[5].Value;
-
-            //Quantidade
-            criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
-            
-            //Nome do objeto
-            string objName = match.Groups[9].Success ? match.Groups[9].Value :
-                            match.Groups[10].Success ? match.Groups[10].Value :
-                            match.Groups[11].Value;
-
-            //if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
-
-            //Idenfificar nome do arquivo
-            var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
-            int startIndex = lastGroup.Index + lastGroup.Length;
-            bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
-
-            if (hasName)
-            {
-                //Posição de parada do nome
-                int stopIndex = command.Length;
-                if (criteria.PostObjectNameIndex != -1)
-                {
-                    stopIndex = criteria.PostObjectNameIndex;
-                }
-
-                int nameLength = stopIndex - startIndex;
-                objName = command.Substring(startIndex, nameLength).Trim();
-
-                objName = objName.Replace("\"", "");
-                objName = objName.Replace("\'", "");
-            }
-            else
-            {
-                objName = "";
-            }
-
-            ////Checar se o nome não é uma das palavras de parada
-            //if (stopWords.Contains(objName.ToLower()))
-            //{
-            //    if (nameIsRequired) return false;
-            //    return true;
-            //}
-
-
-            //Definir tipo de objeto caso não definido
-            if (criteria.ObjectType == "" && criteria.Action == "abrir")
-            {
-                criteria.ObjectType = "aplicativo";
-
-                if (Comandos.allLinkWords.Contains(objName))
-                    criteria.ObjectType = "site";
-
-                //Lixeira
-                if (objName == "lixeira")
-                {
-                    criteria.ObjectPath = "explorer.exe";
-                }
-
-                //Navegador
-                if (objName == "navegador")
-                {
-                    criteria.ObjectType = "site";
-                    criteria.ObjectPath = "https://";
-                }
-            }
-
-
-            #region CAMINHOS PREDEFINIDOS
-
-            //Palavras associadas à arquivos / pastas específicas
-            if (criteria.ObjectType == "pasta")
-            {
-                bool isSpecificName = !match.Groups[11].Success || match.Groups[8].Success;
-                
-                //Pasta padrão
-                if (Comandos.defaultFolderWords.Contains(objName) && !isSpecificName)
-                {
-                    criteria.ObjectPath = Global.DefaultFolder;
-                }
-            }
-
-            //Definir link do site
-            if (criteria.ObjectType == "site" && criteria.ObjectPath == "")
-            {
-                criteria.ObjectPath = Comandos.WordGetLink(objName);
+                MessageBox.Show(BuildPattern());
             }
 
             #endregion
 
 
-            string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            //MessageBox.Show("Objeto -> " + objectStr);
+            if (match.Success)
+            {
+                //Tipo do objeto
+                criteria.ObjectType = obj;
 
-            //Desconsiderar o nome se não houver o tipo de arquivo
-            if (criteria.ObjectType == "")
-                objName = "";
+                //Formato do objeto
+                criteria.ObjectFormat = match.Groups[5].Value;
 
-            if (string.IsNullOrEmpty(objName) && nameIsRequired) return false; //Retornar falso se não houver nome e ele for obrigatório
+                //Quantidade
+                criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
 
-            criteria.ObjectName = objName;
+                //Nome do objeto
+                string objName = match.Groups[9].Success ? match.Groups[9].Value :
+                                match.Groups[10].Success ? match.Groups[10].Value :
+                                match.Groups[11].Value;
+
+                //Idenfificar nome do arquivo
+                var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
+                int startIndex = lastGroup.Index + lastGroup.Length;
+                bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
+
+                if (hasName)
+                {
+                    //Posição de parada do nome
+                    int stopIndex = command.Length;
+                    if (criteria.PostObjectNameIndex != -1)
+                    {
+                        stopIndex = criteria.PostObjectNameIndex;
+                    }
+
+                    int nameLength = stopIndex - startIndex;
+                    objName = command.Substring(startIndex, nameLength).Trim();
+
+                    objName = objName.Replace("\"", "");
+                    objName = objName.Replace("\'", "");
+                }
+                else
+                {
+                    objName = "";
+                }
+
+
+                //Definir tipo de objeto caso não definido
+                if (criteria.ObjectType == "" && criteria.Action == "abrir")
+                {
+                    criteria.ObjectType = "aplicativo";
+
+                    if (Comandos.allLinkWords.Contains(objName))
+                        criteria.ObjectType = "site";
+
+                    //Lixeira
+                    if (objName == "lixeira")
+                    {
+                        criteria.ObjectPath = "explorer.exe";
+                    }
+
+                    //Navegador
+                    if (objName == "navegador")
+                    {
+                        criteria.ObjectType = "site";
+                        criteria.ObjectPath = "https://";
+                    }
+                }
+
+
+                #region CAMINHOS PREDEFINIDOS
+
+                //Palavras associadas à arquivos / pastas específicas
+                if (criteria.ObjectType == "pasta")
+                {
+                    bool isSpecificName = !match.Groups[11].Success || match.Groups[8].Success;
+
+                    //Pasta padrão
+                    if (Comandos.defaultFolderWords.Contains(objName) && !isSpecificName)
+                    {
+                        criteria.ObjectPath = Global.DefaultFolder;
+                    }
+                }
+
+                //Definir link do site
+                if (criteria.ObjectType == "site" && criteria.ObjectPath == "")
+                {
+                    criteria.ObjectPath = Comandos.WordGetLink(objName);
+                }
+
+                #endregion
+
+
+                //Desconsiderar o nome se não houver o tipo de arquivo
+                if (criteria.ObjectType == "")
+                    objName = "";
+
+                criteria.ObjectName = objName;
+
+                string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
+                MessageBox.Show("Objeto -> " + objectStr);
+
+                //Casos de nome vazio
+                if (string.IsNullOrEmpty(objName))
+                {
+                    if (nameIsRequired) return false;
+
+                    //Retornar falso se não houver nenhuma indicação do objeto (sem formato, quantidade ou tamanho)
+                    if (criteria.ObjectFormat == "" && criteria.ObjectAmount == "" && criteria.SizeAmount == "")
+                        return false;
+                }
+            }
 
             return match.Success;
         }
@@ -331,7 +338,7 @@ namespace Vados
         {
             command = command.ToLower().Substring(criteria.ActionPos);
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
-            string pattern = $@"\b(\s+(para|pra))";//\s+({patternName}))";
+            string pattern = $@"(\s+(para|pra))";//\s+({patternName}))";
 
             //Checar se o padrão está no comando
             var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
@@ -366,10 +373,12 @@ namespace Vados
 
                 criteria.ObjectNewName = newName;
 
+                //MessageBox.Show("new name " + criteria.ObjectNewName);
+
                 //Palavra após o nome do objeto
                 criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
 
-                if (criteria.ObjectName == "" && required)
+                if (criteria.ObjectNewName == "" && required)
                     return false;
             }
 
@@ -521,7 +530,7 @@ namespace Vados
             }
 
             string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            //MessageBox.Show("Destino -> " + destinationStr);
+            MessageBox.Show("Destino -> " + destinationStr);
             return match.Success;
         }
     }
@@ -566,10 +575,10 @@ namespace Vados
                 //Unidade
                 criteria.SizeUnit = Comandos.WordGetSynonym(match.Groups[5].Value);
 
-
                 //Palavra após o nome do objeto
                 criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
             }
+            
 
             string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
             //MessageBox.Show("Tamanho -> " + objectStr);

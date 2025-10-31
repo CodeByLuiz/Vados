@@ -308,7 +308,7 @@ namespace Vados
                 criteria.ObjectName = objName;
 
                 string objectStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-                MessageBox.Show("Objeto -> " + objectStr);
+                //MessageBox.Show("Objeto -> " + objectStr);
 
                 //Casos de nome vazio
                 if (string.IsNullOrEmpty(objName))

@@ -51,6 +51,8 @@ namespace Vados
 
             #endregion
 
+
+            //Inicializar banco de dados
             using (var db = new BancoDeDados.DbConnection())
             {
                 db.Database.EnsureCreated();

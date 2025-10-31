@@ -324,16 +324,38 @@ namespace Vados
             audioTimer.Stop();  //Parar timer
 
 
-            //Transcrever áudio
-            TextBoxReset("Transcrevendo...", false);
             string result = await Global.VoiceRecognizer.Stop();
-            result = result.Replace("\"", "");
-            result = Comandos.CleanText(result);
-            result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);
 
-            //Realizar comando
-            TextBoxWrite(result);
-            PerformCommand(result, true);
+            if (Global.VoiceRecognizer.isInitialized)
+            {
+                //Transcrever áudio
+                TextBoxReset("Transcrevendo...", false);
+                result = result.Replace("\"", "");
+                result = Comandos.CleanText(result);
+                result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);
+
+                //Realizar comando
+                TextBoxWrite(result);
+                PerformCommand(result, true);
+            }
+
+            #region---------ERRO: modelo de reconhecimento de voz não inicializado---------
+
+            else
+            {
+                TextBoxReset("Escreva um comando...");
+
+                var rtb = new RichTextBox();
+                Global.AppendPlainText(rtb, "Modelo de reconhecimento de voz não inicializado.");
+
+                //Mostrar mensagem de erro
+                var parentForm = FindForm() as Form1;
+                parentForm.ToggleOverlay(true);
+                parentForm.ShowPopupMessage(true, parentForm, this, null, rtb.Rtf);
+            }
+
+            #endregion----------------------------------------
+
             hasTranscribedAudio = true;
 
             //Resetar botão do microfone

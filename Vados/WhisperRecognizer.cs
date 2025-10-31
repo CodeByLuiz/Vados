@@ -15,6 +15,7 @@ namespace Vados
 {
     public class WhisperRecognizer : IDisposable
     {
+        public bool isInitialized = false;
         private string modelPath;
         private WhisperFactory model;
         private WhisperProcessor processor;
@@ -77,14 +78,15 @@ namespace Vados
         {
             try
             {
-            //    await EnsureModel();
+                //await EnsureModel();
                 model = WhisperFactory.FromPath(modelPath);
                 processor = model.CreateBuilder().WithLanguage("pt").Build();
+                isInitialized = true;
             }
 
             catch (Exception ex)
             {
-                //MessageBox.Show("Erro de inicialização: " + ex.Message);
+                MessageBox.Show("Erro de inicialização: " + ex.Message);
             }
         }
 
@@ -143,19 +145,22 @@ namespace Vados
             audioBuffer.Position = 0;
             waveWriter?.Flush();
 
+            audioBuffer.Dispose();
+            audioBuffer = null;
+
+            isRunning = false;
+            isPaused = false;
+
             //Transcrever audio
+            if (!isInitialized)
+                return string.Empty;
+
             string result = "";
 
             await foreach (var segment in processor.ProcessAsync(audioBuffer))
             {
                 result += segment.Text;
             }
-
-            audioBuffer.Dispose();
-            audioBuffer = null;
-
-            isRunning = false;
-            isPaused = false;
 
             //Retornar transcrição do áudio
             return result.Trim();

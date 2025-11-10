@@ -2442,14 +2442,15 @@ namespace Vados
             string testsPath = Path.Combine(Application.StartupPath, "Vados-Command-Tests.txt");
             MessageBox.Show(testsPath);
             string[] lines = File.ReadAllLines(testsPath);
+            RichTextBox rtb = new RichTextBox();
 
-            for(int i = 0; i < lines.Count(); i++)
+            for (int i = 0; i < lines.Count(); i++)
             {
                 if (string.IsNullOrEmpty(lines[i]))
                     continue;
 
                 //Remover resultado da frente da string
-                string command = lines[i].Substring(4);
+                string command = lines[i].Substring(4, Math.Min(100 - 4, lines[i].Length - 4)).Trim();
                 
                 //Obter resultado
                 var args = Comandos.CommandGetArguments(command);
@@ -2458,6 +2459,28 @@ namespace Vados
 
                 //Escrever resultado na frente da linha
                 lines[i] = success.ToString() + " - " + command;
+
+
+                //Espaçamento
+                while (lines[i].Length < 100)
+                {
+                    lines[i] += " ";
+                }
+
+
+                //Mensagem de confirmação
+                string message;
+
+                if (args.success)
+                {
+                    message = FormMessage.SetConfirmationMessage(rtb, args.criteria);
+                }
+                else
+                {
+                    message = FormMessage.SetErrorMessage(rtb, args.criteria);
+                }
+
+                lines[i] += message;
             }
 
             //Reescrever linhas do arquivo

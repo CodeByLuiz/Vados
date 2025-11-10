@@ -158,7 +158,7 @@ namespace Vados
 
         #region DEFINIR MENSAGEM
 
-        private static void SetConfirmationMessage(RichTextBox textBox, CommandCriteria criteria)
+        public static string SetConfirmationMessage(RichTextBox textBox, CommandCriteria criteria)
         {
             string commandType = criteria.Action;
             string objectType = criteria.ObjectType;
@@ -182,7 +182,7 @@ namespace Vados
             string commandConnector = "";
             Font bold = new Font(textBox.Font, FontStyle.Bold);
 
-            //Comando
+            //Comando       
             if (commandType != "")
             {
                 Global.AppendFormattedText(textBox, " " + commandType, Colors.blueHighlight, bold);
@@ -330,16 +330,18 @@ namespace Vados
 
 
             Global.AppendPlainText(textBox, "?");
+
+            return textBox.Text;
         }
 
 
-        private static void SetErrorMessage(RichTextBox textBox, CommandCriteria criteria)
+        public static string SetErrorMessage(RichTextBox textBox, CommandCriteria criteria)
         {
             //Comando não identificado
             if (string.IsNullOrEmpty(criteria.Action))
             {
                 textBox.Text = "Comando não identificado.";
-                return;
+                return textBox.Text;
             }
 
 
@@ -349,7 +351,7 @@ namespace Vados
                 string objects = "(arquivo / pasta)";
                 if (criteria.Action == "abrir") objects = "(arquivo / aplicativo / site)";
                 textBox.Text = $"Especifique o que você quer {criteria.Action} {objects}.";
-                return;
+                return textBox.Text;
             }
 
 
@@ -362,6 +364,8 @@ namespace Vados
 
 
             //Erro em um dos critérios
+            bool noName = criteria.ObjectFormat == "" && criteria.ObjectAmount == "" && criteria.SizeAmount == "" && criteria.ObjectName == "";
+
             string criteriaMessage = "";
 
             switch(criteria.Action)
@@ -373,6 +377,28 @@ namespace Vados
                         string objToBeCreated = "do arquivo a ser criado";
                         if (criteria.ObjectType == "pasta") objToBeCreated = "da pasta a ser criada";
                         criteriaMessage = "Especifique o nome " + objToBeCreated + ".";
+                    }
+
+                    break;
+
+
+                case "renomear":
+                    //Nome não especificado
+                    if (noName)
+                    {
+                        string obj = "o arquivo";
+                        if (criteria.ObjectType == "pasta") obj = "a pasta";
+                        criteriaMessage = "Especifique " + obj + " a ser renomeado.";
+                        break;
+                    }
+
+                    //Nome não especificado
+                    if (string.IsNullOrEmpty(criteria.ObjectNewName))
+                    {
+                        string obj = "do arquivo";
+                        if (criteria.ObjectType == "pasta") obj = "da pasta";
+                        criteriaMessage = "Especifique o novo nome " + obj + ".";
+                        break;
                     }
 
                     break;
@@ -397,6 +423,7 @@ namespace Vados
             }
 
             textBox.Text = criteriaMessage;
+            return textBox.Text;
         }
 
 

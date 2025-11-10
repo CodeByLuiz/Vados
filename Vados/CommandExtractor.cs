@@ -50,6 +50,8 @@ namespace Vados
 
         public (CommandCriteria criteria, bool success) Parse(string command)
         {
+            bool fullSuccess = true;
+
             //Extrair cada argumento do comando
             for (int i = 0; i < extractors.Count; i++)
             {
@@ -58,10 +60,11 @@ namespace Vados
                 bool success = extractor.Extract(command, criteria);
 
                 //Retornar falso se algum critério obrigatório estiver faltando
-                if (extractor.required && !success) return (criteria, false);
+                if (extractor.required && !success)
+                    fullSuccess = false;
             }
 
-            return (criteria, true);
+            return (criteria, fullSuccess);
         }
     }
 
@@ -207,7 +210,7 @@ namespace Vados
                 objects = new Pattern(objectsList, false);
                 nominators = new Pattern(new List<string>() { "o", "a", "os", "as" }, false);
                 match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
-                MessageBox.Show(BuildPattern());
+                //MessageBox.Show(BuildPattern());
             }
 
             #endregion
@@ -224,12 +227,9 @@ namespace Vados
                 //Quantidade
                 criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
 
-                //Nome do objeto
-                string objName = match.Groups[9].Success ? match.Groups[9].Value :
-                                match.Groups[10].Success ? match.Groups[10].Value :
-                                match.Groups[11].Value;
 
-                //Idenfificar nome do arquivo
+                //Idenfificar nome do objeto
+                string objName = "";
                 var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
                 int startIndex = lastGroup.Index + lastGroup.Length;
                 bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
@@ -244,14 +244,11 @@ namespace Vados
                     }
 
                     int nameLength = stopIndex - startIndex;
-                    objName = command.Substring(startIndex, nameLength).Trim();
+                    if (nameLength > 0)
+                        objName = command.Substring(startIndex, nameLength).Trim();
 
                     objName = objName.Replace("\"", "");
                     objName = objName.Replace("\'", "");
-                }
-                else
-                {
-                    objName = "";
                 }
 
 
@@ -361,7 +358,8 @@ namespace Vados
                     }
 
                     int nameLength = stopIndex - startIndex;
-                    newName = command.Substring(startIndex, nameLength).Trim();
+                    if (nameLength > 0)
+                        newName = command.Substring(startIndex, nameLength).Trim();
 
                     newName = newName.Replace("\"", "");
                     newName = newName.Replace("\'", "");
@@ -376,7 +374,9 @@ namespace Vados
                 //MessageBox.Show("new name " + criteria.ObjectNewName);
 
                 //Palavra após o nome do objeto
-                criteria.PostObjectNameIndex = Global.FindFirstGroupIndex(match.Groups);
+                int index = Global.FindFirstGroupIndex(match.Groups);
+                criteria.PostObjectNameIndex = index;
+                criteria.PostOriginNameIndex = index;
 
                 if (criteria.ObjectNewName == "" && required)
                     return false;
@@ -436,11 +436,11 @@ namespace Vados
                         stopIndex = criteria.PostOriginNameIndex;
                     }
 
-                    //MessageBox.Show(criteria.PostOriginNameIndex.ToString());
-
                     int startIndex = match.Groups[nameGroup].Index;
                     int nameLength = stopIndex - startIndex;
-                    criteria.Origin = command.Substring(startIndex, nameLength).Trim();
+
+                    if (nameLength > 0)
+                        criteria.Origin = command.Substring(startIndex, nameLength).Trim();
                 }
 
                 //Pasta padrão
@@ -508,7 +508,9 @@ namespace Vados
                     int stopIndex = command.Length;
                     int startIndex = match.Groups[nameGroup].Index;
                     int nameLength = stopIndex - startIndex;
-                    criteria.Destination = command.Substring(startIndex, nameLength).Trim();
+
+                    if (nameLength > 0)
+                        criteria.Destination = command.Substring(startIndex, nameLength).Trim();
                 }
 
                 //Pasta padrão
@@ -530,7 +532,7 @@ namespace Vados
             }
 
             string destinationStr = string.Join(", ", match.Groups.Cast<System.Text.RegularExpressions.Group>().Select((g, i) => $"G{i}:'{g.Value}'"));
-            MessageBox.Show("Destino -> " + destinationStr);
+            //MessageBox.Show("Destino -> " + destinationStr);
             return match.Success;
         }
     }

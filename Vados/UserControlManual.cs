@@ -805,8 +805,8 @@ namespace Vados
             Global.AppendFormattedText(exampleRichTextBox, "Renomeie a pasta ", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta' ", Color.Black, exBold);
             Global.AppendPlainText(exampleRichTextBox, "para ");
-            Global.AppendFormattedText(exampleRichTextBox, "‘novo nome da pasta'\n", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie a pasta ‘Fotos’ para ‘Fotos 2025’.”\n“Renomeie a pasta chamada ‘Músicas’ para ‘Músicas Pop/Rock’.”", Color.FromArgb(125, 125, 125), exRegular);
+            Global.AppendFormattedText(exampleRichTextBox, "‘novo nome da pasta'. \n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Renomeie a pasta ‘Fotos’ para ‘Fotos 2025’. ”\n“Renomeie a pasta chamada ‘Músicas’ para ‘Músicas Pop/Rock’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
         }
@@ -850,7 +850,7 @@ namespace Vados
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Para mover uma pasta para dentro de uma outra pasta,basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Mover uma pasta", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, ". Por questão de simplicidade, as pastas movidas devem estar presentes na pasta padrão(chamada \"Vados\"), ou a pasta de dentro deve ser a pasta padrão.");
+            Global.AppendPlainText(descriptionBox, ". Por questão de simplicidade, as pastas movidas devem estar presentes na pasta padrão (chamada \"Vados\"), ou a pasta de dentro deve ser a pasta padrão.");
 
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
@@ -859,10 +859,10 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores:");
-            Global.AppendFormattedText(descriptionBox, " o nome da pasta a ser movida", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, " e o  ");
-            Global.AppendFormattedText(descriptionBox, " nome da pasta de destino.", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores: o");
+            Global.AppendFormattedText(descriptionBox, " nome da pasta a ser movida", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, " e o ");
+            Global.AppendFormattedText(descriptionBox, "nome da pasta de destino.", Colors.greenHighlight, descBold);
 
 
 
@@ -871,10 +871,10 @@ namespace Vados
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Mover Pasta", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta' ", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "para a pasta", Color.Black, exRegular);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta de destino'\n", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "“Mover a pasta ‘Currículos’ pa a pasta 'Arquivos'.”\r\n“Mova a Pasta chamada 'Redações' para a pasta 'Documentos'.”", Color.FromArgb(125, 125, 125), exRegular);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta de destino'. \n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Mover a pasta ‘Currículos’ para a pasta 'Arquivos'.”\r\n“Mova a Pasta chamada 'Redações' para a pasta 'Documentos'.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
         }
@@ -908,7 +908,7 @@ namespace Vados
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Duplicar a pasta", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'. \n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Duplicar a pasta 'Atividades'.”\r\n“Duplique a pasta chamada 'Jogos'”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
@@ -939,8 +939,8 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "Abrir o arquivo", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "'nome do arquivo'", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir o arquivo ", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "'nome do arquivo'.\r\n ", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Abra o arquivo chamado 'Redação'.”\r\n“Abra o arquivo chamado 'Redação.txt'”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
@@ -950,9 +950,6 @@ namespace Vados
         {
             AddTitleToContent("Criar um arquivo");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
             Global.AppendPlainText(descriptionBox, "Para criar um arquivo, basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Criar arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Os arquivos criados são encontrados na pasta padrão do aplicativo, chamada “vados”. Caso um arquivo seja criado com o mesmo nome de outro já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguido. ");
@@ -961,13 +958,11 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+          
             Global.AppendPlainText(descriptionBox, "A execução desse comando depende de apenas um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". É importante dizer o ");
-            Global.AppendFormattedText(descriptionBox, "formato do arquivo", Colors.greenHighlight, descBold);
+            Global.AppendFormattedText(descriptionBox, "formato do arquivo ", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, "para que ele funcione da forma esperada.");
 
 
@@ -975,23 +970,19 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
+           
             Global.AppendFormattedText(exampleRichTextBox, "Crie um arquivo ", Color.Black, exUnderline);
             Global.AppendPlainText(exampleRichTextBox, "chamado");
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’.\r\n ", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Crie um arquivo chamado ‘Lista.txt’.”\r\n“Crie um arquivo com o nome ‘Apresentação.pptx’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
         private void LoadExcluirArquivoContent()
         {
-            AddTitleToContent("");
+         
             AddTitleToContent("Excluir um Arquivo");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+           
             Global.AppendPlainText(descriptionBox, "Para excluir uma arquivo presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Excluir arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Os arquivos excluídos podem ser encontradas na lixeira, e de lá podem ser recuperadas.");
@@ -1000,9 +991,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+         
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas de um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Não é necessário dizer a ");
@@ -1013,23 +1002,18 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
+           
             Global.AppendFormattedText(exampleRichTextBox, "Excluir o arquivo", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’.", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’. \r\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Exclua o arquivo ‘Selfie’.”\r\n“Delete o arquivo chamado ‘Filme.mp4’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
         private void LoadDuplicarArquivoContent()
         {
 
-            AddTitleToContent("");
+           
             AddTitleToContent("Duplicar Arquivo");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
             Global.AppendPlainText(descriptionBox, "Para duplicar um arquivo, basta utilizar o comando");
             Global.AppendFormattedText(descriptionBox, " Duplicar arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". O arquivo duplicado será criado na mesma pasta que o arquivo original, e por terem o mesmo nome, o novo arquivo terá um número na frente do nome, de forma ascendente, para que as pastas possam ser distinguidas.");
@@ -1038,9 +1022,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+           
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo a ser duplicado", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Não é necessário dizer a ");
@@ -1051,11 +1033,10 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
-            Global.AppendFormattedText(exampleRichTextBox, "Duplicar o arquivo ", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome do arquivo’.", Color.Black, exBold);
+        
+            
+            Global.AppendFormattedText(exampleRichTextBox, "Duplicar o arquivo", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Duplicar o arquivo ‘Tutorial’.”\r\n“Duplique o arquivo chamado ‘Lista de compras.txt’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
@@ -1063,12 +1044,10 @@ namespace Vados
 
         private void LoadOperarMultiplosArquivosContent()
         {
-            AddTitleToContent("");
+          
             AddTitleToContent("Operar múltiplos arquivos");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+            
 
             Global.AppendPlainText(descriptionBox, "Os comandos ");
             Global.AppendFormattedText(descriptionBox, "Mover arquivo, Excluir arquivo", Colors.blueHighlight, descBold);
@@ -1079,9 +1058,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+           
             Global.AppendPlainText(descriptionBox, "Os arquivos podem ser filtrados através dos seguintes fatores: ");
             Global.AppendFormattedText(descriptionBox, "nome, formato, data de modificação ", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, "e ");
@@ -1094,14 +1071,11 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
             Global.AppendFormattedText(exampleRichTextBox, "‘Comando’", Color.Black, exUnderline);
-            Global.AppendPlainText(descriptionBox, " os arquivos da pasta ");
+            Global.AppendPlainText(exampleRichTextBox, " os arquivos da pasta ");
             Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’ ", Color.Black, exUnderline);
-            Global.AppendPlainText(descriptionBox, "que");
-            Global.AppendFormattedText(exampleRichTextBox, "‘filtro’. ", Color.Black, exUnderline);
+            Global.AppendPlainText(exampleRichTextBox, "que ");
+            Global.AppendFormattedText(exampleRichTextBox, "‘filtro’.\n ", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, "“Excluir os arquivos da pasta ‘Fotos’ que tenham o nome ‘Praia’.”\r\n“Mova todos os arquivos da pasta ‘Escola’ que sejam ‘.txt’ para a pasta ‘Atividades’.”\r\n“Copiar os arquivos da pasta ‘Gravações’ de depois de 2022 par a pasta ‘Vídeos’.”\r\n“Delete todos os arquivos maiores que 10mb.”\r\n“Mover todos os arquivos da pasta ‘Selfies’ para a pasta ‘Fotos’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
@@ -1111,7 +1085,7 @@ namespace Vados
 
             AddTitleToContent("Renomear um arquivo");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "Para renomear um arquivo presente na pasta padrão(chamada 'Vados'), basta utilizar o comando");
+            Global.AppendPlainText(descriptionBox, "Para renomear um arquivo presente na pasta padrão (chamada 'Vados'), basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Renomear arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Com esse comando também é possívelm alterar a extensão do arquivo. ");
 
@@ -1123,28 +1097,26 @@ namespace Vados
             Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, " e o ");
             Global.AppendFormattedText(descriptionBox, "novo nome desejado", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, ". Não é necessariamente dizer a ");
+            Global.AppendPlainText(descriptionBox, ". Não é necessariamente obrigatório dizer a ");
             Global.AppendFormattedText(descriptionBox, "extensão do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ", mas isso pode ajudar a distinguir arquivos que tenham o mesmo nome.");
             AddExampleBox();
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Renomeie o arquivo", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "'nome do arquivo'", Color.Black, exBold);
-            Global.AppendPlainText(descriptionBox, "para ");
-            Global.AppendFormattedText(exampleRichTextBox, " 'novo nome do arquivo'", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " 'nome do arquivo'" , Color.Black, exBold);
+            Global.AppendPlainText(exampleRichTextBox, " para ");
+            Global.AppendFormattedText(exampleRichTextBox, "'novo nome do arquivo'\n ", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Renomeie o arquivo 'Documentos' para 'Documentos Importantes'.”\r\n“Renomeie o arquivo 'Documentos errados' para 'Documentos certos' ", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
 
         private void LoadMoverArquivoContent()
         {
-            AddTitleToContent("");
+           
             AddTitleToContent("Mover um Arquivo");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+          
             Global.AppendPlainText(descriptionBox, "Para mover um arquivo para dentro de uma pasta, basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Mover arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Por questão de simplicidade, os arquivos movidos devem ou estar presentes na pasta padrão (chamada “vados”), ou a pasta de destino deve ser a pasta padrão.");
@@ -1153,10 +1125,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
-
+            
             Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores: o ");
             Global.AppendFormattedText(descriptionBox, "nome da pasta a ser movida ", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, "e o");
@@ -1165,13 +1134,11 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
+           
             Global.AppendFormattedText(exampleRichTextBox, "Mover o arquivo", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome do arquivo’", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’ ", Color.Black, exBold);
             Global.AppendPlainText(descriptionBox, "para a pasta ");
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’.", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Mover o arquivo ‘Currículo’ para a pasta ‘Trabalho’.”\r\n“Mova o arquivo chamado ‘Redações’ para a pasta padrão.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }

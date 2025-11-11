@@ -337,6 +337,15 @@ namespace Vados
 
         public static string SetErrorMessage(RichTextBox textBox, CommandCriteria criteria)
         {
+            string obj = criteria.ObjectType;
+            string finalLetter = "o";
+            if (obj == "pasta") finalLetter = "a";
+            if (!string.IsNullOrEmpty(criteria.ObjectAmount))
+            {
+                obj += "s";
+                finalLetter += "s";
+            }
+
             //Comando não identificado
             if (string.IsNullOrEmpty(criteria.Action))
             {
@@ -374,9 +383,7 @@ namespace Vados
                     //Nome não especificado
                     if (string.IsNullOrEmpty(criteria.ObjectName))
                     {
-                        string objToBeCreated = "do arquivo a ser criado";
-                        if (criteria.ObjectType == "pasta") objToBeCreated = "da pasta a ser criada";
-                        criteriaMessage = "Especifique o nome " + objToBeCreated + ".";
+                        criteriaMessage = "Especifique o nome d" + finalLetter + " " + obj + " a ser criad" + finalLetter + ".";
                     }
 
                     break;
@@ -386,31 +393,41 @@ namespace Vados
                     //Nome não especificado
                     if (noName)
                     {
-                        string obj = "o arquivo";
-                        if (criteria.ObjectType == "pasta") obj = "a pasta";
-                        criteriaMessage = "Especifique " + obj + " a ser renomeado.";
+                        criteriaMessage = "Especifique o nome d" + finalLetter + " " + obj + " a ser renomead" + finalLetter + ".";
                         break;
                     }
 
-                    //Nome não especificado
+                    //Novo nome não especificado
                     if (string.IsNullOrEmpty(criteria.ObjectNewName))
                     {
-                        string obj = "do arquivo";
-                        if (criteria.ObjectType == "pasta") obj = "da pasta";
-                        criteriaMessage = "Especifique o novo nome " + obj + ".";
+                        criteriaMessage = "Especifique o novo nome d" + finalLetter + " " + obj + ".";
                         break;
                     }
 
                     break;
 
 
+                case "excluir":
+                    //Nome não especificado
+                    if (noName)
+                    {
+                        criteriaMessage = "Especifique o nome d" + finalLetter + " " + obj + " a ser excluíd" + finalLetter + ".";
+                    }
+
+                    break;
+
+
                 case "mover":
+                    //Nome não especificado
+                    if (noName)
+                    {
+                        criteriaMessage = "Especifique o nome d" + finalLetter + " " + obj + " a ser movid" + finalLetter + ".";
+                    }
+
                     //Pasta de destino não identificada
                     if (string.IsNullOrEmpty(criteria.Destination))
                     {
-                        string objToBeCreated = "do arquivo a ser movido";
-                        if (criteria.ObjectType == "pasta") objToBeCreated = "da pasta a ser movida";
-                        criteriaMessage = "Especifique a pasta de destino " + objToBeCreated + ".";
+                        criteriaMessage = "Especifique a pasta de destino.";
                     }
 
                     break;

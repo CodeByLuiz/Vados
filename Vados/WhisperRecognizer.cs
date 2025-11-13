@@ -78,7 +78,7 @@ namespace Vados
         {
             try
             {
-                //await EnsureModel();
+                await EnsureModel();
                 model = WhisperFactory.FromPath(modelPath);
                 processor = model.CreateBuilder().WithLanguage("pt").Build();
                 isInitialized = true;
@@ -145,22 +145,22 @@ namespace Vados
             audioBuffer.Position = 0;
             waveWriter?.Flush();
 
-            audioBuffer.Dispose();
-            audioBuffer = null;
+            //Transcrever audio
+            string result = "";
+
+            if (isInitialized)
+            {
+                await foreach (var segment in processor.ProcessAsync(audioBuffer))
+                {
+                    result += segment.Text;
+                }
+            }
 
             isRunning = false;
             isPaused = false;
 
-            //Transcrever audio
-            if (!isInitialized)
-                return string.Empty;
-
-            string result = "";
-
-            await foreach (var segment in processor.ProcessAsync(audioBuffer))
-            {
-                result += segment.Text;
-            }
+            audioBuffer.Dispose();
+            audioBuffer = null;
 
             //Retornar transcrição do áudio
             return result.Trim();

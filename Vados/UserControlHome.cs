@@ -323,13 +323,12 @@ namespace Vados
 
             audioTimer.Stop();  //Parar timer
 
-
-            string result = await Global.VoiceRecognizer.Stop();
-
+            //Transcrever áudio
             if (Global.VoiceRecognizer.isInitialized)
             {
-                //Transcrever áudio
                 TextBoxReset("Transcrevendo...", false);
+
+                string result = await Global.VoiceRecognizer.Stop();
                 result = result.Replace("\"", "");
                 result = Comandos.CleanText(result);
                 result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);

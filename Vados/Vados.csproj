@@ -50,7 +50,19 @@
     <None Remove="Images\LogoAzul.png" />
     <None Remove="Images\LogoBranco.png" />
     <None Remove="Images\micIcon.png" />
+    <None Remove="Images\prints\Arquivos\Criar Arquivo.png" />
+    <None Remove="Images\prints\Pastas\Abrir Pasta Padrão.png" />
+    <None Remove="Images\prints\Pastas\Abrir Pasta.png" />
+    <None Remove="Images\prints\Pastas\CriarPasta.png" />
+    <None Remove="Images\prints\Pastas\Duplicar pasta.png" />
+    <None Remove="Images\prints\Pastas\Renomear pasta.png" />
     <None Remove="Models\ggml-base.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\prints\Pastas\Abrir Pasta Padrão.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -184,6 +196,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\LogoBranco.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Arquivos\Criar Arquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\Abrir Pasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\CriarPasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\Duplicar pasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\Renomear pasta.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

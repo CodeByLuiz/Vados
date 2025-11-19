@@ -25,6 +25,9 @@ namespace Vados
         private TableLayoutPanel tableLayoutContent;
         private RichTextBox descriptionBox = null;
         private RichTextBox secundarydescriptionBox = null;
+        private Panel panelNavFixed;     
+        private FlowLayoutPanel flowScrollable; 
+
 
         private string pathreturnbutton = @"Images/Icons/closeIcon.png";
 
@@ -53,11 +56,12 @@ namespace Vados
 
             this.Controls.Add(panelContent);
             this.Controls.Add(panelNav);
+           
 
             this.Resize += UserControlManual_Resize;
 
             // Seleciona botão padrão
-            foreach (Control ctrl in flow.Controls)
+            foreach (Control ctrl in flowScrollable.Controls)
             {
                 if (ctrl is Button btn && btn.Text == "Criar uma pasta")
                 {
@@ -171,16 +175,26 @@ namespace Vados
 
 
 
+
+
         private void SetupContentArea()
         {
+            // --- calcula largura da navbar (assume que panelNav já foi criado) ---
+            int navWidth = panelNav?.Width ?? 320;
+
+            // Panel content posicionado À DIREITA da navbar (sem Dock)
             panelContent = new Panel
             {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(223, 223, 223)
+                BackColor = Color.FromArgb(223, 223, 223),
+                Location = new Point(navWidth, 0),
+                Size = new Size(Math.Max(100, this.ClientSize.Width - navWidth), this.ClientSize.Height),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                AutoScroll = false // quem scrolla é o TableLayoutPanel
             };
+            // Adicione ao formulário / controle (ordem de Add deve ser gerida no construtor)
             this.Controls.Add(panelContent);
 
-
+            // ---- botão voltar (dentro do panelContent) ----
             btnReturn = new PictureBox
             {
                 Width = 50,
@@ -190,22 +204,68 @@ namespace Vados
                 Cursor = Cursors.Hand
             };
             btnReturn.Click += btnReturn_Click;
-            btnReturn.Location = new Point(this.Width - btnReturn.Width - 20, 20);
-            btnReturn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            this.Controls.Add(btnReturn);
+            panelContent.Controls.Add(btnReturn);
             btnReturn.BringToFront();
 
+            // --- top padding (distância do topo para o conteúdo) ---
+            int topPadding = 20; // ajuste se quiser mais espaço acima
 
+            // --- área de conteúdo que faz scroll ---
             tableLayoutContent = new TableLayoutPanel
             {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
+                AutoScroll = true,        // scrollbar só quando o conteúdo ultrapassar
                 ColumnCount = 1,
                 RowCount = 0,
-                Padding = new Padding(20, 20, 20, 20)
+                Padding = new Padding(20, topPadding + 10, 20, 20), // espaço interno (top inclui topPadding)
+                Location = new Point(0, 0),
+                // definiremos Width/Height logo abaixo
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
+
+            // Ajusta tamanho inicial com base no panelContent.ClientSize
+            ResizeContentChildren(navWidth, topPadding);
+
             panelContent.Controls.Add(tableLayoutContent);
 
+            // Atualiza tamanhos ao redimensionar o UserControl
+            this.Resize += (s, e) =>
+            {
+                // atualiza o panelContent para ocupar o espaço à direita da navbar
+                panelContent.Location = new Point(navWidth, 0);
+                panelContent.Size = new Size(Math.Max(100, this.ClientSize.Width - navWidth), this.ClientSize.Height);
+
+                // recalcula posições internas
+                ResizeContentChildren(navWidth, topPadding);
+            };
+        }
+
+        // Função auxiliar para recalcular tamanhos internos corretamente
+        private void ResizeContentChildren(int navWidth, int topPadding)
+        {
+            if (panelContent == null || tableLayoutContent == null || btnReturn == null) return;
+
+            // usa ClientSize para evitar incluir bordas externas
+            int contentW = panelContent.ClientSize.Width;
+            int contentH = panelContent.ClientSize.Height;
+
+            // garante mínimo para evitar negative sizes
+            contentW = Math.Max(60, contentW);
+            contentH = Math.Max(60, contentH);
+
+            // posiciona o botão retornar no canto superior direito do panelContent
+            btnReturn.Location = new Point(contentW - btnReturn.Width - 20, 20);
+
+            // tabela deve ocupar toda a área visível do panelContent (sem extrapolar)
+            // deixamos a tabela com a mesma largura do painel (subtraímos padding interno)
+            tableLayoutContent.Location = new Point(0, 0);
+            tableLayoutContent.Size = new Size(contentW, contentH);
+
+            // Garantia extra: AutoScrollMinSize pequeno (não força scrollbar)
+            tableLayoutContent.AutoScrollMinSize = new Size(0, 0);
+
+            // Se quiser, força um reflow imediato
+            tableLayoutContent.PerformLayout();
+            panelContent.PerformLayout();
         }
 
 
@@ -340,7 +400,7 @@ namespace Vados
                     Padding = new Padding(0, 60, 0, 10),
                     Height = 400,
                     Width = 600,
-                    AutoSize = false
+                    AutoSize = true
                 };
 
                 PictureBox picture = new PictureBox
@@ -433,59 +493,55 @@ namespace Vados
             // Painel principal da NavBar
             panelNav = new Panel
             {
-                Dock = DockStyle.Left,
                 Width = 320,
                 BackColor = Color.FromArgb(48, 61, 99),
-
-
+                Location = new Point(0, 0),
+                Height = this.Height,   // ocupa altura toda
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left
             };
             this.Controls.Add(panelNav);
 
-            flow = new FlowLayoutPanel
+            // ------------------------------------------------------------
+            // 1) PAINEL FIXO (LOGO + TÍTULO + LINHAS)
+            // ------------------------------------------------------------
+            panelNavFixed = new Panel
             {
-                Dock = DockStyle.Fill,
-
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                AutoScroll = true,
-                Margin = new Padding(0, 0, 0, 20)
+                Width = panelNav.Width,
+                Height = 280,
+                Location = new Point(0, 0),
+                BackColor = Color.FromArgb(48, 61, 99)
             };
 
-            panelNav.Controls.Add(flow);
+            // ADICIONE O FIXO PRIMEIRO
+            panelNav.Controls.Add(panelNavFixed);
 
-            // Logo no topo
+            // Logo (não centralize por Width aqui — ele ainda é 0)
             PictureBox pictureLogo = new PictureBox
             {
                 Image = Image.FromFile("Images/LogoBranco.png"),
                 SizeMode = PictureBoxSizeMode.Zoom,
                 Width = 200,
                 Height = 200,
-                Margin = new Padding(0, 10, 0, 10),
-                Anchor = AnchorStyles.Top,
+                Top = 10,
+                Left = (320 - 200) / 2  // 320 = largura do panelNav
             };
-            flow.Controls.Add(pictureLogo);
+            panelNavFixed.Controls.Add(pictureLogo);
 
-            // Título
             Label lblTitle = new Label
             {
                 Text = "Comandos",
-                Height = 60,
                 ForeColor = Color.FromArgb(200, 219, 236),
                 Font = Fonts.GetFont(Fonts.MavenMedium, 26f),
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleCenter,
-                Margin = new Padding(0, 10, 0, 10)
+                Height = 50,
+                Width = panelNavFixed.Width,
+                Top = panelNavFixed.Height - 50,
+                Left = 0,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
 
 
-            lblTitle.Width = flow.ClientSize.Width;
-
-
-            flow.Resize += (s, e) =>
-            {
-                lblTitle.Width = flow.ClientSize.Width;
-                lblTitle.Invalidate();
-            };
 
             lblTitle.Paint += (sender, e) =>
             {
@@ -499,6 +555,7 @@ namespace Vados
                     int lineY = centerY;
                     int padding = 1;
                     int lineLength = (lbl.Width - textWidth) / 2 - padding;
+
                     if (lineLength > 0)
                     {
                         e.Graphics.DrawLine(pen, 20, lineY, lineLength, lineY);
@@ -506,34 +563,56 @@ namespace Vados
                     }
                 }
             };
-            flow.Controls.Add(lblTitle);
+            panelNavFixed.Controls.Add(lblTitle);
 
-
-
-            // Categorias e comandos
-            AddSection(flow, "Pastas", @"Images/Icons/pasta.png", new[]
+            // ------------------------------------------------------------
+            // 2) PARTE ROLÁVEL
+            // ------------------------------------------------------------
+            flowScrollable = new FlowLayoutPanel
             {
-"Criar uma pasta", "Abrir uma pasta",
-"Renomear uma pasta", "Excluir uma pasta", "Mover uma pasta", "Duplicar uma pasta"
-});
+                AutoScroll = true,
+                Width = panelNav.Width,
+                Height = panelNav.Height - panelNavFixed.Height,
+                Location = new Point(0, panelNavFixed.Height),
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                BackColor = Color.FromArgb(48, 61, 99),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left
+            };
 
-            AddSection(flow, "Arquivos", @"Images/Icons/Arquivos.png", new[]
+            // ADICIONE O ROLÁVEL DEPOIS
+            panelNav.Controls.Add(flowScrollable);
+
+            // NÃO USE MAIS SetChildIndex => CAUSA SOBREPOSIÇÃO ❌
+
+            // Agora adicione as seções:
+            AddSection(flowScrollable, "Pastas", @"Images/Icons/pasta.png", new[]
             {
-"Criar um arquivo", "Abrir um arquivo", "Renomear um arquivo",
-"Excluir um arquivo", "Mover um arquivo", "Duplicar um arquivo", "Operar múltiplos arquivos"
-});
+        "Criar uma pasta", "Abrir uma pasta",
+        "Renomear uma pasta", "Excluir uma pasta",
+        "Mover uma pasta", "Duplicar uma pasta"
+    });
 
-            AddSection(flow, "Sistema", @"Images/Icons/Sistema.png", new[]
+            AddSection(flowScrollable, "Arquivos", @"Images/Icons/Arquivos.png", new[]
             {
-"Abrir site","Abrir Programa"
-});
+        "Criar um arquivo", "Abrir um arquivo", "Renomear um arquivo",
+        "Excluir um arquivo", "Mover um arquivo",
+        "Duplicar um arquivo", "Operar múltiplos arquivos"
+    });
+
+            AddSection(flowScrollable, "Sistema", @"Images/Icons/Sistema.png", new[]
+            {
+        "Abrir site", "Abrir Programa"
+    });
 
 
-
+            this.Resize += (s, e) =>
+            {
+                panelNav.Height = this.Height;
+                flowScrollable.Height = panelNav.Height - panelNavFixed.Height;
+            };
 
         }
-
-
 
 
         private void AddSection(FlowLayoutPanel parentFlow, string sectionTitle, string iconPath, string[] commands)
@@ -573,71 +652,75 @@ namespace Vados
             // Adiciona a seção ao Flow principal
             parentFlow.Controls.Add(sectionPanel);
 
+            // função local para calcular largura disponível do botão
+            Func<int> availableWidth = () =>
+            {
+                int w = parentFlow.ClientSize.Width;
+                // se ainda for 0 (ainda não layoutado), use panelNav width como fallback
+                if (w <= 0 && panelNav != null) w = panelNav.ClientSize.Width;
+                // subtrai um pouco para compensar possível scrollbar
+                int scrollbarCompensation = SystemInformation.VerticalScrollBarWidth + 8;
+                return Math.Max(40, w - scrollbarCompensation);
+            };
+
             // Criação de botões responsivos
             foreach (var cmd in commands)
             {
                 RoundedButton btn = new RoundedButton
                 {
                     Text = cmd,
-                    Height = 30,
+                    Height = 36,
                     TextAlign = ContentAlignment.MiddleLeft,
                     BackColor = Color.FromArgb(48, 61, 99),
                     ForeColor = Color.White,
                     Font = Fonts.GetFont(Fonts.DarkerRegular, 16f),
                     Padding = new Padding(15, 0, 15, 0),
-                    Margin = new Padding(15, 3, 15, 3),
+                    Margin = new Padding(15, 6, 15, 6),
                     AutoSize = false, // importante para definir Width manualmente
                     Cursor = Cursors.Hand
                 };
 
-                // Define a largura do botão baseado na largura do FlowLayoutPanel
-                btn.Width = flow.ClientSize.Width - btn.Margin.Left - btn.Margin.Right;
+                // Usa parentFlow para definir a largura
+                int btnWidth = availableWidth() - btn.Margin.Left - btn.Margin.Right;
+                btn.Width = Math.Max(120, btnWidth);
 
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
                 btn.Click += NavButton_Click;
-                flow.Controls.Add(btn);
+                parentFlow.Controls.Add(btn);
             }
 
-            // Atualiza largura dos botões quando a janela é redimensionada
-            flow.Resize += (s, e) =>
+            // Atualiza largura dos botões quando o painel for redimensionado
+            parentFlow.Resize += (s, e) =>
             {
-                foreach (RoundedButton btn in flow.Controls.OfType<RoundedButton>())
+                int newAvail = availableWidth();
+                foreach (RoundedButton btn in parentFlow.Controls.OfType<RoundedButton>())
                 {
-                    btn.Width = flow.ClientSize.Width - btn.Margin.Left - btn.Margin.Right;
+                    btn.Width = Math.Max(120, newAvail - btn.Margin.Left - btn.Margin.Right);
                 }
             };
-
-
-
         }
-
-
-
 
 
 
         private void NavButton_Click(object sender, EventArgs e)
         {
-
-            foreach (var btn in flow.Controls.OfType<Button>())
+            // Agora usa o painel rolável onde estão todos os botões
+            foreach (var btn in flowScrollable.Controls.OfType<Button>())
             {
                 btn.Font = Fonts.GetFont(Fonts.DarkerRegular, 16f);
-            }// tira a merda do negrito dos outros botoes pra colocar depois apenas no selecionado
+            }
 
             if (selectedButton != null)
-
                 selectedButton.BackColor = Color.FromArgb(48, 61, 99);
 
             selectedButton = sender as Button;
+
             selectedButton.BackColor = Color.FromArgb(82, 99, 152);
             selectedButton.Font = Fonts.GetFont(Fonts.DarkerExtraBold, 16f);
 
             LoadContentBasedOnSelection(selectedButton.Text);
-
         }
-
-
 
 
         private void LoadContentBasedOnSelection(string buttonText)
@@ -693,7 +776,7 @@ namespace Vados
                 case "Abrir programa":
                     LoadAbrirProgramaContent();
                     break;
-                case "Abrir  site":
+                case "Abrir site":
                     LoadAbrirSiteContent();
                     break;
             }
@@ -729,7 +812,7 @@ namespace Vados
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddImageToContent(@"Images\prints\Pastas\CriarPasta.png");
 
             AddSecundaryDescriptionToContent();
             Global.AppendPlainText(secundarydescriptionBox, "A execução desse comando depende de apenas um fator, o ");
@@ -740,9 +823,9 @@ namespace Vados
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "crie uma pasta", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta", Color.Black, exUnderline);
             Global.AppendPlainText(exampleRichTextBox, " chamada ");
-            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "'nome da pasta'.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta chamada 'Fotos'.\n", Color.FromArgb(125, 125, 125), exRegular);
             Global.AppendFormattedText(exampleRichTextBox, "Crie uma pasta com o nome 'Músicas'.\n", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
@@ -772,7 +855,7 @@ namespace Vados
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Abrir a pasta ", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Abra a pasta ‘Fotos’.”\n“Abrir a pasta chamada ‘Músicas’.”\n", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
@@ -836,7 +919,7 @@ namespace Vados
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Excluir a pasta", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " ‘nome da pasta'.\n", Color.Black, exBold);
 
             Global.AppendFormattedText(exampleRichTextBox, "“Exclua a pasta chamada ‘Jogos’.”\r\n“Delete a pasta ‘Fotos 2017’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
@@ -860,9 +943,10 @@ namespace Vados
 
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores: o");
-            Global.AppendFormattedText(descriptionBox, " nome da pasta a ser movida", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, " e o ");
-            Global.AppendFormattedText(descriptionBox, "nome da pasta de destino.", Colors.greenHighlight, descBold);
+            Global.AppendFormattedText(descriptionBox, " nome da pasta", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, " a ser movida e o ");
+            Global.AppendFormattedText(descriptionBox, "nome da pasta", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, " de destino.");
 
 
 
@@ -958,7 +1042,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-          
+
             Global.AppendPlainText(descriptionBox, "A execução desse comando depende de apenas um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". É importante dizer o ");
@@ -970,7 +1054,7 @@ namespace Vados
             AddExampleBox();
 
 
-           
+
             Global.AppendFormattedText(exampleRichTextBox, "Crie um arquivo ", Color.Black, exUnderline);
             Global.AppendPlainText(exampleRichTextBox, "chamado");
             Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’.\r\n ", Color.Black, exBold);
@@ -979,10 +1063,10 @@ namespace Vados
         }
         private void LoadExcluirArquivoContent()
         {
-         
+
             AddTitleToContent("Excluir um Arquivo");
             AddDescriptionToContent();
-           
+
             Global.AppendPlainText(descriptionBox, "Para excluir uma arquivo presente na pasta padrão (chamada “vados”), basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Excluir arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Os arquivos excluídos podem ser encontradas na lixeira, e de lá podem ser recuperadas.");
@@ -991,7 +1075,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-         
+
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas de um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Não é necessário dizer a ");
@@ -1002,7 +1086,7 @@ namespace Vados
             AddExampleBox();
 
 
-           
+
             Global.AppendFormattedText(exampleRichTextBox, "Excluir o arquivo", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’. \r\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Exclua o arquivo ‘Selfie’.”\r\n“Delete o arquivo chamado ‘Filme.mp4’.”", Color.FromArgb(125, 125, 125), exRegular);
@@ -1011,7 +1095,7 @@ namespace Vados
         private void LoadDuplicarArquivoContent()
         {
 
-           
+
             AddTitleToContent("Duplicar Arquivo");
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Para duplicar um arquivo, basta utilizar o comando");
@@ -1022,7 +1106,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-           
+
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas um fator, o ");
             Global.AppendFormattedText(descriptionBox, "nome do arquivo a ser duplicado", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Não é necessário dizer a ");
@@ -1033,8 +1117,8 @@ namespace Vados
             AddExampleBox();
 
 
-        
-            
+
+
             Global.AppendFormattedText(exampleRichTextBox, "Duplicar o arquivo", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Duplicar o arquivo ‘Tutorial’.”\r\n“Duplique o arquivo chamado ‘Lista de compras.txt’.”", Color.FromArgb(125, 125, 125), exRegular);
@@ -1044,10 +1128,10 @@ namespace Vados
 
         private void LoadOperarMultiplosArquivosContent()
         {
-          
+
             AddTitleToContent("Operar múltiplos arquivos");
             AddDescriptionToContent();
-            
+
 
             Global.AppendPlainText(descriptionBox, "Os comandos ");
             Global.AppendFormattedText(descriptionBox, "Mover arquivo, Excluir arquivo", Colors.blueHighlight, descBold);
@@ -1058,7 +1142,7 @@ namespace Vados
 
 
             AddDescriptionToContent();
-           
+
             Global.AppendPlainText(descriptionBox, "Os arquivos podem ser filtrados através dos seguintes fatores: ");
             Global.AppendFormattedText(descriptionBox, "nome, formato, data de modificação ", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, "e ");
@@ -1073,9 +1157,9 @@ namespace Vados
 
             Global.AppendFormattedText(exampleRichTextBox, "‘Comando’", Color.Black, exUnderline);
             Global.AppendPlainText(exampleRichTextBox, " os arquivos da pasta ");
-            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’ ", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’ ", Color.Black, descBold);
             Global.AppendPlainText(exampleRichTextBox, "que ");
-            Global.AppendFormattedText(exampleRichTextBox, "‘filtro’.\n ", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, "‘filtro’.\n ", Color.Black, descBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Excluir os arquivos da pasta ‘Fotos’ que tenham o nome ‘Praia’.”\r\n“Mova todos os arquivos da pasta ‘Escola’ que sejam ‘.txt’ para a pasta ‘Atividades’.”\r\n“Copiar os arquivos da pasta ‘Gravações’ de depois de 2022 par a pasta ‘Vídeos’.”\r\n“Delete todos os arquivos maiores que 10mb.”\r\n“Mover todos os arquivos da pasta ‘Selfies’ para a pasta ‘Fotos’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
@@ -1104,19 +1188,19 @@ namespace Vados
 
 
             Global.AppendFormattedText(exampleRichTextBox, "Renomeie o arquivo", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, " 'nome do arquivo'" , Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, " 'nome do arquivo'", Color.Black, exBold);
             Global.AppendPlainText(exampleRichTextBox, " para ");
-            Global.AppendFormattedText(exampleRichTextBox, "'novo nome do arquivo'\n ", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "'novo nome do arquivo'.\n ", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Renomeie o arquivo 'Documentos' para 'Documentos Importantes'.”\r\n“Renomeie o arquivo 'Documentos errados' para 'Documentos certos' ", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
 
         private void LoadMoverArquivoContent()
         {
-           
+
             AddTitleToContent("Mover um Arquivo");
             AddDescriptionToContent();
-          
+
             Global.AppendPlainText(descriptionBox, "Para mover um arquivo para dentro de uma pasta, basta utilizar o comando ");
             Global.AppendFormattedText(descriptionBox, "Mover arquivo", Colors.blueHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ". Por questão de simplicidade, os arquivos movidos devem ou estar presentes na pasta padrão (chamada “vados”), ou a pasta de destino deve ser a pasta padrão.");
@@ -1125,16 +1209,16 @@ namespace Vados
 
 
             AddDescriptionToContent();
-            
-            Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores: o ");
-            Global.AppendFormattedText(descriptionBox, "nome da pasta a ser movida ", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "e o");
-            Global.AppendFormattedText(descriptionBox, " nome da pasta de destino.", Colors.greenHighlight, descBold);
 
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa de dois fatores: o ");
+            Global.AppendFormattedText(descriptionBox, "nome do arquivo", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, " a ser movido e o");
+            Global.AppendFormattedText(descriptionBox, " nome da pasta", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, " de destino.");
             AddExampleBox();
 
 
-           
+
             Global.AppendFormattedText(exampleRichTextBox, "Mover o arquivo", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’ ", Color.Black, exBold);
             Global.AppendPlainText(descriptionBox, "para a pasta ");
@@ -1147,59 +1231,61 @@ namespace Vados
 
         private void LoadAbrirSiteContent()
         {
-            AddTitleToContent("");
-            AddTitleToContent("Abrir Site ");
+
+            AddTitleToContent("Abrir site ");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendPlainText(descriptionBox, "Para abrir um site em seu computador, basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Abrir site. ", Colors.blueHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, "Você pode informar o nome do site, caso ele já esteja definido como um site padrão, ou indicar diretamente o link do site. O site será aberto no seu navegador padrão.");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
-
+            Global.AppendPlainText(descriptionBox, "Esse comando requer apenas um parâmetro: o ");
+            Global.AppendFormattedText(descriptionBox, "nome do site ", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, "ou o");
+            Global.AppendFormattedText(descriptionBox, "link do site", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, ".");
 
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir site", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, " 'nome do site/link'. \n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Abrir site Facebook.”\r\n“Abra o site Youtube.com”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
         private void LoadAbrirProgramaContent()
         {
-            AddTitleToContent("");
-            AddTitleToContent("Abrir Programa");
+
+            AddTitleToContent("Abrir programa");
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendPlainText(descriptionBox, "Para abrir um programa do seu computador, basta utilizar o comando ");
+            Global.AppendFormattedText(descriptionBox, "Abrir Programa", Colors.blueHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, ". A busca será realizada em todo seu computador o programa procura tanto arquivos executáveis como atalhos.");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
 
             AddDescriptionToContent();
-            Global.AppendPlainText(descriptionBox, "");
-            Global.AppendFormattedText(descriptionBox, "", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "");
+            Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas de um fator, o ");
+            Global.AppendFormattedText(descriptionBox, "nome do programa", Colors.greenHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, ".");
 
 
             AddExampleBox();
 
 
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exUnderline);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.Black, exBold);
-            Global.AppendFormattedText(exampleRichTextBox, "", Color.FromArgb(125, 125, 125), exRegular);
+            Global.AppendFormattedText(exampleRichTextBox, "Abrir Programa", Color.Black, exUnderline);
+            Global.AppendFormattedText(exampleRichTextBox, " 'nome do Programa'.\n", Color.Black, exBold);
+            Global.AppendFormattedText(exampleRichTextBox, "“Abrir Programa Word”\r\n“Abrir Aplicativo PowerPoint.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
         }
 
 
         #endregion
+
 
         private void btnReturn_Click(object sender, EventArgs e)
         {

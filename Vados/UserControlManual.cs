@@ -179,91 +179,95 @@ namespace Vados
 
         private void SetupContentArea()
         {
-            // --- calcula largura da navbar (assume que panelNav já foi criado) ---
+     
             int navWidth = panelNav?.Width ?? 320;
 
-            // Panel content posicionado À DIREITA da navbar (sem Dock)
+           
             panelContent = new Panel
             {
                 BackColor = Color.FromArgb(223, 223, 223),
                 Location = new Point(navWidth, 0),
                 Size = new Size(Math.Max(100, this.ClientSize.Width - navWidth), this.ClientSize.Height),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                AutoScroll = false // quem scrolla é o TableLayoutPanel
+                AutoScroll = false 
             };
-            // Adicione ao formulário / controle (ordem de Add deve ser gerida no construtor)
+        
             this.Controls.Add(panelContent);
 
-            // ---- botão voltar (dentro do panelContent) ----
+          
             btnReturn = new PictureBox
             {
                 Width = 50,
                 Height = 50,
                 Image = Image.FromFile(pathreturnbutton),
                 SizeMode = PictureBoxSizeMode.Zoom,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+               
             };
             btnReturn.Click += btnReturn_Click;
             panelContent.Controls.Add(btnReturn);
             btnReturn.BringToFront();
 
-            // --- top padding (distância do topo para o conteúdo) ---
-            int topPadding = 20; // ajuste se quiser mais espaço acima
+        
+            int topPadding = 20; 
 
-            // --- área de conteúdo que faz scroll ---
+         
             tableLayoutContent = new TableLayoutPanel
             {
-                AutoScroll = true,        // scrollbar só quando o conteúdo ultrapassar
+                AutoScroll = true,       
                 ColumnCount = 1,
                 RowCount = 0,
-                Padding = new Padding(20, topPadding + 10, 20, 20), // espaço interno (top inclui topPadding)
+                Padding = new Padding(20, topPadding + 10, 20, 20), 
                 Location = new Point(0, 0),
-                // definiremos Width/Height logo abaixo
+             
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            // Ajusta tamanho inicial com base no panelContent.ClientSize
+            
             ResizeContentChildren(navWidth, topPadding);
 
             panelContent.Controls.Add(tableLayoutContent);
 
-            // Atualiza tamanhos ao redimensionar o UserControl
+           
             this.Resize += (s, e) =>
             {
-                // atualiza o panelContent para ocupar o espaço à direita da navbar
+                
                 panelContent.Location = new Point(navWidth, 0);
                 panelContent.Size = new Size(Math.Max(100, this.ClientSize.Width - navWidth), this.ClientSize.Height);
 
-                // recalcula posições internas
+                
                 ResizeContentChildren(navWidth, topPadding);
             };
         }
 
-        // Função auxiliar para recalcular tamanhos internos corretamente
+        
         private void ResizeContentChildren(int navWidth, int topPadding)
         {
             if (panelContent == null || tableLayoutContent == null || btnReturn == null) return;
 
-            // usa ClientSize para evitar incluir bordas externas
+          
             int contentW = panelContent.ClientSize.Width;
             int contentH = panelContent.ClientSize.Height;
 
-            // garante mínimo para evitar negative sizes
+            
             contentW = Math.Max(60, contentW);
             contentH = Math.Max(60, contentH);
 
-            // posiciona o botão retornar no canto superior direito do panelContent
-            btnReturn.Location = new Point(contentW - btnReturn.Width - 20, 20);
 
-            // tabela deve ocupar toda a área visível do panelContent (sem extrapolar)
-            // deixamos a tabela com a mesma largura do painel (subtraímos padding interno)
+            btnReturn.Location = new Point(
+       panelContent.ClientSize.Width - 40 - panelContent.Padding.Right - btnReturn.Width,
+       panelContent.Padding.Top + 20
+   );
+
+
+
             tableLayoutContent.Location = new Point(0, 0);
             tableLayoutContent.Size = new Size(contentW, contentH);
 
-            // Garantia extra: AutoScrollMinSize pequeno (não força scrollbar)
+           
             tableLayoutContent.AutoScrollMinSize = new Size(0, 0);
 
-            // Se quiser, força um reflow imediato
+            
             tableLayoutContent.PerformLayout();
             panelContent.PerformLayout();
         }
@@ -304,20 +308,20 @@ namespace Vados
                 TabStop = false,
                 WordWrap = true,
                 Dock = DockStyle.None,
-                Margin = new Padding(65, 10, 40, 30), // margem externa
+                Margin = new Padding(65, 10, 40, 30),
                 Tag = "descrição",
                 Cursor = Cursors.Arrow
             };
             Global.TextBoxFitHeight(exampleRichTextBox, 10);
 
-            // Bloqueia seleção/foco
+            
             descriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
             descriptionBox.MouseDown += (s, e) => descriptionBox.SelectionLength = 0;
             descriptionBox.SelectionChanged += (s, e) => descriptionBox.SelectionLength = 0;
 
-            // Adiciona margem interna para o texto
-            descriptionBox.SelectionIndent = 0;           // recuo à esquerda
-            descriptionBox.SelectionRightIndent = 20;    // recuo à direita
+           
+            descriptionBox.SelectionIndent = 0;          
+            descriptionBox.SelectionRightIndent = 20;   
 
             ResizeDescriptionBox(descriptionBox);
 
@@ -345,7 +349,7 @@ namespace Vados
                 TabStop = false,
                 WordWrap = true,
                 Dock = DockStyle.None,
-                Margin = new Padding(65, 10, 40, 30), // margem externa
+                Margin = new Padding(65, 10, 40, 30), 
                 Tag = "descrição",
                 Cursor = Cursors.Arrow
             };
@@ -353,14 +357,14 @@ namespace Vados
 
             Global.TextBoxFitHeight(secundarydescriptionBox, 10);
 
-            // Bloqueia seleção/foco
+           
             secundarydescriptionBox.GotFocus += (s, e) => this.ActiveControl = null;
             secundarydescriptionBox.MouseDown += (s, e) => secundarydescriptionBox.SelectionLength = 0;
             secundarydescriptionBox.SelectionChanged += (s, e) => secundarydescriptionBox.SelectionLength = 0;
 
-            // Adiciona margem interna para o texto
-            secundarydescriptionBox.SelectionIndent = 0;           // recuo à esquerda
-            secundarydescriptionBox.SelectionRightIndent = 20;    // recuo à direita
+            
+            secundarydescriptionBox.SelectionIndent = 0;           
+            secundarydescriptionBox.SelectionRightIndent = 20;    
 
             ResizeDescriptionBox(secundarydescriptionBox);
 
@@ -705,7 +709,7 @@ namespace Vados
 
         private void NavButton_Click(object sender, EventArgs e)
         {
-            // Agora usa o painel rolável onde estão todos os botões
+           
             foreach (var btn in flowScrollable.Controls.OfType<Button>())
             {
                 btn.Font = Fonts.GetFont(Fonts.DarkerRegular, 16f);

@@ -264,11 +264,7 @@ namespace Vados
             }
 
             //Extrair argumentos do comando
-            string commandText = command.Replace(",", "");
-            //commandText = commandText.Replace(".", "");
-            commandText = commandText.Replace("!", "");
-            commandText = commandText.Replace("?", "");
-            var arguments = Comandos.CommandGetArguments(commandText);
+            var arguments = Comandos.CommandGetArguments(command);
 
             //Mostrar mensagem de confirmação
             parentForm.ToggleOverlay(true);

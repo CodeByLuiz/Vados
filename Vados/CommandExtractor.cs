@@ -248,13 +248,19 @@ namespace Vados
                     if (nameLength > 0)
                         objName = originalCommand.Substring(startIndex, nameLength).Trim();
 
-                    if (objName.Contains("\"") || objName.Contains("\'"))
+                    //Parar nome em pontuações
+                    objName = Global.SubstringAtPunctuation(objName);
+
+                    //Definir se o nome está entre aspas
+                    int count = objName.Count();
+                    bool quotation = objName[0] == '\"' && objName[count - 1] == '\"';
+                    bool apostrophe = objName[0] == '\'' && objName[count - 1] == '\'';
+
+                    if (quotation || apostrophe)
+                    {
+                        objName = objName.Substring(1, count - 2);
                         hasSpecificName = true;
-
-                    objName = objName.Replace("\"", "");
-
-                    //objName = Global.SubstringAtPunctuation(objName);
-                    //MessageBox.Show(objName);
+                    }
                 }
 
 
@@ -366,8 +372,16 @@ namespace Vados
                     if (nameLength > 0)
                         newName = originalCommand.Substring(startIndex, nameLength).Trim();
 
-                    newName = newName.Replace("\"", "");
-                    newName = newName.Replace("\'", "");
+                    //Parar nome em pontuações
+                    newName = Global.SubstringAtPunctuation(newName);
+
+                    //Definir se o nome está entre aspas
+                    int count = newName.Count();
+                    bool quotation = newName[0] == '\"' && newName[count - 1] == '\"';
+                    bool apostrophe = newName[0] == '\'' && newName[count - 1] == '\'';
+
+                    if (quotation || apostrophe)
+                        newName = newName.Substring(1, count - 2);
                 }
                 else
                 {
@@ -446,6 +460,17 @@ namespace Vados
 
                     if (nameLength > 0)
                         criteria.Origin = originalCommand.Substring(startIndex, nameLength).Trim();
+
+                    //Parar nome em pontuações
+                    criteria.Origin = Global.SubstringAtPunctuation(criteria.Origin);
+
+                    //Definir se o nome está entre aspas
+                    int count = criteria.Origin.Count();
+                    bool quotation = criteria.Origin[0] == '\"' && criteria.Origin[count - 1] == '\"';
+                    bool apostrophe = criteria.Origin[0] == '\'' && criteria.Origin[count - 1] == '\'';
+
+                    if (quotation || apostrophe)
+                        criteria.Origin = criteria.Origin.Substring(1, count - 2);
                 }
 
                 //Pasta padrão
@@ -517,6 +542,17 @@ namespace Vados
 
                     if (nameLength > 0)
                         criteria.Destination = originalCommand.Substring(startIndex, nameLength).Trim();
+
+                    //Parar nome em pontuações
+                    criteria.Destination = Global.SubstringAtPunctuation(criteria.Destination);
+
+                    //Definir se o nome está entre aspas
+                    int count = criteria.Destination.Count();
+                    bool quotation = criteria.Destination[0] == '\"' && criteria.Destination[count - 1] == '\"';
+                    bool apostrophe = criteria.Destination[0] == '\'' && criteria.Destination[count - 1] == '\'';
+
+                    if (quotation || apostrophe)
+                        criteria.Destination = criteria.Destination.Substring(1, count - 2);
                 }
 
                 //Pasta padrão

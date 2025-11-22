@@ -385,14 +385,44 @@ namespace Vados
         //Links associados à palavras
         static Dictionary<string, string> linkSynonyms = new Dictionary<string, string>()
         {
-            //Bytes
             { "google", "https://google.com" },
             { "youtube", "https://www.youtube.com" },
+            { "yt", "https://www.youtube.com" },
             { "netflix", "https://www.netflix.com" },
             { "whatsapp", "https://www.whatsapp.com" },
+            { "whats", "https://www.whatsapp.com" },
+            { "wpp", "https://www.whatsapp.com" },
             { "github", "https://github.com" },
+            { "git hub", "https://github.com" },
             { "tradutor", "https://translate.google.com.br" },
             { "wikipedia", "https://pt.wikipedia.org/wiki/" },
+            { "facebook", "https://www.facebook.com" },
+            { "face", "https://www.facebook.com" },
+            { "instagram", "https://www.instagram.com" },
+            { "insta", "https://www.instagram.com" },
+            { "tiktok", "https://www.tiktok.com" },
+            { "tik tok", "https://www.tiktok.com" },
+            { "ttk", "https://www.tiktok.com" },
+            { "chatgpt", "https://chatgpt.com" },
+            { "chat gpt", "https://chatgpt.com" },
+            { "chat", "https://chatgpt.com" },
+            { "twitter", "https://x.com" },
+            { "x", "https://x.com" },
+            { "x.com", "https://x.com" },
+            { "reddit", "https://www.reddit.com" },
+            { "amazon", "https://www.amazon.com.br" },
+            { "pinterest", "https://br.pinterest.com" },
+            { "gemini", "https://gemini.google.com" },
+            { "twitch", "https://www.twitch.tv" },
+            { "twitch.tv", "https://www.twitch.tv" },
+            { "twitch tv", "https://www.twitch.tv" },
+            { "canva", "https://www.canva.com" },
+            { "telegram", "https://web.telegram.org" },
+            { "linkedin", "https://br.linkedin.com" },
+            { "linked in", "https://br.linkedin.com" },
+            { "nsa", "https://nsa.cps.sp.gov.br" },
+            { "teams", "https://teams.microsoft.com" },
+            { "microsoft teams", "https://teams.microsoft.com" },
         };
 
         public static List<string> allLinkWords = new List<string>(linkSynonyms.Keys);
@@ -2456,6 +2486,7 @@ namespace Vados
 
                 //Remover resultado da frente da string
                 string command = lines[i].Substring(4, Math.Min(100 - 4, lines[i].Length - 4)).Trim();
+                //MessageBox.Show(i.ToString() + " - " + command);
                 
                 //Obter resultado
                 var args = Comandos.CommandGetArguments(command);

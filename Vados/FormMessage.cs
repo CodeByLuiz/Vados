@@ -484,10 +484,11 @@ namespace Vados
 
             //Terminações das palavras no plural
             string termination = "o";
+            if (objectType == "pasta") termination = "a";
             if (amount != "")
             {
                 obj += "s";
-                termination = "as";
+                termination += "s";
             }
 
 

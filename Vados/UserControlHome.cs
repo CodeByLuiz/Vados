@@ -46,7 +46,7 @@ namespace Vados
         PictureBox btnPause;
         PictureBox btnStop;
 
-        bool hasTranscribedAudio = true;
+        bool isTranscribingAudio = false;
         System.Windows.Forms.Timer audioTimer;
         int audioSeconds = 0;
 
@@ -265,7 +265,7 @@ namespace Vados
 
             //Extrair argumentos do comando
             string commandText = command.Replace(",", "");
-            commandText = commandText.Replace(".", "");
+            //commandText = commandText.Replace(".", "");
             commandText = commandText.Replace("!", "");
             commandText = commandText.Replace("?", "");
             var arguments = Comandos.CommandGetArguments(commandText);
@@ -292,7 +292,6 @@ namespace Vados
                 Global.VoiceRecognizer.OnSilence += OnSilence;
             }
 
-            hasTranscribedAudio = false;
             Global.VoiceRecognizer.Start();
 
             micIcon = activeMicIcon;
@@ -327,6 +326,7 @@ namespace Vados
             if (Global.VoiceRecognizer.isInitialized)
             {
                 TextBoxReset("Transcrevendo...", false);
+                isTranscribingAudio = true;
 
                 string result = await Global.VoiceRecognizer.Stop();
                 result = result.Replace("\"", "");
@@ -334,6 +334,7 @@ namespace Vados
                 result = Comandos.CorrectCommonErrors(result, Comandos.commonErrorSynonyms);
 
                 //Realizar comando
+                isTranscribingAudio = false;
                 TextBoxWrite(result);
                 PerformCommand(result, true);
             }
@@ -355,7 +356,6 @@ namespace Vados
 
             #endregion----------------------------------------
 
-            hasTranscribedAudio = true;
 
             //Resetar botão do microfone
             SetMicLoadingIcon(false);
@@ -383,14 +383,12 @@ namespace Vados
             //Pausar timer
             audioTimer.Enabled = false;
             Global.VoiceRecognizer.Pause();
-            hasTranscribedAudio = true;
         }
 
 
         //Continuar comando de voz
         public async void ResumeListening()
         {
-            hasTranscribedAudio = false;
             Global.VoiceRecognizer.Resume();
             TextBoxReset("Escutando...", false);
 
@@ -599,7 +597,7 @@ namespace Vados
 
 
             //Contorno do círculo
-            float outlineSize = Math.Max(25f, Math.Min(circleSize * 0.05f, 25f));
+            float outlineSize = 30f;
 
             Brush brush = new SolidBrush(Colors.bluePrimary);
             RectangleF rect = new RectangleF(circleLeft, circleTop, circleSize, circleSize);
@@ -987,6 +985,8 @@ namespace Vados
                     circleSizeChangeSpeed = 2;
                     float maxSize = 1.2f * circleSizeListening;
                     float normalizedDecibels = 1f - ((float)decibels / -100f);
+                    if (isTranscribingAudio) normalizedDecibels = 0;    //Retomar tamanho ao terminar fala
+
                     circleSizeTarget = circleSizeListening + (maxSize - circleSizeListening) * normalizedDecibels;
                 }
             }

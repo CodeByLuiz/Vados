@@ -170,8 +170,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.Substring(criteria.ActionPos).ToLower();
-            command = Comandos.RemoveDiacritics(command);
+            string originalCommand = command.Substring(criteria.ActionPos);
+            command = Comandos.RemoveDiacritics(originalCommand.ToLower());
 
             string BuildPattern()
             {
@@ -201,7 +201,7 @@ namespace Vados
             {
                 List<string> newNominators = nominators.Values.Concat(Comandos.linkNamingWords).ToList();
                 nominators = new Pattern(newNominators, false);
-                match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
+                match = Regex.Match(command, BuildPattern(), RegexOptions.IgnoreCase);
             }
 
             //Se não encontrar o tipo de objeto, tentar corresponder o nome de outra forma
@@ -209,7 +209,7 @@ namespace Vados
             {
                 objects = new Pattern(objectsList, false);
                 nominators = new Pattern(new List<string>() { "o", "a", "os", "as" }, false);
-                match = Regex.Match(Comandos.RemoveDiacritics(command), BuildPattern(), RegexOptions.IgnoreCase);
+                match = Regex.Match(command, BuildPattern(), RegexOptions.IgnoreCase);
                 //MessageBox.Show(BuildPattern());
             }
 
@@ -233,6 +233,7 @@ namespace Vados
                 var lastGroup = match.Groups[Global.FindLastGroupIndex(match.Groups)];
                 int startIndex = lastGroup.Index + lastGroup.Length;
                 bool hasName = criteria.PostObjectNameIndex == -1 || criteria.PostObjectNameIndex > startIndex + 1;
+                bool hasSpecificName = false;   //Se o nome está entre aspas
 
                 if (hasName)
                 {
@@ -245,10 +246,15 @@ namespace Vados
 
                     int nameLength = stopIndex - startIndex;
                     if (nameLength > 0)
-                        objName = command.Substring(startIndex, nameLength).Trim();
+                        objName = originalCommand.Substring(startIndex, nameLength).Trim();
+
+                    if (objName.Contains("\"") || objName.Contains("\'"))
+                        hasSpecificName = true;
 
                     objName = objName.Replace("\"", "");
-                    objName = objName.Replace("\'", "");
+
+                    //objName = Global.SubstringAtPunctuation(objName);
+                    //MessageBox.Show(objName);
                 }
 
 
@@ -280,10 +286,8 @@ namespace Vados
                 //Palavras associadas à arquivos / pastas específicas
                 if (criteria.ObjectType == "pasta")
                 {
-                    bool isSpecificName = !match.Groups[11].Success || match.Groups[8].Success;
-
                     //Pasta padrão
-                    if (Comandos.defaultFolderWords.Contains(objName) && !isSpecificName)
+                    if (Comandos.defaultFolderWords.Contains(objName) && !hasSpecificName)
                     {
                         criteria.ObjectPath = Global.DefaultFolder;
                     }
@@ -333,7 +337,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower().Substring(criteria.ActionPos);
+            string originalCommand = command.Substring(criteria.ActionPos);
+            command = Comandos.RemoveDiacritics(originalCommand.ToLower());
             string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
             string pattern = $@"(\s+(para|pra))";//\s+({patternName}))";
 
@@ -359,7 +364,7 @@ namespace Vados
 
                     int nameLength = stopIndex - startIndex;
                     if (nameLength > 0)
-                        newName = command.Substring(startIndex, nameLength).Trim();
+                        newName = originalCommand.Substring(startIndex, nameLength).Trim();
 
                     newName = newName.Replace("\"", "");
                     newName = newName.Replace("\'", "");
@@ -370,7 +375,6 @@ namespace Vados
                 }
 
                 criteria.ObjectNewName = newName;
-
                 //MessageBox.Show("new name " + criteria.ObjectNewName);
 
                 //Palavra após o nome do objeto
@@ -406,7 +410,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower().Substring(criteria.ActionPos);
+            string originalCommand = command.Substring(criteria.ActionPos);
+            command = Comandos.RemoveDiacritics(originalCommand.ToLower());
             string patternFrom = string.Join("|", fromIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -415,7 +420,7 @@ namespace Vados
             string pattern = $@"\b({patternFrom})\s+({patternFolder})(\s+({patternNominator}))?\s+({patternName})";
 
             //Checar se o padrão está no comando
-            var match = Regex.Match(Comandos.RemoveDiacritics(command), pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
 
             //Extrair argumentos
             if (match.Success)
@@ -440,7 +445,7 @@ namespace Vados
                     int nameLength = stopIndex - startIndex;
 
                     if (nameLength > 0)
-                        criteria.Origin = command.Substring(startIndex, nameLength).Trim();
+                        criteria.Origin = originalCommand.Substring(startIndex, nameLength).Trim();
                 }
 
                 //Pasta padrão
@@ -481,7 +486,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower().Substring(criteria.ActionPos);
+            string originalCommand = command.Substring(criteria.ActionPos);
+            command = Comandos.RemoveDiacritics(originalCommand.ToLower());
             string patternInside = string.Join("|", insideIndicators.Select(Regex.Escape));
             string patternFolder = string.Join("|", folders.Select(Regex.Escape));
             string patternNominator = string.Join("|", nominators.Select(Regex.Escape));
@@ -510,7 +516,7 @@ namespace Vados
                     int nameLength = stopIndex - startIndex;
 
                     if (nameLength > 0)
-                        criteria.Destination = command.Substring(startIndex, nameLength).Trim();
+                        criteria.Destination = originalCommand.Substring(startIndex, nameLength).Trim();
                 }
 
                 //Pasta padrão
@@ -555,7 +561,8 @@ namespace Vados
 
         public override bool Extract(string command, CommandCriteria criteria)
         {
-            command = command.ToLower().Substring(criteria.ActionPos);
+            string originalCommand = command.Substring(criteria.ActionPos);
+            command = Comandos.RemoveDiacritics(originalCommand.ToLower());
             string patternIndicator = string.Join("|", sizeIndicators.Select(Regex.Escape));
             string patternModifier = string.Join("|", sizeModifiers.Select(Regex.Escape));
             string patternUnit = string.Join("|", sizeUnits.Select(Regex.Escape));

@@ -88,6 +88,9 @@ namespace Vados
             "[som de fundo]",
             "[Som de fundo]",
             "[SOM DE FUNDO]",
+            "[intérprete]",
+            "[Intérprete]",
+            "[INTÉRPRETE]",
         };
 
         //Palavras aceitas/esperadas no reconhecimento de voz que não estão em nenhuma outra lista
@@ -103,6 +106,7 @@ namespace Vados
             { "matos", "Vados" },
             //Criar
             { "fiar", "criar" },
+            { "pliar", "criar" },
             //Renomear
             { "renomei", "renomeie" },
             { "procar", "trocar" },
@@ -110,6 +114,8 @@ namespace Vados
             { "piar", "copiar" },
             //Arquivo
             { "aqui o", "arquivo" },
+            //Pasta
+            { "esta", "pasta" },
         };
 
         #endregion
@@ -871,9 +877,6 @@ namespace Vados
         //Retorna os caminhos encontrados conforme os critérios
         static async Task<(List<string> list, string errorMessage)> GetPaths(string objectType, string name, string format, string origin, string amountModifier, string size, string sizeUnit, string sizeModifier, List<string> priorities = null, List<string> exceptions = null)
         {
-            if (priorities == null) priorities = Global.defaultPriorities;
-            if (exceptions == null) priorities = Global.defaultExceptions;
-
 
             #region TAMANHO
 
@@ -940,13 +943,17 @@ namespace Vados
                     List<string> newPaths = (await SearchPaths(name + "." + extension, objectType == "pasta",
                                                         rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound,
                                                         exceptions: exceptions, priorities: priorities).ConfigureAwait(false)).ToList();
+
                     paths.AddRange(newPaths);
+                    if (paths.Count >= amountNumber) break;
                 }
             }
             else
             {
                 //Procura normal usando o nome                
-                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber, sizeLowerBound: lowerBound, sizeUpperBound: upperBound).ConfigureAwait(false)).ToList();
+                paths = (await SearchPaths(name, objectType == "pasta", rootFolder: origin, pathAmount: amountNumber,
+                                           sizeLowerBound: lowerBound, sizeUpperBound: upperBound, exceptions: exceptions,
+                                           priorities: priorities).ConfigureAwait(false)).ToList();
             }
 
 
@@ -1583,7 +1590,6 @@ namespace Vados
                 if (Directory.Exists(pasta))
                 {
                     fila.Enqueue(pasta);
-
                 }
             }
 
@@ -1679,7 +1685,6 @@ namespace Vados
 
                             //Checar se o arquivo tem o nome correto
                             string actualName = Path.GetFileName(filePath);
-
 
                             if (!string.IsNullOrEmpty(searchName) && !actualName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                                 continue;

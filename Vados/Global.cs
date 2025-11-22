@@ -526,5 +526,70 @@ public static UserControlHome userControlHome;
 
             return false;
         }
+
+
+        //Cortar string após uma pontuação
+        public static string SubstringAtPunctuation(string str)
+        {
+            List<string> punctuation = new List<string>() { ".", ",", "?", "!", "\"", "\'" };
+            char[] chars = str.ToCharArray();
+            bool finished = false;
+            bool enclosed = false;
+            int startIndex = 0;
+            int qmCount = 0;
+            int apCount = 0;
+
+            for (int i = 0; i < chars.Count(); i++)
+            {
+                char c = chars[i];
+                MessageBox.Show(c.ToString());
+
+                switch(c)
+                {
+                    case '.':
+                        if (i == chars.Count() || chars[i + i] == ' ')
+                            finished = true;
+                        break;
+
+                    case '\"':
+                        qmCount += 1;
+                        if (startIndex == 0)
+                            startIndex = i + 1;
+
+                        if (qmCount == 2)
+                        {
+                            finished = true;
+                            enclosed = true;
+                        }
+                        break;
+
+                    case '\'':
+                        apCount += 1;
+                        if (startIndex == 0)
+                            startIndex = i + 1;
+
+                        if (apCount == 2)
+                        {
+                            finished = true;
+                            enclosed = true;
+                        }
+                        break;
+
+                    default:
+                        if (chars.Contains(c))
+                            finished = true;
+                        break;
+                }
+
+                if (enclosed == false)
+                    startIndex = 0;
+
+                //Cortar string antes da pontuação
+                if (finished)
+                    return str.Substring(startIndex, i - 1 - startIndex);
+            }
+
+            return str;
+        }
     }
 }

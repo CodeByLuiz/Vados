@@ -51,6 +51,9 @@
     <None Remove="Images\LogoBranco.png" />
     <None Remove="Images\micIcon.png" />
     <None Remove="Images\prints\Arquivos\Criar Arquivo.png" />
+    <None Remove="Images\prints\Arquivos\CriarArquivo.png" />
+    <None Remove="Images\prints\Arquivos\DuplicarArquivo.png" />
+    <None Remove="Images\prints\Arquivos\RenomearArquivo.png" />
     <None Remove="Images\prints\Pastas\Abrir Pasta Padrão.png" />
     <None Remove="Images\prints\Pastas\Abrir Pasta.png" />
     <None Remove="Images\prints\Pastas\CriarPasta.png" />
@@ -60,6 +63,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Images\prints\Arquivos\CriarArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Arquivos\DuplicarArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Arquivos\RenomearArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\prints\Pastas\Abrir Pasta Padrão.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -196,9 +208,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\LogoBranco.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\prints\Arquivos\Criar Arquivo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\prints\Pastas\Abrir Pasta.png">

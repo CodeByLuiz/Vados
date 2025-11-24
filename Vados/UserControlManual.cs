@@ -606,7 +606,7 @@ namespace Vados
 
             AddSection(flowScrollable, "Sistema", @"Images/Icons/Sistema.png", new[]
             {
-        "Abrir site", "Abrir Programa"
+        "Abrir site", "Abrir programa"
     });
 
 
@@ -1239,8 +1239,8 @@ namespace Vados
             AddTitleToContent("Abrir site ");
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Para abrir um site em seu computador, basta utilizar o comando ");
-            Global.AppendFormattedText(descriptionBox, "Abrir site. ", Colors.blueHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "Você pode informar o nome do site, caso ele já esteja definido como um site padrão, ou indicar diretamente o link do site. O site será aberto no seu navegador padrão.");
+            Global.AppendFormattedText(descriptionBox, "Abrir site", Colors.blueHighlight, descBold);
+            Global.AppendPlainText(descriptionBox, ". Você pode informar o nome do site, caso ele já esteja definido como um site padrão, ou indicar diretamente o link do site. O site será aberto no seu navegador padrão.");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 

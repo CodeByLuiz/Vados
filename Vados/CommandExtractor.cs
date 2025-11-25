@@ -177,8 +177,8 @@ namespace Vados
             {
                 string nameRequirement = nameIsRequired ? "" : "?";
                 string patternName = @"?:'([^']+)'|""([^""]+)""|([^'""\s]+)";
-                string pattern = $@"({amount.ToPattern()}\s+){amount.ToRequired()}" +
-                                 $@"{objects.ToPattern()}{objects.ToRequired()}" +
+                string pattern = $@"({amount.ToPattern()}){amount.ToRequired()}" +
+                                 $@"(\s+{objects.ToPattern()}){objects.ToRequired()}" +
                                  $@"(\s+de\s+{extensions.ToPattern()}){extensions.ToRequired()}" +
                                  $@"(\s+{nominators.ToPattern()}){nominators.ToRequired()}";// +
                                  //$@"\s+({patternName})){nameRequirement}";
@@ -191,7 +191,7 @@ namespace Vados
             var match = Regex.Match(command, pattern, RegexOptions.IgnoreCase);
 
             //Tipo de objeto
-            string obj = Comandos.WordGetSynonym(match.Groups[3].Value);
+            string obj = Comandos.WordGetSynonym(match.Groups[4].Value);
 
 
             #region TENTAR CORRESPONDÊNCIA NOVAMENTE (em casos específicos)
@@ -207,8 +207,9 @@ namespace Vados
             //Se não encontrar o tipo de objeto, tentar corresponder o nome de outra forma
             if (obj == "")
             {
+                List<string> newNominators = new List<string>() { "o", "a", "os", "as", "no", "na", "nos", "nas" };
                 objects = new Pattern(objectsList, false);
-                nominators = new Pattern(new List<string>() { "o", "a", "os", "as" }, false);
+                nominators = new Pattern(newNominators, false);
                 match = Regex.Match(command, BuildPattern(), RegexOptions.IgnoreCase);
                 //MessageBox.Show(BuildPattern());
             }
@@ -222,7 +223,7 @@ namespace Vados
                 criteria.ObjectType = obj;
 
                 //Formato do objeto
-                criteria.ObjectFormat = match.Groups[5].Value;
+                criteria.ObjectFormat = match.Groups[6].Value;
 
                 //Quantidade
                 criteria.ObjectAmount = Comandos.WordGetSynonym(match.Groups[2].Value);
@@ -274,7 +275,9 @@ namespace Vados
                     criteria.ObjectType = "aplicativo";
 
                     if (Comandos.allLinkWords.Contains(objName))
+                    {
                         criteria.ObjectType = "site";
+                    }
 
                     //Lixeira
                     if (objName == "lixeira")
@@ -452,6 +455,7 @@ namespace Vados
 
                 //Idenfificar nome composto sem aspas
                 int nameGroup = 7;
+                bool hasSpecificName = false;
 
                 if (match.Groups[nameGroup].Success)
                 {
@@ -479,12 +483,15 @@ namespace Vados
                         bool apostrophe = criteria.Origin[0] == '\'' && criteria.Origin[count - 1] == '\'';
 
                         if (quotation || apostrophe)
+                        {
                             criteria.Origin = criteria.Origin.Substring(1, count - 2);
+                            hasSpecificName = true;
+                        }
                     }
                 }
 
                 //Pasta padrão
-                if (Comandos.defaultFolderWords.Contains(criteria.Origin) && match.Groups[7].Success)
+                if (Comandos.defaultFolderWords.Contains(criteria.Origin) && !hasSpecificName)
                 {
                     criteria.OriginPath = Global.DefaultFolder;
                 }
@@ -542,6 +549,7 @@ namespace Vados
 
                 //Idenfificar nome composto sem aspas
                 int nameGroup = 7;
+                bool hasSpecificName = false;
 
                 if (match.Groups[nameGroup].Success)
                 {
@@ -564,12 +572,15 @@ namespace Vados
                         bool apostrophe = criteria.Destination[0] == '\'' && criteria.Destination[count - 1] == '\'';
 
                         if (quotation || apostrophe)
+                        {
                             criteria.Destination = criteria.Destination.Substring(1, count - 2);
+                            hasSpecificName = true;
+                        }
                     }
                 }
 
                 //Pasta padrão
-                if (Comandos.defaultFolderWords.Contains(criteria.Destination) && match.Groups[7].Success)
+                if (Comandos.defaultFolderWords.Contains(criteria.Destination) && !hasSpecificName)
                 {
                     criteria.DestinationPath = Global.DefaultFolder;
                 }

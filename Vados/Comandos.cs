@@ -103,19 +103,42 @@ namespace Vados
         public static Dictionary<string, string> commonErrorSynonyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             //Vados
-            { "matos", "Vados" },
+            { "matos ", "Vados " },
+            { "nadas ", "Vados " },
             //Criar
-            { "fiar", "criar" },
-            { "pliar", "criar" },
+            { "fiar ", "criar " },
+            { "pliar ", "criar " },
+            { "estriar ", "criar " },
+            { "seria ", "criar " },
+            { "viar ", "criar " },
+            { "e ar ", "criar " },
+            { "prio ", "crie " },
+            { "cri ", "crie " },
+            { "trie ", "crie " },
             //Renomear
-            { "renomei", "renomeie" },
-            { "procar", "trocar" },
+            { "renomei ", "renomeie " },
+            { "procar ", "trocar " },
+            { "proque ", "troque " },
+            { "aqualize ", "atualize " },
+            //Excluir
+            { "exclure ", "excluir " },
+            { "belete ", "delete " },
+            { "pague ", "apague " },
+            { "jogforo ", "jogue fora " },
+            { "regarde fora ", "jogue fora " },
+            //Mover
+            { "vou ver ", "mover " },
+            { "deslocue ", "desloque " },
             //Duplicar
-            { "piar", "copiar" },
+            { "piar ", "copiar " },
+            { "pia ", "copie " },
+            { "cocopie ", "copie " },
+            //Abrir
+            { "processa ", "acesse " },
             //Arquivo
-            { "aqui o", "arquivo" },
+            { "aqui o ", "arquivo " },
             //Pasta
-            { "esta", "pasta" },
+            { "esta ", "pasta " },
         };
 
         #endregion
@@ -191,6 +214,10 @@ namespace Vados
             { "substitua o nome", "renomear" },
             { "substitisse o nome", "renomear" },
             { "substituiria o nome", "renomear" },
+            { "atualizar o nome", "renomear" },
+            { "atualize o nome", "renomear" },
+            { "atualizasse o nome", "renomear" },
+            { "atualizaria o nome", "renomear" },
             //Excluir
             { "excluir", "excluir" },
             { "exclua", "excluir" },
@@ -236,13 +263,21 @@ namespace Vados
             { "oblitere", "excluir" },
             { "obliterasse", "excluir" },
             { "obliteraria", "excluir" },
+            { "jogar fora", "excluir" },
+            { "jogue fora", "excluir" },
+            { "jogasse fora", "excluir" },
+            { "jogaria fora", "excluir" },
+            { "descartar", "excluir" },
+            { "descarte", "excluir" },
+            { "descartasse", "excluir" },
+            { "descartaria", "excluir" },
             //Mover
             { "mover", "mover" },
             { "mova", "mover" },
             { "movesse", "mover" },
             { "moveria", "mover" },
             { "transferir", "mover" },
-            { "transfera", "mover" },
+            { "transfira", "mover" },
             { "transferisse", "mover" },
             { "transferiria", "mover" },
             { "realocar", "mover" },
@@ -302,6 +337,30 @@ namespace Vados
             { "imite", "duplicar" },
             { "imitasse", "duplicar" },
             { "imitaria", "duplicar" },
+            { "clonar", "duplicar" },
+            { "clone", "duplicar" },
+            { "clonasse", "duplicar" },
+            { "clonaria", "duplicar" },
+            { "fazer uma cópia", "duplicar" },
+            { "faça uma cópia", "duplicar" },
+            { "fizesse uma cópia", "duplicar" },
+            { "faria uma cópia", "duplicar" },
+            { "fazer uma réplica", "duplicar" },
+            { "faça uma réplica", "duplicar" },
+            { "fizesse uma réplica", "duplicar" },
+            { "faria uma réplica", "duplicar" },
+            { "fazer uma duplicata", "duplicar" },
+            { "faça uma duplicata", "duplicar" },
+            { "fizesse uma duplicata", "duplicar" },
+            { "faria uma duplicata", "duplicar" },
+            { "fazer uma imitação", "duplicar" },
+            { "faça uma imitação", "duplicar" },
+            { "fizesse uma imitação", "duplicar" },
+            { "faria uma imitação", "duplicar" },
+            { "fazer um clone", "duplicar" },
+            { "faça um clone", "duplicar" },
+            { "fizesse um clone", "duplicar" },
+            { "faria um clone", "duplicar" },
             //Abrir
             { "abrir", "abrir" },
             { "abra", "abrir" },
@@ -327,6 +386,22 @@ namespace Vados
             { "acorde", "abrir" },
             { "acordasse", "abrir" },
             { "acordaria", "abrir" },
+            { "acessar", "abrir" },
+            { "acesse", "abrir" },
+            { "acessasse", "abrir" },
+            { "acessaria", "abrir" },
+            { "entrar", "abrir" },
+            { "entre", "abrir" },
+            { "entrasse", "abrir" },
+            { "entraria", "abrir" },
+            { "executar", "abrir" },
+            { "execute", "abrir" },
+            { "executasse", "abrir" },
+            { "executaria", "abrir" },
+            { "mostrar", "abrir" },
+            { "mostre", "abrir" },
+            { "mostrasse", "abrir" },
+            { "mostraria", "abrir" },
         };
 
         //Todas as variações dos comandos
@@ -432,7 +507,10 @@ namespace Vados
         {
             "da",
             "do",
+            "na",
+            "no",
             "do site",
+            "no site",
         };
 
         #endregion
@@ -572,6 +650,7 @@ namespace Vados
             { "as", "todos" },
             { "todos", "todos" },
             { "todos os", "todos" },
+            { "qualquer", "todos" },
             { "todas as", "todos" },
             { "cada", "todos" },
             { "metade dos", "metade" },
@@ -619,6 +698,8 @@ namespace Vados
             "com destino no",
             "no interior da",
             "no interior do",
+            "com base na",
+            "com base no",
         };
 
         //Formas de indicar a pasta de destino (comando mover)
@@ -647,29 +728,57 @@ namespace Vados
             "da",
             "do",
             "pertencente a",
+            "pertencente ao",
             "pertencentes a",
+            "pertencentes ao",
+            "com base na",
+            "com base no",
             "associado a",
+            "associado ao",
             "associada a",
+            "associada ao",
             "associados a",
+            "associados ao",
             "associadas a",
+            "associadas ao",
             "ligado a",
+            "ligado ao",
             "ligada a",
+            "ligada ao",
             "ligados a",
+            "ligados ao",
             "associadas a",
+            "associadas ao",
             "que pertence a",
+            "que pertence ao",
             "que pertencem a",
+            "que pertencem ao",
             "que esta dentro da",
+            "que esta dentro do",
             "que estao dentro da",
+            "que estao dentro do",
             "que estiver dentro da",
+            "que estiver dentro do",
             "que estiverem dentro da",
+            "que estiverem dentro do",
             "que esta no interior da",
+            "que esta no interior do",
             "que estao no interior da",
+            "que estao no interior do",
             "que estiver no interior da",
+            "que estiver no interior do",
             "que estiverem no interior da",
+            "que estiverem no interior do",
             "que esta presente na",
+            "que esta presente no",
             "que estao presentes na",
+            "que estao presentes no",
             "que estiver presente na",
+            "que estiver presente no",
             "que estiverem presentes na",
+            "que estiverem presentes no",
+            "que tenham base na",
+            "que tenham base no",
         };
 
 
@@ -771,6 +880,7 @@ namespace Vados
             "metade dos",
             "metade das",
             "cada",
+            "qualquer",
         };
 
         #endregion
@@ -887,6 +997,7 @@ namespace Vados
                 case "abrir":
                     parser = new CommandParser(criteria, new List<CriteriaExtractor>()
                     {
+                        new SizeExtractor(sizeWords, allSizeModifierWords, allSizeUnitWords),
                         new OriginExtractor(fromWords, folderWords, namingWords),
                         new ObjectExtractor((amountWords, false), (allObjects, true), (allExtensionsWords, false), (namingWords, false), true, null, true),
                     });
@@ -898,7 +1009,7 @@ namespace Vados
             }
 
             var arguments = parser.Parse(command);
-            //MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
+            MessageBox.Show($"Comando: --{criteria.Action}*\r\nObjeto: --{criteria.ObjectType}*\r\nFormato: --{criteria.ObjectFormat}\r\nQuantidade: --{criteria.ObjectAmount}\r\nNome: --{criteria.ObjectName}\r\nNovo nome: --{criteria.ObjectNewName}\r\nOrigem: --{criteria.Origin}\r\nDestino: --{criteria.Destination}\r\nTamanho: --{criteria.SizeModifier} {criteria.SizeAmount} {criteria.SizeUnit}");
 
             return arguments;
         }

@@ -172,11 +172,14 @@ namespace Vados
             string size = criteria.SizeAmount;
             string sizeUnit = criteria.SizeUnit;
             string sizeModifier = criteria.SizeModifier;
+            string originPath = criteria.OriginPath;
+            string destinationPath = criteria.DestinationPath;
 
             bool isBrowser = objectType == "site" && name == "navegador" && objectPath != "";
             bool isRecycleBin = name == "lixeira" && objectPath != "";
+            string defaultFolderName = "pasta padrão (Vados)";
             bool isDefaultFolder = objectType == "pasta" && Comandos.defaultFolderWords.Contains(name) && objectPath != "";
-            if (isDefaultFolder) name = "pasta padrão (Vados)";
+            if (isDefaultFolder) name = defaultFolderName;
 
             textBox.Text = "Você deseja";
             string commandConnector = "";
@@ -230,13 +233,13 @@ namespace Vados
             //Objeto
             if (objectType != "")
             {
-                string objectStr = " " + objectType;
+                string objectStr = objectType;
                 if (amount != "") objectStr += "s";
 
                 Global.AppendPlainText(textBox, commandConnector);  //"o", "a", "todos os", etc
 
                 if (objectType != "aplicativo" && !isBrowser && !isDefaultFolder) //Exceções
-                    Global.AppendPlainText(textBox, objectType);  //"arquivo", "pasta", etc
+                    Global.AppendPlainText(textBox, objectStr);  //"arquivo", "pasta", etc
             }
 
 
@@ -293,6 +296,9 @@ namespace Vados
                 string insideIndicator = " presente na pasta ";
                 if (amount != "") insideIndicator = " presentes na pasta ";
 
+                if (Comandos.defaultFolderWords.Contains(origin) && originPath != "")
+                    origin = defaultFolderName;
+
                 Global.AppendPlainText(textBox, insideIndicator);
                 Global.AppendFormattedText(textBox, origin, Colors.greenHighlight, bold);
             }
@@ -315,6 +321,8 @@ namespace Vados
                         break;
                 }
 
+                if (Comandos.defaultFolderWords.Contains(destination) && destinationPath != "")
+                    destination = defaultFolderName;
 
                 Global.AppendPlainText(textBox, destinationIndicator);
                 Global.AppendFormattedText(textBox, destination, Colors.greenHighlight, bold);

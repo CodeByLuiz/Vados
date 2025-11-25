@@ -425,8 +425,6 @@ namespace Vados
             }
         }
 
-
-
         private void AddExampleBox()
         {
             Label exampleLabel = new Label
@@ -443,7 +441,7 @@ namespace Vados
             {
                 BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
-                Height = 200,
+                Height = 240,
                 Margin = new Padding(5, 5, 5, 80),
                 Padding = new Padding(10)
             };
@@ -462,7 +460,6 @@ namespace Vados
                 Height = examplePanel.Height - 20
             };
 
-            // Evitar foco e seleção
             exampleRichTextBox.GotFocus += (s, e) => this.ActiveControl = null;
             exampleRichTextBox.MouseDown += (s, e) => exampleRichTextBox.SelectionLength = 0;
             exampleRichTextBox.SelectionChanged += (s, e) => exampleRichTextBox.SelectionLength = 0;
@@ -488,7 +485,6 @@ namespace Vados
 
 
 
-
         private void SetupNavBar()
         {
             // Painel principal da NavBar
@@ -497,14 +493,12 @@ namespace Vados
                 Width = 320,
                 BackColor = Color.FromArgb(48, 61, 99),
                 Location = new Point(0, 0),
-                Height = this.Height,   // ocupa altura toda
+                Height = this.Height,   
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left
             };
             this.Controls.Add(panelNav);
 
-            // ------------------------------------------------------------
-            // 1) PAINEL FIXO (LOGO + TÍTULO + LINHAS)
-            // ------------------------------------------------------------
+          
             panelNavFixed = new Panel
             {
                 Width = panelNav.Width,
@@ -513,10 +507,9 @@ namespace Vados
                 BackColor = Color.FromArgb(48, 61, 99)
             };
 
-            // ADICIONE O FIXO PRIMEIRO
             panelNav.Controls.Add(panelNavFixed);
 
-            // Logo (não centralize por Width aqui — ele ainda é 0)
+            
             PictureBox pictureLogo = new PictureBox
             {
                 Image = Image.FromFile("Images/LogoBranco.png"),
@@ -524,7 +517,7 @@ namespace Vados
                 Width = 200,
                 Height = 200,
                 Top = 10,
-                Left = (320 - 200) / 2  // 320 = largura do panelNav
+                Left = (320 - 200) / 2  
             };
             panelNavFixed.Controls.Add(pictureLogo);
 
@@ -566,9 +559,7 @@ namespace Vados
             };
             panelNavFixed.Controls.Add(lblTitle);
 
-            // ------------------------------------------------------------
-            // 2) PARTE ROLÁVEL
-            // ------------------------------------------------------------
+         
             flowScrollable = new FlowLayoutPanel
             {
                 AutoScroll = true,
@@ -581,12 +572,10 @@ namespace Vados
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left
             };
 
-            // ADICIONE O ROLÁVEL DEPOIS
+          
             panelNav.Controls.Add(flowScrollable);
 
-            // NÃO USE MAIS SetChildIndex => CAUSA SOBREPOSIÇÃO ❌
-
-            // Agora adicione as seções:
+            
             AddSection(flowScrollable, "Pastas", @"Images/Icons/pasta.png", new[]
             {
         "Criar uma pasta", "Abrir uma pasta",
@@ -1168,7 +1157,7 @@ namespace Vados
             Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’ ", Color.Black, descBold);
             Global.AppendPlainText(exampleRichTextBox, "que ");
             Global.AppendFormattedText(exampleRichTextBox, "‘filtro’.\n ", Color.Black, descBold);
-            Global.AppendFormattedText(exampleRichTextBox, "“Excluir os arquivos da pasta ‘Fotos’ que tenham o nome ‘Praia’.”\r\n“Mova todos os arquivos da pasta ‘Escola’ que sejam ‘.txt’ para a pasta ‘Atividades’.”\r\n“Copiar os arquivos da pasta ‘Gravações’ de depois de 2022 par a pasta ‘Vídeos’.”\r\n“Delete todos os arquivos maiores que 10mb.”\r\n“Mover todos os arquivos da pasta ‘Selfies’ para a pasta ‘Fotos’.”", Color.FromArgb(125, 125, 125), exRegular);
+            Global.AppendFormattedText(exampleRichTextBox, "“Excluir os arquivos da pasta ‘Fotos’ que tenham o nome ‘Praia’.”\r\n“Mova todos os arquivos da pasta ‘Escola’ que sejam ‘.txt’ para a pasta ‘Atividades’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
 
             

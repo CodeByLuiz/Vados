@@ -24,6 +24,7 @@ using NAudio.Wave;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
 using System.Reflection.Metadata.Ecma335;
+using Newtonsoft.Json.Linq;
 //using static System.Net.Mime.MediaTypeNames;
 
 namespace Vados
@@ -123,6 +124,8 @@ namespace Vados
             //Excluir
             { "exclure ", "excluir " },
             { "belete ", "delete " },
+            { "pagar ", "apagar " },
+            { "agora ", "apagar " },
             { "pague ", "apague " },
             { "jogforo ", "jogue fora " },
             { "regarde fora ", "jogue fora " },
@@ -131,6 +134,7 @@ namespace Vados
             { "deslocue ", "desloque " },
             //Duplicar
             { "piar ", "copiar " },
+            { "opear ", "copiar " },
             { "pia ", "copie " },
             { "cocopie ", "copie " },
             //Abrir
@@ -2449,7 +2453,7 @@ namespace Vados
                     File.Copy(path, newPath, false);
                 }
 
-                OpenFileExplorer(newPath, false);
+                //OpenFileExplorer(newPath, false);
                 return "";
             }
 
@@ -2633,6 +2637,86 @@ namespace Vados
             //Reescrever linhas do arquivo
             File.WriteAllLines(testsPath, lines);
             ExecutarCaminho(testsPath);
+        }
+
+
+        public static string GenerateRandomFileName(string extension)
+        {
+            string start = "";
+
+            //Tipo de arquivo
+            switch(extension)
+            {
+                case "jpg":
+                    start = "IMG";
+                    break;
+                case "mp4":
+                    start = "VID";
+                    break;
+            }
+
+            //Data
+            int minYear = 2016;
+            int maxYear = 2025;
+            int maxMonth = 12;
+            int maxDay = 31;
+            int maxHours = 23;
+            int maxMinutes = 59;
+            int maxSeconds = 59;
+
+            Random random = new Random();
+            string year = random.Next(minYear, maxYear).ToString();
+            string month = random.Next(1, maxMonth).ToString();
+            if (month.Length == 1) month = "0" + month;
+            string day = random.Next(1, maxDay).ToString();
+            if (day.Length == 1) day = "0" + day;
+            string hour = random.Next(0, maxHours).ToString();
+            if (hour.Length == 1) hour = "0" + hour;
+            string minute = random.Next(0, maxMinutes).ToString();
+            if (minute.Length == 1) minute = "0" + minute;
+            string second = random.Next(0, maxSeconds).ToString();
+            if (second.Length == 1) second = "0" + second;
+
+            //Nome final
+            return start + "_" + year + month + day + "_" + hour + minute + second + "." + extension;
+        }
+
+
+        public static void CreateRandomFiles(int fileAmount, string folderPath, List<string> imageFiles, List<string> videoFiles, int videoChance)
+        {
+            Random random = new Random();
+
+            //Copiar arquivos
+            int count = 0;
+            while(count < fileAmount)
+            {
+                //Tipo de arquivo
+                List<string> files = imageFiles;
+                string extension = "jpg";
+                int chance = random.Next(0, 100);
+                if (chance <= videoChance)
+                {
+                    extension = "mp4";
+                    files = videoFiles;
+                }
+
+                //Escolher um arquivo aleatório
+                int randomIndex = random.Next(0, files.Count);
+                string filePath = files[randomIndex];
+                List<string> file = new List<string>() { filePath };
+
+                //Novo nome do arquivo
+                string randomName = GenerateRandomFileName(extension);
+
+                //Copiar e renomear
+                string oldName = Path.GetFileName(filePath);
+                DuplicarArquivo(file, folderPath);
+                RenomearArquivo(oldName, randomName, folderPath);
+
+                count += 1;
+            }
+
+            MessageBox.Show("criados");
         }
     }
 

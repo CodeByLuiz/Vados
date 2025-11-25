@@ -256,10 +256,34 @@ namespace Vados
                 return;
             }
 
-            //Realizer testes
+            //Realizar testes
             if (command == "teste")
             {
                 Comandos.TestCases();
+                return;
+            }
+
+            //Criar arquivos aleatorios
+            if (command == "random")
+            {
+                List<string> images = new List<string>()
+                {
+                    @"C:\Users\lungu\Viagens\cachoeira-2025.jpg",
+                    @"C:\Users\lungu\Viagens\Cristo-Redentor-Rio-de-Janeiro-2024.jpg",
+                    @"C:\Users\lungu\Viagens\paris-2024.jpg",
+                    @"C:\Users\lungu\Viagens\ponte-paris-2024.jpg",
+                    @"C:\Users\lungu\Viagens\praia-2025.jpg",
+                    @"C:\Users\lungu\Viagens\praia-aventureiro-2024.webp",
+                    @"C:\Users\lungu\Viagens\praia-com-coqueiro-ao-por-do-sol_2025.jpg"
+                };
+                List<string> videos = new List<string>()
+                {
+                    @"C:\Users\lungu\Viagens\Corcovado-Cristo-Redentor-Rio-de-Janeiro.mp4",
+                    @"C:\Users\lungu\Viagens\praia-2025.mp4"
+                };
+
+                string folderPath = @"C:\Users\lungu\Viagens\Celular";
+                Comandos.CreateRandomFiles(1, folderPath, images, videos, 15);
                 return;
             }
 

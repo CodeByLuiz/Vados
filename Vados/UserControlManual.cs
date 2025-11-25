@@ -1223,7 +1223,7 @@ namespace Vados
 
             Global.AppendFormattedText(exampleRichTextBox, "Mover o arquivo", Color.Black, exUnderline);
             Global.AppendFormattedText(exampleRichTextBox, " ‘nome do arquivo’ ", Color.Black, exBold);
-            Global.AppendPlainText(descriptionBox, "para a pasta ");
+            Global.AppendPlainText(exampleRichTextBox, "para a pasta ");
             Global.AppendFormattedText(exampleRichTextBox, "‘nome da pasta’.\n", Color.Black, exBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Mover o arquivo ‘Currículo’ para a pasta ‘Trabalho’.”\r\n“Mova o arquivo chamado ‘Redações’ para a pasta padrão.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
@@ -1246,7 +1246,7 @@ namespace Vados
             AddDescriptionToContent();
             Global.AppendPlainText(descriptionBox, "Esse comando requer apenas um parâmetro: o ");
             Global.AppendFormattedText(descriptionBox, "nome do site ", Colors.greenHighlight, descBold);
-            Global.AppendPlainText(descriptionBox, "ou o");
+            Global.AppendPlainText(descriptionBox, "ou o ");
             Global.AppendFormattedText(descriptionBox, "link do site", Colors.greenHighlight, descBold);
             Global.AppendPlainText(descriptionBox, ".");
 

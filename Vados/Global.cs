@@ -396,6 +396,8 @@ public static UserControlHome userControlHome;
         //Adiciona texto simples a uma RichTextBox
         public static void AppendPlainText(RichTextBox textBox, string text)
         {
+            if(textBox == null)
+                return;
             //Iniciar seleção no fim da string
             textBox.SelectionStart = textBox.TextLength;
             textBox.SelectionLength = 0;
@@ -412,6 +414,8 @@ public static UserControlHome userControlHome;
         //Adiciona texto formatado a uma RichTextBox
         public static void AppendFormattedText(RichTextBox textBox, string text, Color color, Font font)
         {
+            if (textBox == null)
+                return;
             //Iniciar seleção no fim da string
             textBox.SelectionStart = textBox.TextLength;
             textBox.SelectionLength = 0;

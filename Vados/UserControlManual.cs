@@ -394,6 +394,7 @@ namespace Vados
 
 
 
+
         private void AddImageToContent(string caminhoimagem)
         {
             if (System.IO.File.Exists(caminhoimagem))
@@ -428,7 +429,6 @@ namespace Vados
 
         private void AddExampleBox()
         {
-
             Label exampleLabel = new Label
             {
                 Text = "Exemplos:",
@@ -439,17 +439,14 @@ namespace Vados
                 Margin = new Padding(0, 0, 10, 0)
             };
 
-
             Panel examplePanel = new Panel
             {
                 BackColor = Color.FromArgb(231, 231, 231),
                 Width = 480,
                 Height = 200,
                 Margin = new Padding(5, 5, 5, 80),
-                Padding = new Padding(10),
-
+                Padding = new Padding(10)
             };
-
 
             exampleRichTextBox = new RichTextBox
             {
@@ -462,15 +459,15 @@ namespace Vados
                 Margin = new Padding(10),
                 Dock = DockStyle.Fill,
                 Width = examplePanel.Width - 100,
-                Height = examplePanel.Height - 20,
+                Height = examplePanel.Height - 20
             };
 
+            // Evitar foco e seleção
             exampleRichTextBox.GotFocus += (s, e) => this.ActiveControl = null;
             exampleRichTextBox.MouseDown += (s, e) => exampleRichTextBox.SelectionLength = 0;
             exampleRichTextBox.SelectionChanged += (s, e) => exampleRichTextBox.SelectionLength = 0;
 
             examplePanel.Controls.Add(exampleRichTextBox);
-
 
             FlowLayoutPanel container = new FlowLayoutPanel
             {
@@ -478,18 +475,18 @@ namespace Vados
                 AutoSize = true,
                 WrapContents = false,
                 Margin = new Padding(60, 20, 0, 0),
-                Padding = new Padding(0),
+                Padding = new Padding(0)
             };
-
 
             container.Controls.Add(exampleLabel);
             container.Controls.Add(examplePanel);
-
 
             tableLayoutContent.RowCount++;
             tableLayoutContent.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             tableLayoutContent.Controls.Add(container, 0, tableLayoutContent.RowCount - 1);
         }
+
+
 
 
         private void SetupNavBar()
@@ -847,7 +844,7 @@ namespace Vados
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
-            AddImageToContent(@"Images\imagem-nao-encontrada.jpg");
+            AddImageToContent(@"Images\prints\Pastas\AbrirPasta.png");
 
             AddSecundaryDescriptionToContent();
             Global.AppendPlainText(secundarydescriptionBox, "Esse comando precisa de um único fator, o ");
@@ -876,6 +873,7 @@ namespace Vados
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
+            AddImageToContent(@"Images\prints\Pastas\RenomearPasta.png");
 
 
 
@@ -980,7 +978,7 @@ namespace Vados
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
-
+            AddImageToContent(@"Images\prints\Pastas\DuplicarPasta.png");
 
 
             AddDescriptionToContent();
@@ -1043,6 +1041,10 @@ namespace Vados
             Global.AppendPlainText(descriptionBox, ". Os arquivos criados são encontrados na pasta padrão do aplicativo, chamada “vados”. Caso um arquivo seja criado com o mesmo nome de outro já existente, seu nome terá um número na frente, de forma ascendente, para que possa ser distinguido. ");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
+
+
+
+            AddImageToContent(@"Images\prints\Arquivos\CriarArquivo.png");
 
 
             AddDescriptionToContent();
@@ -1109,6 +1111,8 @@ namespace Vados
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
 
 
+            AddImageToContent(@"Images\prints\Arquivos\DuplicarArquivo.png");
+
             AddDescriptionToContent();
 
             Global.AppendPlainText(descriptionBox, "Esse comando precisa apenas um fator, o ");
@@ -1166,6 +1170,8 @@ namespace Vados
             Global.AppendFormattedText(exampleRichTextBox, "‘filtro’.\n ", Color.Black, descBold);
             Global.AppendFormattedText(exampleRichTextBox, "“Excluir os arquivos da pasta ‘Fotos’ que tenham o nome ‘Praia’.”\r\n“Mova todos os arquivos da pasta ‘Escola’ que sejam ‘.txt’ para a pasta ‘Atividades’.”\r\n“Copiar os arquivos da pasta ‘Gravações’ de depois de 2022 par a pasta ‘Vídeos’.”\r\n“Delete todos os arquivos maiores que 10mb.”\r\n“Mover todos os arquivos da pasta ‘Selfies’ para a pasta ‘Fotos’.”", Color.FromArgb(125, 125, 125), exRegular);
             exampleRichTextBox.Rtf = Global.RtfChangeFont(exampleRichTextBox.Rtf, exRegular, exActualBold);
+
+            
         }
 
         private void LoadRenomearArquivoContent()
@@ -1178,6 +1184,9 @@ namespace Vados
             Global.AppendPlainText(descriptionBox, ". Com esse comando também é possívelm alterar a extensão do arquivo. ");
 
             descriptionBox.Rtf = Global.RtfChangeFont(descriptionBox.Rtf, descRegular, descActualBold);
+
+
+            AddImageToContent(@"Images\prints\Arquivos\RenomearArquivo.png");
 
 
             AddDescriptionToContent();

@@ -1102,41 +1102,8 @@ namespace Vados
         }
 
 
-        //Botão das configurações
-        private void btnConfigs_Paint(object sender, PaintEventArgs e)
-        {
-            int yy = (btnConfigs.Height - btnConfigs.Width) / 2;
-
-            //Sombra
-            e.Graphics.DrawImage(btnConfigsShadow, new Rectangle(0, yy + 3, btnConfigs.Width, btnConfigs.Width));
-
-            //Imagem normal
-            e.Graphics.DrawImage(btnConfigs.Image, new Rectangle(0, yy, btnConfigs.Width, btnConfigs.Width));
-        }
-
-        private void btnConfigs_Click(object sender, EventArgs e) => loadPage?.Invoke(this, new LoadPageEventArgs(Global.userControlSettings));
-        private void btnConfigs_MouseEnter(object sender, EventArgs e)
-        {
-            btnConfigs.Image = btnConfigsImageHover;
-
-            //Nome do botão
-            lblButtonName.Text = "Configurações";
-
-            Global.LabelFitWidth(lblButtonName);
-            int btnX = btnConfigs.Location.X + btnConfigs.Width / 2 - lblButtonName.Width / 2;
-            int btnY = btnConfigs.Location.Y + btnConfigs.Height;
-            lblButtonName.Location = new Point(btnX, btnY);
-
-            lblButtonName.Visible = true;
-            lblButtonName.Enabled = true;
-        }
-        private void btnConfigs_MouseLeave(object sender, EventArgs e)
-        {
-            btnConfigs.Image = btnConfigsImage;
-            lblButtonName.Visible = false;
-            lblButtonName.Enabled = false;
-        }
-
+ 
+      
 
         //Botão do histórico
         private bool historyOpen = false;

@@ -50,7 +50,32 @@
     <None Remove="Images\LogoAzul.png" />
     <None Remove="Images\LogoBranco.png" />
     <None Remove="Images\micIcon.png" />
+    <None Remove="Images\prints\Arquivos\Criar Arquivo.png" />
+    <None Remove="Images\prints\Arquivos\CriarArquivo.png" />
+    <None Remove="Images\prints\Arquivos\DuplicarArquivo.png" />
+    <None Remove="Images\prints\Arquivos\RenomearArquivo.png" />
+    <None Remove="Images\prints\Pastas\Abrir Pasta Padrão.png" />
+    <None Remove="Images\prints\Pastas\Abrir Pasta.png" />
+    <None Remove="Images\prints\Pastas\AbrirPasta.png" />
+    <None Remove="Images\prints\Pastas\AbrirPastaPadrão.png" />
+    <None Remove="Images\prints\Pastas\CriarPasta.png" />
+    <None Remove="Images\prints\Pastas\Duplicar pasta.png" />
+    <None Remove="Images\prints\Pastas\DuplicarPasta.png" />
+    <None Remove="Images\prints\Pastas\Renomear pasta.png" />
+    <None Remove="Images\prints\Pastas\RenomearPasta.png" />
     <None Remove="Models\ggml-base.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\prints\Arquivos\CriarArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Arquivos\DuplicarArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Arquivos\RenomearArquivo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -184,6 +209,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\LogoBranco.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\AbrirPasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\AbrirPastaPadrão.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\CriarPasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\DuplicarPasta.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\prints\Pastas\RenomearPasta.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -6,7 +6,7 @@ Período: Fevereiro de 2025 – Novembro de 2025
 
 ---
 
-##Sobre o Projeto
+## Sobre o Projeto
 
 O **V.A.D.O.S** é um assistente virtual para desktop desenvolvido com o objetivo de aumentar a produtividade por meio da automação de tarefas no sistema operacional, utilizando comandos de voz e texto.
 
@@ -43,7 +43,7 @@ O V.A.D.O.S possui uma interface simples e intuitiva, desenvolvida para atender 
 
 ---
 
-##Impacto do Projeto
+## Impacto do Projeto
 
 O projeto demonstra como soluções de automação podem:
 

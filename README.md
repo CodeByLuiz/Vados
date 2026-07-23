@@ -72,10 +72,10 @@ Durante o desenvolvimento deste projeto, foram aplicadas e aprimoradas habilidad
 Projeto desenvolvido em equipe como parte do curso técnico em Desenvolvimento de Sistemas.
 
 **Integrantes do grupo:**
-Luiz André Almeida dos Santos
-Pedro de Oliveira Pelegrino
-Miguel Sievert Rodrigues
-Matheus Lunguinho de Moura
+Luiz André Almeida dos Santos,
+Pedro de Oliveira Pelegrino,
+Miguel Sievert Rodrigues,
+Matheus Lunguinho de Moura,
 
 **Orientação:**
 

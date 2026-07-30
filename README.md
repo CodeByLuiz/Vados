@@ -45,4 +45,4 @@ Os itens abaixo nao foram implementados na versao original por restricao de praz
 - Comando para alterar brilho
 - Comando para alterar horario
 
-A ser definida.
+A

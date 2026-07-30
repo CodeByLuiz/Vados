@@ -1,85 +1,68 @@
-# V.A.D.O.S  
-**Virtual Assistant for Dynamic Operations in the System**
+# Vados
 
-Projeto desenvolvido como Trabalho de Conclusão de Curso (TCC) na ETEC Anna de Oliveira Ferraz  
-Período: Fevereiro de 2025 – Novembro de 2025  
+Virtual Assistant for Dynamic Operations in the System
 
----
+Vados e um assistente virtual para desktop que permite controlar o computador atraves de comandos de voz ou texto, com foco em simplicidade e acessibilidade para usuarios com pouca familiaridade com tecnologia.
 
-## Sobre o Projeto
+Este e um fork do projeto original, desenvolvido como Trabalho de Conclusao de Curso (TCC) do Tecnico em Desenvolvimento de Sistemas na Etec "Profa. Anna de Oliveira Ferraz" (2025).
 
-O **V.A.D.O.S** é um assistente virtual para desktop desenvolvido com o objetivo de aumentar a produtividade por meio da automação de tarefas no sistema operacional, utilizando comandos de voz e texto.
+## Sobre o projeto
 
-A proposta do projeto é reduzir interações manuais repetitivas, tornando o uso do computador mais eficiente, rápido e intuitivo.
+O Vados foi desenvolvido com foco em tornar o uso do computador mais pratico para pessoas sem familiaridade com tecnologia. Em comparacao com assistentes semelhantes (Cortana, Simon, XULIA, Dragon NaturallySpeaking), o projeto prioriza:
 
----
+- Simplicidade: interface intuitiva, sem funcionalidades desnecessarias
+- Acessibilidade: comandos por voz ou texto, adequados a qualquer nivel de experiencia
+- Confiabilidade: confirmacao de comandos antes da execucao, reduzindo erros
 
 ## Funcionalidades
 
-O sistema permite a execução automatizada de diversas ações, incluindo:
+- Reconhecimento de comandos de voz, com opcoes de pausa e encerramento
+- Comandos por texto como alternativa ao comando de voz
+- Manipulacao de arquivos e pastas
+- Execucao de aplicativos e sites
+- Confirmacao de comando antes da execucao
+- Historico de comandos, com opcoes de edicao e exclusao
+- Manual de comandos integrado, organizado por categoria, com exemplos de uso
+- Mensagens de sucesso ou falha apos a execucao do comando
 
-### Manipulação de arquivos e pastas
-- Criação  
-- Exclusão  
-- Renomeação  
-- Cópia  
-- Movimentação  
+## Tecnologias utilizadas
 
-### Automação de sistema
-- Execução de programas  
-- Abertura de sites  
+- C#
+- Reconhecimento de voz e processamento de fala
+- Conceitos de Processamento de Linguagem Natural (NLP)
 
-### Aplicação de critérios personalizados
-- Nome de arquivos  
-- Local de origem  
-- Tamanho  
-- Outros parâmetros para maior precisão nas operações  
+## Funcionalidades planejadas
 
----
+Os itens abaixo nao foram implementados na versao original por restricao de prazo:
 
-## Interface
+- Aba de configuracoes
+- Selecao de dispositivo de entrada de audio
+- Teste de microfone
+- Selecao de tema
+- Selecao de idioma
+- Aba "Sobre nos"
+- Comando para alterar volume
+- Comando para alterar brilho
+- Comando para alterar horario
 
-O V.A.D.O.S possui uma interface simples e intuitiva, desenvolvida para atender tanto usuários iniciantes quanto usuários mais experientes que buscam agilidade no dia a dia.
+## Como executar
 
----
+```bash
+git clone <url-do-repositorio>
+cd vados
+```
 
-## Impacto do Projeto
+Requisitos e passos de build/execucao a serem definidos de acordo com o ambiente do projeto.
 
-O projeto demonstra como soluções de automação podem:
 
-- Reduzir erros operacionais  
-- Padronizar processos  
-- Aumentar a produtividade  
-- Melhorar o fluxo de trabalho  
+## Contexto academico
 
-Especialmente em tarefas repetitivas.
+Projeto original desenvolvido por Luiz Andre Almeida dos Santos, Matheus Lunguinho de Moura, Miguel Sievert Rodrigues e Pedro de Oliveira Pelegrino, como Trabalho de Conclusao de Curso apresentado na Etec "Profa. Anna de Oliveira Ferraz", sob orientacao da Profa. Erica Scache Fabri. Aprovado em 26 de novembro de 2025.
 
----
+## Contribuindo
 
-## Aprendizados
+Sugestoes, issues e pull requests sao bem-vindos.
 
-Durante o desenvolvimento deste projeto, foram aplicadas e aprimoradas habilidades como:
+## Licenca
 
-- Desenvolvimento de software  
-- Organização e estruturação de projetos  
-- Trabalho em equipe  
-- Resolução de problemas  
-
----
-
-## Equipe
-
-Projeto desenvolvido em equipe como parte do curso técnico em Desenvolvimento de Sistemas.
-
-**Integrantes do grupo:**
-Luiz André Almeida dos Santos,
-Pedro de Oliveira Pelegrino,
-Miguel Sievert Rodrigues,
-Matheus Lunguinho de Moura,
-
-**Orientação:**
-
-- Prof.ª Érica Scache Fabri  
-- Prof.ª Gabriela dos Santos Gimenes  
-
----
+A ser definida.

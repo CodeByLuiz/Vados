@@ -45,24 +45,4 @@ Os itens abaixo nao foram implementados na versao original por restricao de praz
 - Comando para alterar brilho
 - Comando para alterar horario
 
-## Como executar
-
-```bash
-git clone <url-do-repositorio>
-cd vados
-```
-
-Requisitos e passos de build/execucao a serem definidos de acordo com o ambiente do projeto.
-
-
-## Contexto academico
-
-Projeto original desenvolvido por Luiz Andre Almeida dos Santos, Matheus Lunguinho de Moura, Miguel Sievert Rodrigues e Pedro de Oliveira Pelegrino, como Trabalho de Conclusao de Curso apresentado na Etec "Profa. Anna de Oliveira Ferraz", sob orientacao da Profa. Erica Scache Fabri. Aprovado em 26 de novembro de 2025.
-
-## Contribuindo
-
-Sugestoes, issues e pull requests sao bem-vindos.
-
-## Licenca
-
 A ser definida.

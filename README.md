@@ -2,7 +2,7 @@
 
 Sistema desktop desenvolvido em equipe com foco na automação de tarefas do sistema operacional através de comandos de texto e voz, permitindo manipulação automatizada de arquivos, execução de programas e otimização do fluxo de trabalho do usuário.
 
-⚙ Stack utilizada:
+ Stack utilizada:
 - C#
 - .NET 8
 - Windows Forms

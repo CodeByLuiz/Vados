@@ -1,48 +1,85 @@
 # Vados
 
-Virtual Assistant for Dynamic Operations in the System
+Vados (Virtual Assistant for Dynamic Operations in the System) é um assistente virtual para desktop feito em C#. Ele permite que a pessoa execute tarefas comuns do computador, como criar pastas, mover arquivos ou abrir um site, escrevendo ou falando o que quer fazer, em vez de fazer o processo manualmente.
 
-Vados e um assistente virtual para desktop que permite controlar o computador atraves de comandos de voz ou texto, com foco em simplicidade e acessibilidade para usuarios com pouca familiaridade com tecnologia.
+O projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso Técnico em Desenvolvimento de Sistemas da Etec Profª Anna de Oliveira Ferraz (Araraquara), e aprovado pela banca em 26 de novembro de 2025.
 
-Este e um fork do projeto original, desenvolvido como Trabalho de Conclusao de Curso (TCC) do Tecnico em Desenvolvimento de Sistemas na Etec "Profa. Anna de Oliveira Ferraz" (2025).
+## Por que o Vados existe
 
-## Sobre o projeto
+Assistentes de voz para computador já existem. Cortana, Simon, XULIA e Dragon NaturallySpeaking foram alguns dos que analisamos durante a pesquisa. Todos têm reconhecimento de voz, mas, na análise que fizemos, identificamos fatores que aumentam a complexidade desses programas, como a customização de comandos e funções desnecessárias.
 
-O Vados foi desenvolvido com foco em tornar o uso do computador mais pratico para pessoas sem familiaridade com tecnologia. Em comparacao com assistentes semelhantes (Cortana, Simon, XULIA, Dragon NaturallySpeaking), o projeto prioriza:
+O Vados foi pensado para ser simples e intuitivo: a pessoa deve entender o aplicativo e começar a usá-lo o quanto antes, sem se confundir com excesso de funcionalidades. O público principal são pessoas com pouca experiência com computadores.
 
-- Simplicidade: interface intuitiva, sem funcionalidades desnecessarias
-- Acessibilidade: comandos por voz ou texto, adequados a qualquer nivel de experiencia
-- Confiabilidade: confirmacao de comandos antes da execucao, reduzindo erros
+## Como funciona
+
+A tela principal tem um botão de microfone no centro e, logo abaixo, uma caixa para digitar o comando. Na parte superior ficam os atalhos para o histórico, o manual e as configurações.
+
+O fluxo de um comando é sempre o mesmo:
+
+1. A pessoa fala (ou escreve) o que quer fazer, em linguagem natural.
+2. O Vados interpreta e mostra uma janela de confirmação com o que entendeu, por exemplo: "Você deseja renomear a pasta chamada viagens para fotos?".
+3. Se a pessoa confirmar, o comando é executado, com uma mensagem indicando o andamento.
+4. Se algo der errado, aparece o motivo do erro. A pessoa pode descartar a mensagem ou clicar em "Editar", que devolve o comando para a caixa de texto para ser corrigido.
+
+Durante a gravação por voz, o áudio aparece como barras animadas, junto com a duração e os botões de pausar e encerrar.
 
 ## Funcionalidades
 
-- Reconhecimento de comandos de voz, com opcoes de pausa e encerramento
-- Comandos por texto como alternativa ao comando de voz
-- Manipulacao de arquivos e pastas
-- Execucao de aplicativos e sites
-- Confirmacao de comando antes da execucao
-- Historico de comandos, com opcoes de edicao e exclusao
-- Manual de comandos integrado, organizado por categoria, com exemplos de uso
-- Mensagens de sucesso ou falha apos a execucao do comando
+Comandos disponíveis:
 
-## Tecnologias utilizadas
+- Pastas: criar, abrir, renomear, excluir, mover e duplicar.
+- Arquivos: criar, abrir, renomear, excluir, mover, duplicar e operar sobre vários arquivos de uma vez.
+- Aplicativos e sites: execução de aplicativos e abertura de sites.
 
-- C#
-- Reconhecimento de voz e processamento de fala
-- Conceitos de Processamento de Linguagem Natural (NLP)
+O Vados aceita mais de uma forma de dizer um mesmo comando. Exemplos de comandos que aparecem no histórico e nas telas do TCC:
 
-## Funcionalidades planejadas
+```
+criar uma pasta chamada Videos dentro da pasta praia
+renomear a pasta chamada "viagens" para "fotos"
+mover todos os arquivos com nome praia da pasta viagens para a pasta praia
+criar um arquivo de texto chamado teste
+abrir o site youtube
+abrir o programa gamemaker
+```
 
-Os itens abaixo nao foram implementados na versao original por restricao de prazo:
+Outros recursos do aplicativo:
 
-- Aba de configuracoes
-- Selecao de dispositivo de entrada de audio
-- Teste de microfone
-- Selecao de tema
-- Selecao de idioma
-- Aba "Sobre nos"
-- Comando para alterar volume
-- Comando para alterar brilho
-- Comando para alterar horario
+- Reconhecimento de voz e entrada por texto.
+- Confirmação antes de executar qualquer comando, para evitar acidentes.
+- Histórico de comandos com título, texto original e data e hora. Cada item pode ser editado (volta para a caixa de texto) ou apagado.
+- Manual integrado, com uma página por comando contendo descrição, imagem ilustrativa e exemplos. Os comandos ficam listados em uma barra lateral, separados por categoria. Esse manual nativo é uma característica que não encontramos nos sistemas semelhantes que pesquisamos.
 
-A
+As pastas criadas pelo comando "Criar pasta" ficam na pasta padrão do aplicativo, chamada `Vados`. Se já existir uma pasta com o mesmo nome, o nome da nova pasta recebe um número na frente, em ordem crescente, para que elas possam ser distinguidas.
+
+## Estrutura de dados
+
+O diagrama entidade-relacionamento do projeto (seção 2.2 do documento do TCC) tem duas entidades: Usuário, identificado por um UUID, e Comando, com identificador, tipo do comando, data e hora e caminhos alvo. Um usuário pode usar vários comandos.
+
+## Como executar
+
+O Vados é um aplicativo desktop e usa o microfone do computador para os comandos de voz.
+
+
+## Limitações conhecidas
+
+Por falta de tempo, e por termos priorizado as funções principais, algumas coisas previstas ficaram de fora:
+
+- A tela de configurações existe na interface, mas não tem funcionamento. Ficaram de fora a escolha do dispositivo de entrada de áudio, o teste de microfone, a escolha de tema, a escolha de idioma e a aba "Sobre nós".
+- Os comandos de alterar volume, brilho e horário não foram implementados.
+
+## Próximos passos
+
+- Ampliar a variedade de comandos.
+- Implementar a tela de configurações (teste de microfone, dispositivo de entrada de áudio e informações de contato para dúvidas).
+
+## Equipe
+
+- Luiz André Almeida dos Santos
+- Matheus Lunguinho de Moura
+- Miguel Sievert Rodrigues
+- Pedro de Oliveira Pelegrino
+
+Orientadora: Profª Erica Scache Fabri
+Avaliadora: Profª Gabriela dos Santos Gimenes
+
+Etec Profª Anna de Oliveira Ferraz, Centro Paula Souza, 2025.
